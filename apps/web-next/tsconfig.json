@@ -1,0 +1,62 @@
+{
+  "compilerOptions": {
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "incremental": true,
+    "noImplicitAny": false,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "paths": {
+      "@/*": [
+        "./*"
+      ],
+      "@repo/components": [
+        "../../packages/components-ui/src"
+      ],
+      "@repo/auth": [
+        "../../packages/auth/src"
+      ],
+      "@repo/api-bridge": [
+        "../../packages/api-bridge/src"
+      ],
+      "@repo/i18n": [
+        "../../packages/i18n/src"
+      ],
+      "@repo/exercises": [
+        "../../packages/exercises/src"
+      ],
+      "@repo/edu-editor": [
+        "../../packages/edu-editor/src"
+      ],
+      "@repo/variables": [
+        "../../packages/variables/src"
+      ]
+    },
+    "target": "ES2017"
+  },
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}

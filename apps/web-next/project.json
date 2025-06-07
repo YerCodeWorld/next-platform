@@ -1,0 +1,7 @@
+{
+  "name": "web-next",
+  "framework": "nextjs",
+  "buildCommand": "cd ../.. && pnpm build:vercel",
+  "installCommand": "cd ../.. && pnpm install",
+  "outputDirectory": ".next"
+}

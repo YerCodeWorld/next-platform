@@ -1,0 +1,27 @@
+{
+  "name": "eduplatform",
+  "private": true,
+  "scripts": {
+    "dev": "turbo run dev --parallel",
+    "dev:scss": "turbo run dev build:scss --parallel",
+    "build": "turbo run build",
+    "build:vercel": "turbo run db:generate build:scss && turbo run build --filter=web-next",
+    "lint": "turbo run lint",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "check-types": "turbo run check-types",
+    "clean": "turbo run clean",
+    "start": "turbo run start"
+  },
+  "devDependencies": {
+    "prettier": "^3.5.3",
+    "turbo": "^2.5.4",
+    "typescript": "5.8.2"
+  },
+  "packageManager": "pnpm@9.0.0",
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "next": "^15.3.3"
+  }
+}

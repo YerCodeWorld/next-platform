@@ -1,0 +1,868 @@
+// packages/components/assets/sass/utilities/_responsive-fixes.scss
+// 🔥 CRITICAL RESPONSIVE FIXES - Phase 2
+
+// Global Responsive Spacing System
+:root {
+  // 🔥 NEW: Adaptive spacing that scales with viewport
+  --spacing-responsive-xs: clamp(0.5rem, 2vw, 1rem);
+  --spacing-responsive-sm: clamp(1rem, 3vw, 1.5rem);
+  --spacing-responsive-md: clamp(1.5rem, 4vw, 2.5rem);
+  --spacing-responsive-lg: clamp(2rem, 5vw, 4rem);
+  --spacing-responsive-xl: clamp(3rem, 6vw, 6rem);
+
+  // Container padding that adapts to screen size
+  --container-padding: clamp(1rem, 5vw, 4rem);
+  --section-padding: clamp(2rem, 8vw, 8rem);
+
+  // Touch-friendly targets
+  --touch-target-min: 44px;
+}
+
+// 🎯 BANNER MOBILE OPTIMIZATION
+.banner-enhanced {
+  // Better mobile padding
+  padding: clamp(3rem, 8vw, 6rem) 0 clamp(2rem, 5vw, 4rem);
+  min-height: clamp(60vh, 80vh, 90vh);
+
+  @media (max-width: 768px) {
+    padding: 4rem 0 3rem;
+    min-height: 70vh;
+  }
+
+  @media (max-width: 480px) {
+    padding: 3rem 0 2rem;
+    min-height: 60vh;
+  }
+
+  &__container {
+    padding: 0 var(--container-padding);
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  &__content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: center;
+    min-height: 70vh;
+
+    @media (max-width: 1024px) {
+      grid-template-columns: 1fr;
+      gap: 3rem;
+      text-align: center;
+    }
+
+    @media (max-width: 768px) {
+      gap: 2rem;
+      min-height: 50vh;
+    }
+  }
+
+  &__text {
+    max-width: 580px;
+
+    @media (max-width: 1024px) {
+      max-width: 100%;
+      margin: 0 auto;
+    }
+  }
+
+  &__title {
+    font-size: clamp(2rem, 5vw, 4rem);
+    line-height: 1.1;
+    margin-bottom: clamp(1rem, 3vw, 1.5rem);
+
+    @media (max-width: 768px) {
+      font-size: clamp(1.75rem, 6vw, 2.5rem);
+    }
+  }
+
+  &__subtitle {
+    font-size: clamp(1rem, 2.5vw, 1.25rem);
+    line-height: 1.6;
+    margin-bottom: clamp(1.5rem, 4vw, 2.5rem);
+
+    @media (max-width: 768px) {
+      font-size: clamp(0.95rem, 3vw, 1.1rem);
+    }
+  }
+
+  &__actions {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+
+    @media (max-width: 768px) {
+      flex-direction: column;
+      align-items: center;
+      gap: 0.75rem;
+    }
+  }
+
+  &__visual {
+    position: relative;
+    height: clamp(400px, 50vh, 600px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    @media (max-width: 1024px) {
+      height: clamp(300px, 40vh, 400px);
+    }
+
+    @media (max-width: 768px) {
+      height: clamp(250px, 35vh, 350px);
+    }
+  }
+}
+
+// 🔧 BANNER CARDS - MOBILE FIXES
+.banner-card {
+  position: absolute;
+  background: white;
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+
+  // 🔥 CRITICAL: Mobile positioning fixes
+  @media (max-width: 1024px) {
+    position: static;
+    margin: 1rem auto;
+    max-width: 320px;
+    animation: none !important; // Disable floating on mobile
+    transform: none !important;
+  }
+
+  @media (max-width: 768px) {
+    padding: 1rem;
+    max-width: 280px;
+    margin: 0.75rem auto;
+  }
+
+  @media (max-width: 480px) {
+    padding: 0.875rem;
+    max-width: 250px;
+    margin: 0.5rem auto;
+  }
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+
+    @media (max-width: 1024px) {
+      transform: translateY(-3px); // Reduced hover effect on mobile
+    }
+  }
+
+  // Specific mobile fixes for user card
+  &--users {
+    min-width: 280px;
+
+    @media (max-width: 1024px) {
+      order: -1; // Show users card first on mobile
+      margin-bottom: 1.5rem;
+    }
+
+    @media (max-width: 768px) {
+      min-width: 260px;
+    }
+
+    @media (max-width: 480px) {
+      min-width: 240px;
+    }
+  }
+
+  &--offer,
+  &--support {
+    @media (max-width: 1024px) {
+      margin-top: 0.5rem;
+    }
+  }
+}
+
+// 🔧 ENROLLED STUDENTS - MOBILE RESPONSIVE
+.enrolled-students {
+  display: flex;
+  gap: -0.5rem;
+
+  @media (max-width: 768px) {
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+  }
+
+  @media (max-width: 480px) {
+    gap: 0.125rem;
+  }
+
+  &__avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 2px solid white;
+    overflow: hidden;
+    margin-left: -8px;
+    transition: all 0.2s ease;
+
+    @media (max-width: 768px) {
+      width: 32px;
+      height: 32px;
+      margin-left: -6px;
+    }
+
+    @media (max-width: 480px) {
+      width: 28px;
+      height: 28px;
+      margin-left: -4px;
+    }
+
+    &:hover {
+      transform: scale(1.1);
+      z-index: 10;
+    }
+
+    &:first-child {
+      margin-left: 0;
+    }
+  }
+
+  &__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+// 🔧 BUTTONS - MOBILE RESPONSIVE
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: clamp(0.75rem, 2vw, 1rem) clamp(1.5rem, 4vw, 2rem);
+  border-radius: 50px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  font-size: clamp(0.9rem, 2vw, 1rem);
+  border: 2px solid transparent;
+  min-height: var(--touch-target-min);
+
+  @media (max-width: 768px) {
+    width: 100%;
+    max-width: 280px;
+    padding: 0.875rem 1.5rem;
+  }
+
+  @media (max-width: 480px) {
+    max-width: 250px;
+    padding: 0.75rem 1.25rem;
+    font-size: 0.9rem;
+  }
+
+  &--primary {
+    background: var(--primary);
+    color: white;
+    box-shadow: 0 8px 25px rgba(var(--primary-rgb), 0.3);
+
+    &:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 35px rgba(var(--primary-rgb), 0.4);
+      background: var(--primary-dark);
+    }
+
+    @media (max-width: 768px) {
+      &:hover {
+        transform: translateY(-2px);
+      }
+    }
+  }
+
+  &--secondary {
+    background: transparent;
+    color: var(--primary);
+    border-color: var(--primary);
+
+    &:hover {
+      background: var(--primary);
+      color: white;
+      transform: translateY(-3px);
+    }
+
+    @media (max-width: 768px) {
+      &:hover {
+        transform: translateY(-2px);
+      }
+    }
+  }
+}
+
+// 💻 WELCOME MESSAGE - DESKTOP FIXES
+.welcome-message {
+  position: relative;
+  background: linear-gradient(135deg, var(--primary-50) 0%, var(--primary-100) 50%, white 100%);
+  border: 2px solid var(--primary-200);
+  border-radius: var(--border-radius-xl);
+  padding: var(--spacing-responsive-lg);
+  margin: var(--spacing-responsive-md) 0;
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+
+  // 🔥 DESKTOP SPECIFIC IMPROVEMENTS
+  @media (min-width: 768px) {
+    padding: 3rem 3rem 2.5rem;
+    margin: 3rem 0;
+  }
+
+  @media (min-width: 1024px) {
+    padding: 4rem 4rem 3rem;
+    margin: 4rem 0;
+    max-width: none; // Allow full width on large screens
+  }
+
+  @media (min-width: 1200px) {
+    padding: 5rem 5rem 4rem;
+  }
+}
+
+.welcome-content {
+  position: relative;
+  z-index: 2;
+}
+
+.welcome-header {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+
+  // 🔥 DESKTOP LAYOUT FIXES
+  @media (min-width: 768px) {
+    flex-direction: row;
+    text-align: left;
+    gap: 2rem;
+    margin-bottom: 2.5rem;
+  }
+
+  @media (min-width: 1024px) {
+    gap: 3rem;
+    margin-bottom: 3rem;
+  }
+
+  // Mobile layout
+  @media (max-width: 767px) {
+    flex-direction: column;
+    text-align: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+}
+
+.welcome-avatar {
+  position: relative;
+  flex-shrink: 0;
+
+  &__image,
+  &__placeholder {
+    width: clamp(56px, 8vw, 80px);
+    height: clamp(56px, 8vw, 80px);
+    border-radius: 50%;
+    border: 3px solid var(--primary);
+    object-fit: cover;
+
+    @media (min-width: 1024px) {
+      width: 80px;
+      height: 80px;
+    }
+  }
+}
+
+.welcome-greeting {
+  margin: 0 0 0.5rem 0;
+  color: var(--primary-dark);
+  font-size: clamp(1.5rem, 4vw, 2.25rem);
+  font-weight: 700;
+  line-height: 1.2;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  // 🔥 DESKTOP SPECIFIC
+  @media (min-width: 768px) {
+    flex-direction: row;
+    justify-content: flex-start;
+    font-size: clamp(1.75rem, 3vw, 2rem);
+  }
+
+  @media (min-width: 1024px) {
+    font-size: 2.25rem;
+  }
+
+  // Mobile specific
+  @media (max-width: 767px) {
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.25rem;
+    font-size: clamp(1.25rem, 5vw, 1.5rem);
+  }
+}
+
+.welcome-actions {
+  display: grid;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+
+  // 🔥 RESPONSIVE GRID SYSTEM
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  @media (min-width: 1024px) {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+    margin-bottom: 2.5rem;
+  }
+
+  @media (min-width: 1400px) {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  // Mobile - single column
+  @media (max-width: 767px) {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
+}
+
+.welcome-action {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: clamp(0.875rem, 2vw, 1.25rem);
+  background: white;
+  border: 1px solid var(--primary-200);
+  border-radius: var(--border-radius-lg);
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  min-height: var(--touch-target-min);
+
+  @media (min-width: 1024px) {
+    padding: 1.25rem 1.5rem;
+  }
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--primary);
+
+    @media (max-width: 768px) {
+      transform: translateY(-1px);
+    }
+  }
+
+  &__icon {
+    width: clamp(40px, 6vw, 48px);
+    height: clamp(40px, 6vw, 48px);
+    border-radius: var(--border-radius-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.2s ease;
+
+    @media (min-width: 1024px) {
+      width: 48px;
+      height: 48px;
+    }
+  }
+
+  &__title {
+    margin: 0 0 0.25rem 0;
+    font-size: clamp(0.9rem, 2vw, 1rem);
+    font-weight: 600;
+    color: var(--primary-dark);
+
+    @media (min-width: 1024px) {
+      font-size: 1rem;
+    }
+  }
+
+  &__description {
+    margin: 0;
+    font-size: clamp(0.8rem, 1.5vw, 0.875rem);
+    color: var(--gray-600);
+    line-height: 1.4;
+
+    @media (min-width: 1024px) {
+      font-size: 0.875rem;
+    }
+  }
+}
+
+// 🏠 HOME PAGE CONTAINER - GLOBAL PADDING FIX
+.home-page {
+  &__container {
+    max-width: 1400px;
+    margin: var(--spacing-responsive-md) auto;
+    padding: var(--spacing-responsive-lg);
+    background: white;
+    border: 3px solid var(--primary);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-primary-lg);
+    position: relative;
+
+    @media (max-width: 768px) {
+      margin: var(--spacing-responsive-sm);
+      padding: var(--spacing-responsive-md);
+    }
+
+    @media (max-width: 480px) {
+      margin: var(--spacing-responsive-xs);
+      padding: var(--spacing-responsive-sm);
+    }
+  }
+
+  &__content {
+    margin-left: clamp(2rem, 5vw, 4rem);
+    position: relative;
+    z-index: 2;
+
+    @media (max-width: 768px) {
+      margin-left: clamp(1.5rem, 4vw, 2.5rem);
+    }
+
+    @media (max-width: 480px) {
+      margin-left: clamp(1rem, 3vw, 1.5rem);
+    }
+  }
+
+  &__lines {
+    position: absolute;
+    top: 0;
+    left: clamp(2rem, 5vw, 4rem);
+    right: 0;
+    bottom: 0;
+    background-image: repeating-linear-gradient(
+                    transparent,
+                    transparent 1.5rem,
+                    var(--primary-100) 1.5rem,
+                    var(--primary-100) calc(1.5rem + 1px)
+    );
+    opacity: 0.3;
+    z-index: 0;
+    pointer-events: none;
+
+    @media (max-width: 768px) {
+      left: clamp(1.5rem, 4vw, 2.5rem);
+    }
+
+    @media (max-width: 480px) {
+      left: clamp(1rem, 3vw, 1.5rem);
+    }
+  }
+}
+
+// 📊 ENHANCED STATISTICS CARDS
+.statistics-card {
+  position: relative;
+  background: linear-gradient(135deg, white 0%, var(--primary-25) 100%);
+  border-radius: 20px;
+  padding: clamp(2rem, 3vw, 2.5rem) clamp(1.5rem, 2.5vw, 2rem);
+  border: 1px solid var(--primary-100);
+  box-shadow:
+          0 4px 20px rgba(0, 0, 0, 0.08),
+          0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  text-align: center;
+  min-height: clamp(180px, 25vw, 220px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  // 🔥 ENHANCED HOVER EFFECTS
+  &:hover {
+    transform: translateY(-12px) scale(1.02);
+    box-shadow:
+            0 20px 40px rgba(0, 0, 0, 0.15),
+            0 8px 16px rgba(var(--primary-rgb), 0.2);
+    border-color: var(--primary-300);
+
+    .statistics-card__icon {
+      transform: scale(1.15) rotate(10deg);
+      box-shadow: 0 8px 25px rgba(var(--primary-rgb), 0.4);
+
+      &::before {
+        opacity: 1;
+      }
+    }
+
+    .statistics-card__number {
+      transform: scale(1.05);
+    }
+
+    @media (max-width: 768px) {
+      transform: translateY(-8px) scale(1.01);
+    }
+  }
+
+  // 🎨 ENHANCED ICON STYLING
+  &__icon {
+    width: clamp(70px, 10vw, 80px);
+    height: clamp(70px, 10vw, 80px);
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    margin-bottom: 1.5rem;
+    transition: all 0.3s ease;
+    position: relative;
+    z-index: 2;
+    box-shadow: 0 4px 15px rgba(var(--primary-rgb), 0.3);
+
+    // ✨ SHINE EFFECT
+    &::before {
+      content: '';
+      position: absolute;
+      inset: 2px;
+      background: linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.2) 50%, transparent 70%);
+      border-radius: inherit;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    @media (max-width: 768px) {
+      width: 60px;
+      height: 60px;
+      margin-bottom: 1rem;
+    }
+  }
+
+  // 🎨 ENHANCED NUMBER DISPLAY
+  &__number {
+    font-size: clamp(2.2rem, 4vw, 3rem);
+    font-weight: 800;
+    line-height: 1;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 0.25rem;
+    background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    transition: transform 0.3s ease;
+
+    @media (max-width: 768px) {
+      font-size: clamp(2rem, 5vw, 2.5rem);
+    }
+  }
+
+  &__symbol {
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    color: var(--primary);
+    font-weight: 700;
+
+    @media (max-width: 768px) {
+      font-size: clamp(1.25rem, 4vw, 1.5rem);
+    }
+  }
+
+  &__label {
+    font-size: clamp(1rem, 2vw, 1.1rem);
+    font-weight: 600;
+    color: var(--gray-700);
+    margin: 0 0 0.5rem 0;
+    line-height: 1.3;
+
+    @media (max-width: 768px) {
+      font-size: clamp(0.9rem, 2.5vw, 1rem);
+    }
+  }
+}
+
+// 🔧 PLATFORM SHOWCASE - MOBILE FIXES
+.platform-showcase {
+  position: relative;
+  width: 100%;
+  max-width: 500px;
+  height: 400px;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+
+  @media (max-width: 768px) {
+    max-width: 100%;
+    height: 300px;
+    border-radius: 16px;
+  }
+
+  @media (max-width: 480px) {
+    height: 250px;
+    border-radius: 12px;
+  }
+}
+
+.platform-swiper {
+  width: 100%;
+  height: 100%;
+}
+
+.platform-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+// 🎯 UTILITY CLASSES
+.container-responsive {
+  padding-inline: var(--container-padding);
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.section-responsive {
+  padding-block: var(--section-padding);
+}
+
+// Touch-friendly elements
+.touch-target {
+  min-height: var(--touch-target-min);
+  min-width: var(--touch-target-min);
+}
+
+// 🔧 TILES SECTION - MOBILE OPTIMIZATION
+.tiles-section {
+  padding: var(--section-padding) 0;
+
+  .tiles-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 var(--container-padding);
+
+    @media (max-width: 1024px) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+  }
+
+  .tile-article {
+    height: clamp(300px, 25vw, 350px);
+    border-radius: 10px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    transition: transform 0.5s ease, box-shadow 0.3s ease, opacity 0.5s ease;
+
+    &:hover {
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+      transform: translateY(-5px);
+    }
+
+    @media (max-width: 768px) {
+      height: 280px;
+
+      &:hover {
+        transform: translateY(-3px);
+      }
+    }
+
+    @media (max-width: 480px) {
+      height: 250px;
+    }
+  }
+
+  .tile-content {
+    padding: clamp(1.5rem, 3vw, 2rem);
+
+    h3 {
+      font-size: clamp(1.25rem, 3vw, 1.8rem);
+      margin-bottom: clamp(0.5rem, 1vw, 0.8rem);
+    }
+
+    p {
+      font-size: clamp(0.9rem, 2vw, 1.1rem);
+    }
+  }
+}
+
+// 🔧 MARQUEE SECTION - MOBILE OPTIMIZATION
+.marquee-section {
+  padding: clamp(2rem, 5vw, 4rem) 0;
+
+  .marquee-item {
+    .marquee-text {
+      font-size: clamp(1rem, 2.5vw, 1.25rem);
+    }
+
+    .marquee-icon {
+      font-size: clamp(1.5rem, 3vw, 2rem);
+    }
+  }
+}
+
+// 🔧 SECTION HEADERS - MOBILE OPTIMIZATION
+.section-header {
+  text-align: center;
+  max-width: 800px;
+  margin: 0 auto clamp(2rem, 5vw, 3rem);
+  padding: 0 var(--container-padding);
+
+  h2 {
+    font-size: clamp(2rem, 5vw, 2.5rem);
+    margin-bottom: clamp(0.5rem, 2vw, 1rem);
+  }
+
+  p {
+    font-size: clamp(1rem, 2.5vw, 1.1rem);
+    line-height: 1.6;
+  }
+}
+
+// 🔧 FOOTER - MOBILE OPTIMIZATION
+.footer {
+  &__content {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 2rem;
+
+    @media (max-width: 1024px) {
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+    }
+
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+      text-align: center;
+    }
+  }
+
+  &__main {
+    padding: clamp(2rem, 5vw, 3rem) 0 clamp(1rem, 3vw, 2rem);
+  }
+
+  &__bottom {
+    padding: clamp(1rem, 3vw, 1.5rem) 0;
+  }
+}

@@ -1,0 +1,84 @@
+/* src/styles/common/underConstruction.css */
+
+.under-construction-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 2rem;
+    text-align: center;
+    background: var(--primary);
+}
+
+.under-construction-content {
+    margin-top: 2rem;
+    min-height: 60vh;
+    width: 100%;        /* Use width instead of min-width */
+    max-width: 800px;   /* Set a maximum width */
+    padding: 2rem;      /* Smaller padding */
+    background-color: white;
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-sm);
+}
+.construction-icon {
+    font-size: 3.5rem;
+    color: var(--primary);
+    margin-bottom: 1.5rem;
+    animation: pulse 2s infinite ease-in-out;
+}
+
+.construction-title {
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+    color: var(--dark);
+}
+
+.construction-link {
+    margin-bottom: 3rem;
+}
+
+
+.construction-message {
+    font-size: 1.1rem;
+    margin-bottom: 1.5rem;
+    color: var(--gray);
+    max-width: 450px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.estimated-completion {
+    display: inline-block;
+    background-color: var(--light);
+    padding: 0.6rem 1.2rem;
+    margin-top: 2rem;
+    border-radius: var(--border-radius-md);
+    font-size: 0.9rem;
+    color: var(--dark);
+}
+
+.estimated-completion span {
+    font-weight: 600;
+    color: var(--primary);
+}
+
+@media (max-width: 768px) {
+    .under-construction-content {
+        margin-top: 1rem;
+        padding: 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .under-construction-content {
+        padding: 1rem;
+    }
+
+    .construction-title {
+        font-size: 1.5rem;
+    }
+
+    .construction-message {
+        font-size: 0.9rem;
+    }
+}

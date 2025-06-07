@@ -1,0 +1,130 @@
+{
+  "common": {
+    "welcome": "Bienvenido a EduGuiders",
+    "buttons": {
+      "login": "Iniciar Sesión",
+      "register": "Registrarse",
+      "logout": "Cerrar Sesión"
+    },
+    "navigation": {
+      "home": "Inicio",
+      "teachers": "EduProfesores",
+      "journal": "EduBlog",
+      "games": "EduJuegos",
+      "courses": "EduCursos",
+      "competitions": "EduPartida",
+      "discussion": "EduDebate"
+    }
+  },
+  "home": {
+    "hero": {
+      "title": "Encuentra a tu Profesor de Inglés Perfecto",
+      "subtitle": "Conecta con maestros expertos que pueden ayudarte a alcanzar tus metas de aprendizaje"
+    },
+    "carousel": {
+      "slide1": {
+        "title": "Encuentra tu Curso Ideal, Desarrolla Habilidades",
+        "subtitle": "Bienvenido a EduGuiders, donde el aprendizaje no tiene límites. Ya seas estudiante, profesional, o aprendiz de por vida...",
+        "buttonText": "Explorar Cursos"
+      },
+      "slide2": {
+        "title": "Conecta con Profesores Expertos",
+        "subtitle": "Aprende de educadores experimentados que están apasionados por ayudarte a tener éxito.",
+        "buttonText": "Encontrar Profesores"
+      },
+      "slide3": {
+        "title": "Experiencia de Aprendizaje Interactiva",
+        "subtitle": "Participa con métodos de enseñanza modernos y tecnología educativa de vanguardia.",
+        "buttonText": "Explorar Cursos"
+      },
+      "slide4": {
+        "title": "Únete a Nuestra Comunidad Creciente",
+        "subtitle": "Sé parte de una red global de estudiantes y educadores que marcan la diferencia.",
+        "buttonText": "Ver Testimonios"
+      }
+    },
+    "banner": {
+      "enrolledStudents": "Estudiantes Inscritos",
+      "offFor": "20% DESCUENTO",
+      "forAllCourses": "En Todos los Cursos",
+      "onlineSupports": "Soporte En Línea",
+      "browseCoursesAlt": "Explorar Cursos",
+      "aboutUsAlt": "Acerca de Nosotros"
+    },
+    "cards": {
+      "card1": {
+        "title": "Pruebas y Exámenes",
+        "description": "Descubre nuestros servicios para evaluar tu nivel"
+      },
+      "card2": {
+        "title": "Actividades de Enseñanza",
+        "description": "¿Necesitas ideas para enseñar? Permítenos ayudarte. Crea tus propias actividades o lee las hechas por otros"
+      },
+      "card3": {
+        "title": "Recursos",
+        "description": "Accede a recursos y materiales educativos integrales"
+      },
+      "seeMore": "Ver Más"
+    },
+    "tiles": {
+      "title": "Explora Nuestra Plataforma",
+      "subtitle": "Descubre todas las características increíbles que tenemos para ofrecer",
+      "explore": "Explorar",
+      "tile1": {
+        "title": "Encontrar Profesores",
+        "subtitle": "Conecta con educadores expertos"
+      },
+      "tile2": {
+        "title": "Cursos",
+        "subtitle": "Programas de aprendizaje integrales"
+      },
+      "tile3": {
+        "title": "Artículos",
+        "subtitle": "Perspectivas y consejos educativos"
+      },
+      "tile4": {
+        "title": "Juegos",
+        "subtitle": "Ejercicios de aprendizaje interactivos"
+      },
+      "tile5": {
+        "title": "Competencias",
+        "subtitle": "Desafíate a ti mismo y a otros"
+      },
+      "tile6": {
+        "title": "Discusión",
+        "subtitle": "Conecta con la comunidad"
+      }
+    },
+    "statistics": {
+      "title": "Nuestro Impacto en Números",
+      "subtitle": "Creciendo más fuerte cada día con educadores y estudiantes de todo el mundo",
+      "teachers": "Profesores Expertos",
+      "students": "Estudiantes Activos",
+      "courses": "Artículos Publicados",
+      "satisfaction": "Tasa de Satisfacción"
+    },
+    "testimonies": {
+      "title": "Lo Que Dicen Nuestros Estudiantes",
+      "subtitle": "Experiencias reales de nuestra comunidad de estudiantes y educadores",
+      "viewAll": "Ver Todos los Testimonios",
+      "role": {
+        "teacher": "Profesor",
+        "student": "Estudiante",
+        "admin": "Administrador"
+      }
+    },
+    "blog": {
+      "title": "Últimas Noticias",
+      "subtitle": "Mantente Informado, Mantente Inspirado",
+      "description": "Bienvenido a nuestro blog, donde compartimos perspectivas, historias y actualizaciones sobre temas que van desde la educación",
+      "readMore": "Leer Más",
+      "by": "Por"
+    }
+  },
+  "blog": {
+    "pageTitle": "EduBlog - Perspectivas de Maestros",
+    "loading": "Cargando...",
+    "viewPost": "Ver Publicación",
+    "createPost": "Crear Nueva Publicación"
+  }
+}

@@ -1,0 +1,130 @@
+{
+  "common": {
+    "welcome": "Welcome to EduGuiders",
+    "buttons": {
+      "login": "Log In",
+      "register": "Register",
+      "logout": "Log Out"
+    },
+    "navigation": {
+      "home": "Home",
+      "teachers": "EduTeachers",
+      "journal": "EduBlog",
+      "games": "EduGames",
+      "courses": "EduCourses",
+      "competitions": "EduMatch",
+      "discussion": "EduChat"
+    }
+  },
+  "home": {
+    "hero": {
+      "title": "Find Your Perfect English Teacher",
+      "subtitle": "Connect with expert educators who can help you achieve your learning goals"
+    },
+    "carousel": {
+      "slide1": {
+        "title": "Find Your Ideal Course, Build Skills",
+        "subtitle": "Welcome to EduGuiders, where learning knows no bounds. Whether you're a student, professional, or lifelong learner...",
+        "buttonText": "Browse Courses"
+      },
+      "slide2": {
+        "title": "Connect with Expert Teachers",
+        "subtitle": "Learn from experienced educators who are passionate about helping you succeed.",
+        "buttonText": "Find Teachers"
+      },
+      "slide3": {
+        "title": "Interactive Learning Experience",
+        "subtitle": "Engage with modern teaching methods and cutting-edge educational technology.",
+        "buttonText": "Explore Courses"
+      },
+      "slide4": {
+        "title": "Join Our Growing Community",
+        "subtitle": "Be part of a global network of learners and educators making a difference.",
+        "buttonText": "See Testimonials"
+      }
+    },
+    "banner": {
+      "enrolledStudents": "Enrolled Students",
+      "offFor": "20% OFF",
+      "forAllCourses": "For All Courses",
+      "onlineSupports": "Online Supports",
+      "browseCoursesAlt": "Browse Courses",
+      "aboutUsAlt": "About Us"
+    },
+    "cards": {
+      "card1": {
+        "title": "Tests and Exams",
+        "description": "Discover our services for testing your level"
+      },
+      "card2": {
+        "title": "Teaching Activities",
+        "description": "Need ideas for teaching? Let us handle it for you. Create your own activities or read those made by others"
+      },
+      "card3": {
+        "title": "Resources",
+        "description": "Access comprehensive educational resources and materials"
+      },
+      "seeMore": "See More"
+    },
+    "tiles": {
+      "title": "Explore Our Platform",
+      "subtitle": "Discover all the amazing features we have to offer",
+      "explore": "Explore",
+      "tile1": {
+        "title": "Find Teachers",
+        "subtitle": "Connect with expert educators"
+      },
+      "tile2": {
+        "title": "Courses",
+        "subtitle": "Comprehensive learning programs"
+      },
+      "tile3": {
+        "title": "Articles",
+        "subtitle": "Educational insights and tips"
+      },
+      "tile4": {
+        "title": "Games",
+        "subtitle": "Interactive learning exercises"
+      },
+      "tile5": {
+        "title": "Competitions",
+        "subtitle": "Challenge yourself and others"
+      },
+      "tile6": {
+        "title": "Discussion",
+        "subtitle": "Connect with the community"
+      }
+    },
+    "statistics": {
+      "title": "Our Impact by the Numbers",
+      "subtitle": "Growing stronger every day with educators and learners from around the world",
+      "teachers": "Expert Teachers",
+      "students": "Active Students",
+      "courses": "Published Articles",
+      "satisfaction": "Satisfaction Rate"
+    },
+    "testimonies": {
+      "title": "What Our Students Say",
+      "subtitle": "Real experiences from our community of learners and educators",
+      "viewAll": "View All Testimonials",
+      "role": {
+        "teacher": "Teacher",
+        "student": "Student",
+        "admin": "Administrator"
+      }
+    },
+    "blog": {
+      "title": "Latest News",
+      "subtitle": "Stay Informed, Stay Inspired",
+      "description": "Welcome to our blog, where we share insights, stories, and updates on topics ranging from education",
+      "readMore": "Read More",
+      "by": "By"
+    }
+  },
+  "blog": {
+    "pageTitle": "EduBlog - Teacher Insights",
+    "loading": "Loading...",
+    "viewPost": "View Post",
+    "createPost": "Create New Post"
+  }
+}

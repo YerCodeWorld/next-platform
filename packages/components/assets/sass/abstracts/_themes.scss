@@ -1,0 +1,153 @@
+// packages/components/assets/sass/abstracts/_themes.scss
+
+// Base theme colors
+$theme-colors: (
+        'lavender': #A47BB9,
+        'coral': #E08D79,
+        'teal': #5C9EAD,
+        'warmpink': #D46BA3,
+        'blue': #779ECB,
+        'purple': #8859A3
+);
+
+// Function to generate color variations
+@function mix-color($color, $mix-color, $amount) {
+  @return mix($mix-color, $color, $amount);
+}
+// Mixin to generate all color variations for a theme
+@mixin generate-theme-vars($theme-name, $base-color) {
+  --theme-name: '#{$theme-name}';
+
+  // Primary color variations
+  --primary: #{$base-color};
+  --primary-rgb: #{red($base-color)}, #{green($base-color)}, #{blue($base-color)};
+
+  // Generate 50-900 scale
+  --primary-50: #{generate-shade($base-color, 50)};
+  --primary-100: #{generate-shade($base-color, 100)};
+  --primary-200: #{generate-shade($base-color, 200)};
+  --primary-300: #{generate-shade($base-color, 300)};
+  --primary-400: #{generate-shade($base-color, 400)};
+  --primary-500: #{$base-color}; // Base color
+  --primary-600: #{generate-shade($base-color, 600)};
+  --primary-700: #{generate-shade($base-color, 700)};
+  --primary-800: #{generate-shade($base-color, 800)};
+  --primary-900: #{generate-shade($base-color, 900)};
+
+  // Semantic variations
+  --primary-dark: var(--primary-700);
+  --primary-light: var(--primary-200);
+  --primary-surface: var(--primary-50);
+
+  // Surface colors based on theme
+  --surface: #{mix-color($base-color, white, 2%)};
+  --surface-100: #{mix-color($base-color, white, 4%)};
+  --surface-200: #{mix-color($base-color, white, 8%)};
+
+  // Logo path based on theme
+  --logo: url('/images/logo/#{$theme-name}.png');
+
+  // Gradients
+  --gradient: linear-gradient(135deg, var(--primary) 0%, var(--primary-600) 100%);
+  --gradient-soft: linear-gradient(135deg, var(--primary-100) 0%, var(--primary-200) 100%);
+
+  // Box shadows with theme colors
+  --shadow-primary: 0 4px 20px rgba(var(--primary-rgb), 0.15);
+  --shadow-primary-lg: 0 10px 30px rgba(var(--primary-rgb), 0.2);
+
+  // Notebook lines pattern
+  --notebook-lines: repeating-linear-gradient(
+                  transparent,
+                  transparent 1.5rem,
+                  var(--primary-100) 1.5rem,
+                  var(--primary-100) calc(1.5rem + 1px)
+  );
+}
+
+
+
+// Function to lighten/darken colors
+@function generate-shade($color, $level) {
+  @if $level < 500 {
+    // Lighter shades (50-400)
+    $amount: (500 - $level) / 10;
+    @return mix-color($color, white, $amount * 2%);
+  } @else if $level > 500 {
+    // Darker shades (600-900)
+    $amount: ($level - 500) / 10;
+    @return mix-color($color, black, $amount * 2%);
+  }
+  @return $color; // 500 is the base color
+}
+
+// Generate CSS custom properties for each theme
+:root {
+  // Default theme (lavender)
+  --current-theme: 'lavender';
+  @include generate-theme-vars('lavender', map-get($theme-colors, 'lavender'));
+}
+
+// Generate theme classes
+@each $theme-name, $base-color in $theme-colors {
+  [data-theme="#{$theme-name}"],
+  .theme-#{$theme-name} {
+    @include generate-theme-vars($theme-name, $base-color);
+  }
+}
+
+// Theme-aware utility classes
+.text-primary {
+  color: var(--primary) !important;
+}
+
+.text-primary-dark {
+  color: var(--primary-dark) !important;
+}
+
+.bg-primary {
+  background-color: var(--primary) !important;
+}
+
+.bg-primary-surface {
+  background-color: var(--primary-surface) !important;
+}
+
+.border-primary {
+  border-color: var(--primary) !important;
+}
+
+.shadow-primary {
+  box-shadow: var(--shadow-primary) !important;
+}
+
+// Generate all primary shade utilities
+@for $i from 1 through 9 {
+  $shade: $i * 100;
+
+  @if $shade <= 900 {
+    .text-primary-#{$shade} {
+      color: var(--primary-#{$shade}) !important;
+    }
+
+    .bg-primary-#{$shade} {
+      background-color: var(--primary-#{$shade}) !important;
+    }
+
+    .border-primary-#{$shade} {
+      border-color: var(--primary-#{$shade}) !important;
+    }
+  }
+}
+
+// Add 50 shade
+.text-primary-50 {
+  color: var(--primary-50) !important;
+}
+
+.bg-primary-50 {
+  background-color: var(--primary-50) !important;
+}
+
+.border-primary-50 {
+  border-color: var(--primary-50) !important;
+}

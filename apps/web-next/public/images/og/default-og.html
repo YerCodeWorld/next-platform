@@ -1,0 +1,69 @@
+
+<!DOCTYPE html>
+<html>
+<meta charset="utf-8" />
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            width: 1200px;
+            height: 630px;
+            background: linear-gradient(135deg, #A47BB9 0%, #A47BB9cc 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Inter', Arial, sans-serif;
+            color: white;
+            text-align: center;
+            overflow: hidden;
+            position: relative;
+        }
+        .background-pattern {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.1;
+            background-image: 
+                radial-gradient(circle at 20% 20%, white 2px, transparent 2px),
+                radial-gradient(circle at 80% 80%, white 2px, transparent 2px);
+            background-size: 60px 60px;
+        }
+        .content {
+            position: relative;
+            z-index: 1;
+        }
+        .logo {
+            font-size: 36px;
+            font-weight: 600;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            opacity: 0.9;
+        }
+        .title {
+            font-size: 64px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.4);
+            line-height: 1.1;
+        }
+        .subtitle {
+            font-size: 32px;
+            font-weight: 400;
+            opacity: 0.95;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="background-pattern"></div>
+    <div class="content">
+        <div class="logo">🎓 EduGuiders</div>
+        <div class="title">EduGuiders</div>
+        <div class="subtitle">Your Educational Platform</div>
+    </div>
+</body>
+</html>
