@@ -4,7 +4,6 @@
   "outputDirectory": "apps/web-next/.next",
   "installCommand": "pnpm install",
   "framework": "nextjs",
-  "ignoreCommand": "git diff --quiet HEAD^ HEAD ./apps/web-next",
   "functions": {
     "apps/web-next/app/api/**/*.ts": {
       "maxDuration": 10
