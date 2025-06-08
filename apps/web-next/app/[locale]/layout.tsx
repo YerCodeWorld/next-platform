@@ -51,7 +51,7 @@ export default async function LocaleLayout({
         <html lang={locale} className={inter.variable} data-theme="lavender">
         <body className="font-inter">
         <NextIntlClientProvider messages={messages} locale={locale}>
-            <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || ''}>
+            <GoogleOAuthProvider clientId={process.env.GOOGLE_CLIENT_ID || ''}>
                 <AuthProvider user={user}>
                     <div className="site-wrapper-container">
                         <div className="site-wrapper">
