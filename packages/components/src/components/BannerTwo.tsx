@@ -84,6 +84,12 @@ const BannerTwo: React.FC<BannerTwoProps> = ({
             alt: 'Teacher Profiles - Meet our expert educators',
             title: 'Teachers',
             description: 'Connect with experienced and passionate educators'
+        },
+        {
+            src: '/images/platform/mascot-test-removebg-preview.png',
+            alt: 'Teacher Profiles - Meet our expert educators',
+            title: 'Teachers',
+            description: 'Connect with experienced and passionate educators'
         }
     ];
 
@@ -185,6 +191,8 @@ const BannerTwo: React.FC<BannerTwoProps> = ({
             </div>
         );
     };
+
+    if (!currentSlideData) return;
 
     return (
         <section className="banner-fixed">
@@ -864,44 +872,7 @@ const BannerTwo: React.FC<BannerTwoProps> = ({
                         display: none;
                     }
                 }
-
-                @media (max-width: 480px) {
-                    .banner-container {
-                        padding: 0 1rem;
-                    }
-
-                    .banner-visual {
-                        height: 200px;
-                    }
-
-                    .platform-showcase {
-                        max-width: 100%;
-                        height: 200px;
-                    }
-
-                    .btn {
-                        width: 100%;
-                        max-width: 200px;
-                    }
-
-                    .banner-cards {
-                        gap: 0.75rem;
-                    }
-
-                    .banner-card {
-                        padding: 1rem;
-                    }
-
-                    .banner-card__icon {
-                        width: 36px;
-                        height: 36px;
-                    }
-
-                    /* Hide educational floaters on very small screens */
-                    .educational-floaters {
-                        display: none;
-                    }
-                }
+l
 
                 /* High contrast mode support */
                 @media (prefers-contrast: custom) {

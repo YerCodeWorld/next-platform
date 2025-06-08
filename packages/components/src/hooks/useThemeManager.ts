@@ -8,45 +8,45 @@ export const themeColors = [
     {
         name: 'Lavender',
         value: 'lavender',
-        primary: '#A47BB9',
-        primaryDark: '#8A66A0',
-        preview: '#A47BB9'
+        primary: '#8A3FFC',       // vivid lavender
+        primaryDark: '#6929C4',
+        preview: '#8A3FFC'
     },
     {
         name: 'Coral',
         value: 'coral',
-        primary: '#E08D79',
-        primaryDark: '#C17063',
-        preview: '#E08D79'
+        primary: '#FF6F61',       // energetic coral
+        primaryDark: '#D94F3A',
+        preview: '#FF6F61'
     },
     {
         name: 'Teal',
         value: 'teal',
-        primary: '#5C9EAD',
-        primaryDark: '#487F8A',
-        preview: '#5C9EAD'
+        primary: '#007D79',       // deep teal
+        primaryDark: '#005F5B',
+        preview: '#007D79'
     },
     {
         name: 'Warm Pink',
         value: 'warmpink',
-        primary: '#D46BA3',
-        primaryDark: '#B3588C',
-        preview: '#D46BA3'
+        primary: '#FF3CA2',       // vibrant pink
+        primaryDark: '#D92685',
+        preview: '#FF3CA2'
     },
     {
         name: 'Blue',
         value: 'blue',
-        primary: '#779ECB',
-        primaryDark: '#637EB0',
-        preview: '#779ECB'
+        primary: '#007BFF',       // new blue from the image
+        primaryDark: '#005FCC',   // darker variant
+        preview: '#007BFF'
     },
-    {
-        name: 'Purple',
+    {        name: 'Purple',
         value: 'purple',
-        primary: '#8859A3',
-        primaryDark: '#6D4580',
-        preview: '#8859A3'
+        primary: '#A56EFF',       // strong purple
+        primaryDark: '#894CDF',
+        preview: '#A56EFF'
     }
+
 ];
 
 // Convert database color preference to theme value
