@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "buildCommand": "pnpm build:vercel",
+  "buildCommand": "turbo run db:generate build:scss && turbo run build --filter=web-next",
   "outputDirectory": "apps/web-next/.next",
   "installCommand": "pnpm install",
   "framework": "nextjs",
