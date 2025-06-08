@@ -10,6 +10,7 @@ import { Toaster } from 'sonner';
 
 import HeaderWrapper from '@/components/layout/HeaderWrapper';
 import FooterWrapper from '@/components/layout/FooterWrapper';
+import HelpAssistant from '../../components/global/HelpAssitant';
 import { AuthProvider } from '@/components/providers/AuthProvider';
 import { getCurrentUser } from '@/lib/auth';
 
@@ -62,6 +63,10 @@ export default async function LocaleLayout({
                             <FooterWrapper locale={locale} />
                         </div>
                     </div>
+
+                    {/* Global Help Assistant */}
+                    <HelpAssistant />
+
                     <Toaster position="bottom-center" richColors />
                 </AuthProvider>
             </GoogleOAuthProvider>
