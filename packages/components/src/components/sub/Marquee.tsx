@@ -31,14 +31,14 @@ const Marquee: React.FC<MarqueeProps> = ({
                                              className = ''
                                          }) => {
     return (
-        <section className={`marquee-section py-60 overflow-hidden ${className}`} style={{ background: 'var(--primary)' }}>
+        <section className={`marquee-section py-60 border-8 overflow-hidden ${className} mt-120 bg-primary-300`}>
             <MarqueeReact
                 speed={speed}
                 direction={direction}
                 gradient={false}
                 pauseOnHover={true}
             >
-                <div className="marquee-content flex-align gap-60">
+                <div className="marquee-content flex-align gap-60 ">
                     {items.map((item) => (
                         <div key={item.id} className="marquee-item flex-align gap-16 text-white">
                             {item.icon && (

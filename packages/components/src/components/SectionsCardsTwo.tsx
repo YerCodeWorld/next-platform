@@ -92,7 +92,7 @@ const SectionsCardsTwo: React.FC<SectionsCardsTwoProps> = ({
                 {componentInfo.map((item, index) => (
                     <div
                         key={index}
-                        className='col-xl-4 col-sm-6'
+                        className=''
                         data-aos='fade-up'
                         data-aos-duration={600}
                     >
@@ -107,7 +107,7 @@ const SectionsCardsTwo: React.FC<SectionsCardsTwoProps> = ({
                                 />
                             </span>
                             <div>
-                                <h4 className='mb-16'>{item.title}</h4>
+                                <h4 className={`mb-16 text text-${item.buttonColor.slice(3)}`}>{item.title}</h4>
                                 <p className='text-neutral-700'>
                                     {item.text}
                                 </p>

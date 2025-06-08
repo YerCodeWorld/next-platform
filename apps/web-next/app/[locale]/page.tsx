@@ -8,7 +8,7 @@ import StatisticsWrapper from '@/components/home/StatisticsWrapper';
 import TestimonialsWrapper from '@/components/home/TestimonialsWrapper';
 import BlogShowCaseWrapper from '@/components/home/BlogShowCaseWrapper';
 import SectionsCardsTwoWrapper from '@/components/home/SectionsCardsTwoWrapper';
-// import WelcomeMessage from "@/components/home/WelcomeMessage";
+import WelcomeMessage from '@/components/home/WelcomeMessage';
 import { getCurrentUser } from '@/lib/auth';
 
 export default async function HomePage({
@@ -26,6 +26,11 @@ export default async function HomePage({
                 <BannerTwoWrapper locale={locale} />
             </Suspense>
 
+            {/* Welcome Message - Above notebook, only for authenticated users */}
+            {user && (
+                <WelcomeMessage user={user} locale={locale} />
+            )}
+
             {/* Notebook Container for main content */}
             <div className="home-page__container">
                 {/* Notebook lines background */}
@@ -33,13 +38,13 @@ export default async function HomePage({
 
                 <div className="home-page__content">
 
+                    {/* Tiles Section */}
+                    <TilesServerWrapper locale={locale} />
+
                     {/* Cards Section */}
                     <Suspense fallback={<div>Loading cards...</div>}>
                         <SectionsCardsTwoWrapper locale={locale} />
                     </Suspense>
-
-                    {/* Tiles Section */}
-                    <TilesServerWrapper locale={locale} />
 
                     {/* Marquee */}
                     <Marquee />
@@ -95,7 +100,6 @@ export default async function HomePage({
                     </section>
                 </div>
             </div>
-
         </div>
     );
 }

@@ -1,5 +1,8 @@
 /* src/styles/home/tiles.css */
 
+.tiles-section {
+    margin: 0;
+}
 
 .section-header {
     text-align: center;

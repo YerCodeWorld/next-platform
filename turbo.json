@@ -3,6 +3,9 @@
   "ui": "tui",
   "tasks": {
     "db:generate": {
+      "env": [
+        "DATABASE_URL"
+      ],
       "cache": false,
       "inputs": ["prisma/schema.prisma", ".env*"],
       "outputs": []
@@ -13,11 +16,21 @@
       "outputs": ["dist/styles.css", "dist/**/*.css"]
     },
     "build": {
+      "env": [
+        "DATABASE_URL",
+        "GOOGLE_CLIENT_SECRET",
+         "NEXT_PUBLIC_GOOGLE_CLIENT_ID"
+      ],
       "dependsOn": ["^build", "build:scss", "db:generate"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
       "outputs": [".next/**", "!.next/cache/**", "dist/**"]
     },
     "dev": {
+      "env": [
+        "DATABASE_URL",
+        "GOOGLE_CLIENT_SECRET",
+        "NEXT_PUBLIC_GOOGLE_CLIENT_ID"
+      ],
       "dependsOn": ["^dev"],
       "cache": false,
       "persistent": true

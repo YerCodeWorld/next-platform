@@ -1,18 +1,17 @@
 // packages/components/src/components/BannerTwo.tsx
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Autoplay, Pagination, EffectFade, Navigation } from 'swiper/modules';
+import { Autoplay, Pagination, EffectFade } from 'swiper/modules';
 import { Watch, PhoneCall, ArrowUpRight, Play, Users, Star } from 'phosphor-react';
 
 // Import Swiper styles
 import 'swiper/css';
 import 'swiper/css/effect-fade';
 import 'swiper/css/pagination';
-import 'swiper/css/navigation';
 
 export interface BannerUser {
     id: string;
@@ -63,6 +62,7 @@ const BannerTwo: React.FC<BannerTwoProps> = ({
     const [currentSlide, setCurrentSlide] = useState(0);
     const [isVideoPlaying, setIsVideoPlaying] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
+    const [mounted, setMounted] = useState(false);
     const swiperRef = useRef<any>(null);
 
     // Platform features carousel images
@@ -87,10 +87,12 @@ const BannerTwo: React.FC<BannerTwoProps> = ({
         }
     ];
 
-    // Check if mobile on mount
+    // Check if mobile and set mounted
     useEffect(() => {
+        setMounted(true);
+
         const checkMobile = () => {
-            setIsMobile(window.innerWidth <= 1024);
+            setIsMobile(window.innerWidth <= 768);
         };
 
         checkMobile();
@@ -101,33 +103,66 @@ const BannerTwo: React.FC<BannerTwoProps> = ({
 
     const currentSlideData = data.slides[currentSlide];
 
-    // Auto-advance slides
+    // Auto-advance slides only when not playing video
     useEffect(() => {
-        if (!isVideoPlaying) {
-            const interval = setInterval(() => {
-                setCurrentSlide((prev) => (prev + 1) % data.slides.length);
-            }, 5000);
-            return () => clearInterval(interval);
-        }
-    }, [data.slides.length, isVideoPlaying]);
+        if (!mounted || isVideoPlaying) return;
+
+        const interval = setInterval(() => {
+            setCurrentSlide((prev) => (prev + 1) % data.slides.length);
+        }, 5000);
+
+        return () => clearInterval(interval);
+    }, [data.slides.length, isVideoPlaying, mounted]);
 
     const handleVideoPlay = () => {
         setIsVideoPlaying(true);
     };
 
+    // Don't render until mounted to prevent hydration issues
+    if (!mounted || !currentSlideData) {
+        return (
+            <section className="banner-loading">
+                <div className="loading-container">
+                    <div className="loading-spinner"></div>
+                </div>
+                <style>{`
+                    .banner-loading {
+                        min-height: 60vh;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        background: linear-gradient(135deg, var(--primary-50) 0%, white 100%);
+                    }
+                    .loading-spinner {
+                        width: 40px;
+                        height: 40px;
+                        border: 4px solid var(--primary-200);
+                        border-top: 4px solid var(--primary);
+                        border-radius: 50%;
+                        animation: spin 1s linear infinite;
+                    }
+                    @keyframes spin {
+                        0% { transform: rotate(0deg); }
+                        100% { transform: rotate(360deg); }
+                    }
+                `}</style>
+            </section>
+        );
+    }
+
     const UserBadge = () => {
         const userPictures = users
             .filter(user => user.picture)
-            .slice(0, isMobile ? 6 : 8)
+            .slice(0, isMobile ? 4 : 6)
             .map(user => user.picture!);
 
         if (userPictures.length === 0) return null;
 
         return (
             <div className="banner-card banner-card--users">
-                <div className="banner-card__content">
+                <div className="banner-card__header">
                     <div className="banner-card__icon">
-                        <Users size={isMobile ? 20 : 24} weight="bold" />
+                        <Users size={20} weight="bold" />
                     </div>
                     <div className="banner-card__info">
                         <h4 className="banner-card__title">+{totalUsers + 150}</h4>
@@ -140,8 +175,8 @@ const BannerTwo: React.FC<BannerTwoProps> = ({
                             <Image
                                 src={picture}
                                 alt=""
-                                width={isMobile ? 28 : 36}
-                                height={isMobile ? 28 : 36}
+                                width={28}
+                                height={28}
                                 className="enrolled-students__image"
                             />
                         </div>
@@ -151,64 +186,26 @@ const BannerTwo: React.FC<BannerTwoProps> = ({
         );
     };
 
-    // Mobile-specific layout for banner cards
-    const MobileBannerCards = () => (
-        <div className="banner-cards-mobile">
-            <UserBadge />
-
-            <div className="banner-card banner-card--offer">
-                <div className="banner-card__content">
-                    <div className="banner-card__icon banner-card__icon--watch">
-                        <Watch size={20} weight="regular" />
-                    </div>
-                    <div className="banner-card__info">
-                        <h4 className="banner-card__title">{translations.offFor}</h4>
-                        <p className="banner-card__subtitle">{translations.forAllCourses}</p>
-                    </div>
-                </div>
-            </div>
-
-            <div className="banner-card banner-card--support">
-                <div className="banner-card__content">
-                    <div className="banner-card__icon banner-card__icon--phone">
-                        <PhoneCall size={20} weight="regular" />
-                    </div>
-                    <div className="banner-card__info">
-                        <h4 className="banner-card__title">{translations.onlineSupports}</h4>
-                        <a
-                            href="tel:(704)555-0127"
-                            className="banner-card__link"
-                        >
-                            (704) 555-0127
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
-
-    if (!currentSlideData) return null;
-
     return (
-        <section className="banner-enhanced">
-            <div className="banner-enhanced__container">
-                <div className="banner-enhanced__content">
+        <section className="banner-fixed">
+            <div className="banner-container">
+                <div className="banner-content">
                     {/* Left Content */}
-                    <div className="banner-enhanced__text">
-                        <div className="banner-enhanced__badge">
+                    <div className="banner-text">
+                        <div className="banner-badge">
                             <Star size={16} weight="fill" />
                             <span>Your Future, Achieve Success</span>
                         </div>
 
-                        <h1 className="banner-enhanced__title">
+                        <h1 className="banner-title">
                             {currentSlideData.title}
                         </h1>
 
-                        <p className="banner-enhanced__subtitle">
+                        <p className="banner-subtitle">
                             {currentSlideData.subtitle}
                         </p>
 
-                        <div className="banner-enhanced__actions">
+                        <div className="banner-actions">
                             <Link
                                 href={currentSlideData.buttonLink}
                                 className="btn btn--primary"
@@ -227,7 +224,7 @@ const BannerTwo: React.FC<BannerTwoProps> = ({
                         </div>
 
                         {/* Slide Indicators */}
-                        <div className="banner-enhanced__indicators">
+                        <div className="banner-indicators">
                             {data.slides.map((_, index) => (
                                 <button
                                     key={index}
@@ -240,7 +237,7 @@ const BannerTwo: React.FC<BannerTwoProps> = ({
                     </div>
 
                     {/* Right Visual */}
-                    <div className="banner-enhanced__visual">
+                    <div className="banner-visual">
                         {/* Main Platform Showcase */}
                         <div className="platform-showcase">
                             <Swiper
@@ -257,28 +254,33 @@ const BannerTwo: React.FC<BannerTwoProps> = ({
                                     bulletClass: 'platform-bullet',
                                     bulletActiveClass: 'platform-bullet--active'
                                 }}
-                                loop={platformImages.length >= 1} // FIX: Only loop if more than 1 slide
+                                loop={platformImages.length > 1}
                                 speed={1000}
                                 className="platform-swiper"
                                 ref={swiperRef}
+                                key={`swiper-${mounted}`} // Force re-render on mount
                             >
                                 {platformImages.map((image, index) => (
                                     <SwiperSlide key={index}>
                                         <div className="platform-slide">
-                                            <div className="platform-slide__image">
-                                                <Image
-                                                    src={image.src}
-                                                    alt={image.alt}
-                                                    width={500}
-                                                    height={400}
-                                                    className="platform-image"
-                                                    priority={index === 0}
-                                                />
-                                                <div className="platform-slide__overlay">
-                                                    <div className="platform-slide__info">
-                                                        <h3>{image.title}</h3>
-                                                        <p>{image.description}</p>
-                                                    </div>
+                                            <Image
+                                                src={image.src}
+                                                alt={image.alt}
+                                                width={500}
+                                                height={400}
+                                                className="platform-image"
+                                                priority={index === 0}
+                                                quality={90}
+                                                onError={(e) => {
+                                                    console.error('Image failed to load:', image.src);
+                                                    // Fallback to a solid color background
+                                                    e.currentTarget.style.display = 'none';
+                                                }}
+                                            />
+                                            <div className="platform-overlay">
+                                                <div className="platform-info">
+                                                    <h3>{image.title}</h3>
+                                                    <p>{image.description}</p>
                                                 </div>
                                             </div>
                                         </div>
@@ -293,92 +295,112 @@ const BannerTwo: React.FC<BannerTwoProps> = ({
                                     onClick={handleVideoPlay}
                                     aria-label="Play introduction video"
                                 >
-                                    <Play size={isMobile ? 24 : 32} weight="fill" />
+                                    <Play size={isMobile ? 20 : 28} weight="fill" />
                                 </button>
                             </div>
                         </div>
-
-                        {/* Desktop Floating Cards */}
-                        {!isMobile && (
-                            <>
-                                <UserBadge />
-
-                                <div className="banner-card banner-card--offer">
-                                    <div className="banner-card__content">
-                                        <div className="banner-card__icon banner-card__icon--watch">
-                                            <Watch size={24} weight="regular" />
-                                        </div>
-                                        <div className="banner-card__info">
-                                            <h4 className="banner-card__title">{translations.offFor}</h4>
-                                            <p className="banner-card__subtitle">{translations.forAllCourses}</p>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="banner-card banner-card--support">
-                                    <div className="banner-card__content">
-                                        <div className="banner-card__icon banner-card__icon--phone">
-                                            <PhoneCall size={24} weight="regular" />
-                                        </div>
-                                        <div className="banner-card__info">
-                                            <h4 className="banner-card__title">{translations.onlineSupports}</h4>
-                                            <a
-                                                href="tel:(704)555-0127"
-                                                className="banner-card__link"
-                                            >
-                                                (704) 555-0127
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </>
-                        )}
                     </div>
                 </div>
 
-                {/* Mobile Cards Section - Below main content */}
-                {isMobile && <MobileBannerCards />}
+                {/* Cards Section - Mobile optimized */}
+                <div className="banner-cards">
+                    <UserBadge />
+
+                    <div className="banner-card banner-card--offer">
+                        <div className="banner-card__header">
+                            <div className="banner-card__icon banner-card__icon--watch">
+                                <Watch size={20} weight="regular" />
+                            </div>
+                            <div className="banner-card__info">
+                                <h4 className="banner-card__title">{translations.offFor}</h4>
+                                <p className="banner-card__subtitle">{translations.forAllCourses}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="banner-card banner-card--support">
+                        <div className="banner-card__header">
+                            <div className="banner-card__icon banner-card__icon--phone">
+                                <PhoneCall size={20} weight="regular" />
+                            </div>
+                            <div className="banner-card__info">
+                                <h4 className="banner-card__title">{translations.onlineSupports}</h4>
+                                <a
+                                    href="tel:(704)555-0127"
+                                    className="banner-card__link"
+                                >
+                                    (704) 555-0127
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Educational floating elements */}
+                <div className="educational-floaters">
+                    <div className="edu-floater edu-floater--notebook">
+                        <Image
+                            src="/images/shapes/shape6.png"
+                            alt=""
+                            width={50}
+                            height={50}
+                            className="edu-floater-image"
+                        />
+                    </div>
+                    <div className="edu-floater edu-floater--ruler">
+                        <Image
+                            src="/images/shapes/shape3.png"
+                            alt=""
+                            width={45}
+                            height={45}
+                            className="edu-floater-image"
+                        />
+                    </div>
+                    <div className="edu-floater edu-floater--planet">
+                        <Image
+                            src="/images/shapes/shape1.png"
+                            alt=""
+                            width={55}
+                            height={55}
+                            className="edu-floater-image"
+                        />
+                    </div>
+                </div>
             </div>
 
-            {/* Background Effects */}
-            <div className="banner-enhanced__effects">
-                <div className="floating-shape floating-shape--1"></div>
-                <div className="floating-shape floating-shape--2"></div>
-                <div className="floating-shape floating-shape--3"></div>
-                <div className="floating-shape floating-shape--4"></div>
-            </div>
-
-            {/* Enhanced Styles with Mobile Fixes */}
             <style>{`
-                .banner-enhanced {
+                .banner-fixed {
                     position: relative;
-                    padding: clamp(3rem, 8vw, 6rem) 0 clamp(2rem, 5vw, 4rem);
-                    min-height: clamp(60vh, 80vh, 90vh);
-                    background: linear-gradient(135deg, var(--primary-50) 0%, white 50%, var(--primary-25) 100%);
+                    padding: clamp(2rem, 8vw, 4rem) 0;
+                    margin-top: 5%;
+                    min-height: clamp(500px, 70vh, 700px);
+                    background: linear-gradient(135deg, var(--primary-50) 0%, white 50%, var(--primary-100) 100%);
                     overflow: hidden;
                 }
 
-                .banner-enhanced__container {
-                    max-width: 1400px;
+                .banner-container {
+                    max-width: 1200px;
                     margin: 0 auto;
-                    padding: 0 clamp(1rem, 5vw, 4rem);
+                    padding: 0 clamp(1rem, 4vw, 2rem);
                     position: relative;
                     z-index: 2;
                 }
 
-                .banner-enhanced__content {
+                .banner-content {
                     display: grid;
                     grid-template-columns: 1fr 1fr;
-                    gap: 4rem;
+                    gap: clamp(2rem, 6vw, 4rem);
                     align-items: center;
-                    min-height: 70vh;
+                    min-height: 50vh;
                 }
 
-                .banner-enhanced__text {
-                    max-width: 580px;
+                .banner-text {
+                    max-width: 100%;
+                    z-index: 3;
+                    position: relative;
                 }
 
-                .banner-enhanced__badge {
+                .banner-badge {
                     display: inline-flex;
                     align-items: center;
                     gap: 0.5rem;
@@ -386,7 +408,7 @@ const BannerTwo: React.FC<BannerTwoProps> = ({
                     background: var(--primary);
                     color: white;
                     border-radius: 50px;
-                    font-size: 0.9rem;
+                    font-size: 0.85rem;
                     font-weight: 500;
                     margin-bottom: 1.5rem;
                     animation: pulse 2s infinite;
@@ -397,8 +419,8 @@ const BannerTwo: React.FC<BannerTwoProps> = ({
                     50% { transform: scale(1.05); }
                 }
 
-                .banner-enhanced__title {
-                    font-size: clamp(2rem, 5vw, 4rem);
+                .banner-title {
+                    font-size: clamp(1.8rem, 5vw, 3.2rem);
                     font-weight: 800;
                     line-height: 1.1;
                     color: var(--primary-dark);
@@ -409,15 +431,15 @@ const BannerTwo: React.FC<BannerTwoProps> = ({
                     background-clip: text;
                 }
 
-                .banner-enhanced__subtitle {
-                    font-size: clamp(1rem, 2.5vw, 1.25rem);
+                .banner-subtitle {
+                    font-size: clamp(0.95rem, 2.5vw, 1.1rem);
                     line-height: 1.6;
                     color: var(--gray-600);
-                    margin-bottom: clamp(1.5rem, 4vw, 2.5rem);
+                    margin-bottom: clamp(1.5rem, 4vw, 2rem);
                     max-width: 90%;
                 }
 
-                .banner-enhanced__actions {
+                .banner-actions {
                     display: flex;
                     gap: 1rem;
                     margin-bottom: 2rem;
@@ -428,25 +450,26 @@ const BannerTwo: React.FC<BannerTwoProps> = ({
                     display: inline-flex;
                     align-items: center;
                     gap: 0.5rem;
-                    padding: clamp(0.75rem, 2vw, 1rem) clamp(1.5rem, 4vw, 2rem);
+                    padding: clamp(0.7rem, 2vw, 0.9rem) clamp(1.2rem, 3vw, 1.6rem);
                     border-radius: 50px;
                     font-weight: 600;
                     text-decoration: none;
                     transition: all 0.3s ease;
-                    font-size: clamp(0.9rem, 2vw, 1rem);
+                    font-size: clamp(0.85rem, 2vw, 0.95rem);
                     border: 2px solid transparent;
                     min-height: 44px;
+                    white-space: nowrap;
                 }
 
                 .btn--primary {
                     background: var(--primary);
                     color: white;
-                    box-shadow: 0 8px 25px rgba(var(--primary-rgb), 0.3);
+                    box-shadow: 0 6px 20px rgba(var(--primary-rgb), 0.3);
                 }
 
                 .btn--primary:hover {
-                    transform: translateY(-3px);
-                    box-shadow: 0 12px 35px rgba(var(--primary-rgb), 0.4);
+                    transform: translateY(-2px);
+                    box-shadow: 0 8px 25px rgba(var(--primary-rgb), 0.4);
                     background: var(--primary-dark);
                 }
 
@@ -459,17 +482,17 @@ const BannerTwo: React.FC<BannerTwoProps> = ({
                 .btn--secondary:hover {
                     background: var(--primary);
                     color: white;
-                    transform: translateY(-3px);
+                    transform: translateY(-2px);
                 }
 
-                .banner-enhanced__indicators {
+                .banner-indicators {
                     display: flex;
                     gap: 0.5rem;
                 }
 
                 .indicator {
-                    width: 12px;
-                    height: 12px;
+                    width: 10px;
+                    height: 10px;
                     border-radius: 50%;
                     border: none;
                     background: var(--primary-200);
@@ -482,22 +505,24 @@ const BannerTwo: React.FC<BannerTwoProps> = ({
                     transform: scale(1.2);
                 }
 
-                .banner-enhanced__visual {
+                .banner-visual {
                     position: relative;
-                    height: clamp(400px, 50vh, 600px);
+                    height: clamp(300px, 45vh, 450px);
                     display: flex;
                     align-items: center;
                     justify-content: center;
+                    z-index: 2;
                 }
 
                 .platform-showcase {
                     position: relative;
                     width: 100%;
-                    max-width: 500px;
-                    height: 400px;
-                    border-radius: 20px;
+                    max-width: 400px;
+                    height: 100%;
+                    border-radius: 16px;
                     overflow: hidden;
-                    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+                    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+                    background: var(--gray-100);
                 }
 
                 .platform-swiper {
@@ -509,45 +534,41 @@ const BannerTwo: React.FC<BannerTwoProps> = ({
                     position: relative;
                     width: 100%;
                     height: 100%;
-                }
-
-                .platform-slide__image {
-                    position: relative;
-                    width: 100%;
-                    height: 100%;
+                    background: var(--gray-100);
                 }
 
                 .platform-image {
                     width: 100%;
                     height: 100%;
                     object-fit: cover;
+                    transition: opacity 0.3s ease;
                 }
 
-                .platform-slide__overlay {
+                .platform-overlay {
                     position: absolute;
                     bottom: 0;
                     left: 0;
                     right: 0;
                     background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
-                    padding: 2rem;
+                    padding: 1.5rem;
                     color: white;
                     opacity: 0;
                     transition: opacity 0.3s ease;
                 }
 
-                .platform-slide:hover .platform-slide__overlay {
+                .platform-slide:hover .platform-overlay {
                     opacity: 1;
                 }
 
-                .platform-slide__info h3 {
+                .platform-info h3 {
                     margin: 0 0 0.5rem 0;
-                    font-size: 1.25rem;
+                    font-size: 1.1rem;
                     font-weight: 600;
                 }
 
-                .platform-slide__info p {
+                .platform-info p {
                     margin: 0;
-                    font-size: 0.9rem;
+                    font-size: 0.85rem;
                     opacity: 0.9;
                 }
 
@@ -556,12 +577,12 @@ const BannerTwo: React.FC<BannerTwoProps> = ({
                     top: 50%;
                     left: 50%;
                     transform: translate(-50%, -50%);
-                    z-index: 2; /* FIX: Lower than banner cards */
+                    z-index: 3;
                 }
 
                 .play-button {
-                    width: clamp(60px, 10vw, 80px);
-                    height: clamp(60px, 10vw, 80px);
+                    width: clamp(50px, 8vw, 70px);
+                    height: clamp(50px, 8vw, 70px);
                     border-radius: 50%;
                     background: rgba(255, 255, 255, 0.95);
                     border: none;
@@ -571,56 +592,41 @@ const BannerTwo: React.FC<BannerTwoProps> = ({
                     color: var(--primary);
                     cursor: pointer;
                     transition: all 0.3s ease;
-                    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+                    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
                 }
 
                 .play-button:hover {
                     transform: scale(1.1);
-                    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.3);
+                    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+                }
+
+                .banner-cards {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                    gap: 1.5rem;
+                    margin-top: 3rem;
+                    max-width: 900px;
+                    margin-left: auto;
+                    margin-right: auto;
                 }
 
                 .banner-card {
-                    position: absolute;
                     background: white;
-                    border-radius: 16px;
+                    border-radius: 12px;
                     padding: 1.5rem;
-                    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-                    backdrop-filter: blur(10px);
-                    border: 1px solid rgba(255, 255, 255, 0.2);
+                    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+                    border: 1px solid var(--primary-100);
                     transition: all 0.3s ease;
-                    z-index: 5; /* FIX: Higher than video overlay */
+                    position: relative;
+                    z-index: 4;
                 }
 
                 .banner-card:hover {
-                    transform: translateY(-5px);
-                    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+                    transform: translateY(-4px);
+                    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
                 }
 
-                .banner-card--users {
-                    top: 10%;
-                    left: -10%;
-                    min-width: 280px;
-                    animation: float 6s ease-in-out infinite;
-                }
-
-                .banner-card--offer {
-                    top: 60%;
-                    right: -15%;
-                    animation: float 6s ease-in-out infinite 2s;
-                }
-
-                .banner-card--support {
-                    bottom: 10%;
-                    left: -5%;
-                    animation: float 6s ease-in-out infinite 4s;
-                }
-
-                @keyframes float {
-                    0%, 100% { transform: translateY(0px); }
-                    50% { transform: translateY(-10px); }
-                }
-
-                .banner-card__content {
+                .banner-card__header {
                     display: flex;
                     align-items: center;
                     gap: 1rem;
@@ -628,14 +634,15 @@ const BannerTwo: React.FC<BannerTwoProps> = ({
                 }
 
                 .banner-card__icon {
-                    width: 48px;
-                    height: 48px;
-                    border-radius: 12px;
+                    width: 40px;
+                    height: 40px;
+                    border-radius: 10px;
                     display: flex;
                     align-items: center;
                     justify-content: center;
                     background: var(--primary-50);
                     color: var(--primary);
+                    flex-shrink: 0;
                 }
 
                 .banner-card__icon--watch {
@@ -650,14 +657,14 @@ const BannerTwo: React.FC<BannerTwoProps> = ({
 
                 .banner-card__title {
                     margin: 0 0 0.25rem 0;
-                    font-size: 1.1rem;
+                    font-size: 1rem;
                     font-weight: 600;
                     color: var(--primary-dark);
                 }
 
                 .banner-card__subtitle {
                     margin: 0;
-                    font-size: 0.9rem;
+                    font-size: 0.85rem;
                     color: var(--gray-600);
                 }
 
@@ -665,20 +672,22 @@ const BannerTwo: React.FC<BannerTwoProps> = ({
                     color: var(--primary);
                     text-decoration: none;
                     font-weight: 600;
+                    font-size: 0.85rem;
                 }
 
                 .enrolled-students {
                     display: flex;
-                    gap: -0.5rem;
+                    gap: -0.25rem;
+                    margin-top: 0.5rem;
                 }
 
                 .enrolled-students__avatar {
-                    width: 36px;
-                    height: 36px;
+                    width: 28px;
+                    height: 28px;
                     border-radius: 50%;
                     border: 2px solid white;
                     overflow: hidden;
-                    margin-left: -8px;
+                    margin-left: -6px;
                     transition: all 0.2s ease;
                 }
 
@@ -697,77 +706,74 @@ const BannerTwo: React.FC<BannerTwoProps> = ({
                     object-fit: cover;
                 }
 
-                /* Mobile Cards Section */
-                .banner-cards-mobile {
-                    display: grid;
-                    grid-template-columns: 1fr;
-                    gap: 1rem;
-                    margin-top: 2rem;
-                    max-width: 400px;
-                    margin-left: auto;
-                    margin-right: auto;
-                }
-
-                .banner-enhanced__effects {
+                .educational-floaters {
                     position: absolute;
                     top: 0;
                     left: 0;
                     right: 0;
                     bottom: 0;
+                    pointer-events: none;
                     z-index: 1;
-                    overflow: hidden;
                 }
 
-                .floating-shape {
+                .edu-floater {
                     position: absolute;
-                    border-radius: 50%;
-                    background: linear-gradient(135deg, var(--primary-100), var(--primary-200));
-                    animation: floatShape 20s linear infinite;
+                    animation: eduFloat 15s ease-in-out infinite;
+                    opacity: 0.6;
+                    transition: opacity 0.3s ease;
                 }
 
-                .floating-shape--1 {
-                    width: 60px;
-                    height: 60px;
-                    top: 20%;
-                    left: 10%;
+                .edu-floater:hover {
+                    opacity: 0.9;
+                }
+
+                .edu-floater--notebook {
+                    top: 15%;
+                    left: 8%;
                     animation-delay: 0s;
                 }
 
-                .floating-shape--2 {
-                    width: 40px;
-                    height: 40px;
-                    top: 70%;
-                    right: 20%;
+                .edu-floater--ruler {
+                    top: 65%;
+                    right: 10%;
                     animation-delay: 5s;
+                    transform: rotate(-25deg);
                 }
 
-                .floating-shape--3 {
-                    width: 80px;
-                    height: 80px;
-                    bottom: 30%;
-                    left: 5%;
+                .edu-floater--planet {
+                    bottom: 25%;
+                    left: 15%;
                     animation-delay: 10s;
                 }
 
-                .floating-shape--4 {
-                    width: 30px;
-                    height: 30px;
-                    top: 40%;
-                    right: 10%;
-                    animation-delay: 15s;
+                @keyframes eduFloat {
+                    0%, 100% { 
+                        transform: translateY(0px) rotate(0deg); 
+                    }
+                    25% { 
+                        transform: translateY(-15px) rotate(5deg); 
+                    }
+                    50% { 
+                        transform: translateY(0px) rotate(-5deg); 
+                    }
+                    75% { 
+                        transform: translateY(10px) rotate(3deg); 
+                    }
                 }
 
-                @keyframes floatShape {
-                    0%, 100% { transform: translateY(0px) rotate(0deg); }
-                    25% { transform: translateY(-20px) rotate(90deg); }
-                    50% { transform: translateY(0px) rotate(180deg); }
-                    75% { transform: translateY(20px) rotate(270deg); }
+                .edu-floater-image {
+                    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
+                    transition: transform 0.3s ease;
+                }
+
+                .edu-floater:hover .edu-floater-image {
+                    transform: scale(1.1);
                 }
 
                 /* Swiper customization */
                 :global(.platform-bullet) {
-                    width: 12px !important;
-                    height: 12px !important;
+                    width: 8px !important;
+                    height: 8px !important;
                     background: rgba(255, 255, 255, 0.5) !important;
                     opacity: 1 !important;
                     transition: all 0.3s ease !important;
@@ -779,139 +785,146 @@ const BannerTwo: React.FC<BannerTwoProps> = ({
                 }
 
                 :global(.swiper-pagination) {
-                    opacity: 0.7;
-                    transform: translateY(10px);
-                    transition: all 0.3s ease;
+                    bottom: 15px !important;
                 }
 
                 /* MOBILE RESPONSIVE STYLES */
-                @media (max-width: 1024px) {
-                    .banner-enhanced__content {
+                @media (max-width: 768px) {
+                    .banner-fixed {
+                        padding: 2rem 0 1rem;
+                        min-height: auto;
+                    }
+
+                    .banner-content {
                         grid-template-columns: 1fr;
-                        gap: 3rem;
+                        gap: 2rem;
                         text-align: center;
+                        min-height: auto;
                     }
 
-                    .banner-enhanced__text {
-                        max-width: 100%;
+                    .banner-text {
                         order: 1;
+                        max-width: 100%;
                     }
 
-                    .banner-enhanced__visual {
+                    .banner-visual {
                         order: 2;
-                        height: clamp(300px, 40vh, 400px);
+                        height: 250px;
                     }
 
                     .platform-showcase {
-                        max-width: 100%;
-                        height: 300px;
-                        border-radius: 16px;
+                        max-width: 300px;
+                        height: 250px;
+                        border-radius: 12px;
                     }
 
-                    .banner-card {
-                        position: static !important;
-                        margin: 0 auto 1rem !important;
-                        max-width: 320px !important;
-                        animation: none !important;
-                        transform: none !important;
-                    }
-
-                    .banner-cards-mobile .banner-card {
-                        margin: 0 auto 0.75rem !important;
-                        max-width: 100% !important;
-                    }
-                }
-
-                @media (max-width: 768px) {
-                    .banner-enhanced {
-                        padding: 4rem 0 3rem;
-                        min-height: 70vh;
-                    }
-
-                    .banner-enhanced__content {
-                        gap: 2rem;
-                        min-height: 50vh;
-                    }
-
-                    .banner-enhanced__actions {
-                        flex-direction: column;
-                        align-items: center;
+                    .banner-actions {
+                        justify-content: center;
                         gap: 0.75rem;
                     }
 
                     .btn {
-                        width: 100%;
-                        max-width: 280px;
+                        min-width: 140px;
                         justify-content: center;
                     }
 
-                    .platform-showcase {
-                        height: 250px;
-                        border-radius: 12px;
+                    .banner-cards {
+                        grid-template-columns: 1fr;
+                        gap: 1rem;
+                        margin-top: 2rem;
+                    }
+
+                    .banner-card {
+                        padding: 1.25rem;
                     }
 
                     .enrolled-students {
                         justify-content: center;
                         flex-wrap: wrap;
-                        gap: 0.25rem;
+                        gap: 0.125rem;
                     }
 
                     .enrolled-students__avatar {
-                        width: 32px;
-                        height: 32px;
-                        margin-left: -6px;
+                        width: 24px;
+                        height: 24px;
+                        margin-left: -4px;
                     }
 
                     .enrolled-students__avatar:first-child {
                         margin-left: 0;
                     }
 
-                    .banner-card {
-                        padding: 1rem !important;
+                    /* Simplify educational floaters on mobile */
+                    .edu-floater {
+                        opacity: 0.3;
+                        transform: scale(0.7);
                     }
 
-                    .banner-card__icon {
-                        width: 40px;
-                        height: 40px;
-                    }
-
-                    .banner-card__title {
-                        font-size: 1rem;
-                    }
-
-                    .banner-card__subtitle {
-                        font-size: 0.85rem;
+                    .edu-floater--ruler {
+                        display: none;
                     }
                 }
 
                 @media (max-width: 480px) {
-                    .banner-enhanced {
-                        padding: 3rem 0 2rem;
-                        min-height: 60vh;
+                    .banner-container {
+                        padding: 0 1rem;
                     }
 
-                    .btn {
-                        max-width: 250px;
-                        padding: 0.75rem 1.25rem;
-                        font-size: 0.9rem;
-                    }
-
-                    .platform-showcase {
+                    .banner-visual {
                         height: 200px;
                     }
 
-                    .enrolled-students__avatar {
-                        width: 28px;
-                        height: 28px;
-                        margin-left: -4px;
+                    .platform-showcase {
+                        max-width: 100%;
+                        height: 200px;
+                    }
+
+                    .btn {
+                        width: 100%;
+                        max-width: 200px;
+                    }
+
+                    .banner-cards {
+                        gap: 0.75rem;
                     }
 
                     .banner-card {
-                        padding: 0.875rem !important;
+                        padding: 1rem;
                     }
 
-                    .banner-card--users {
-                        min-width: 240px !important;
+                    .banner-card__icon {
+                        width: 36px;
+                        height: 36px;
+                    }
+
+                    /* Hide educational floaters on very small screens */
+                    .educational-floaters {
+                        display: none;
+                    }
+                }
+
+                /* High contrast mode support */
+                @media (prefers-contrast: custom) {
+                    .banner-card {
+                        border-width: 2px;
+                    }
+                    
+                    .play-button {
+                        border: 2px solid var(--primary);
+                    }
+                }
+
+                /* Reduced motion support */
+                @media (prefers-reduced-motion: reduce) {
+                    .banner-badge,
+                    .edu-floater {
+                        animation: none;
+                    }
+                    
+                    .btn:hover,
+                    .banner-card:hover,
+                    .play-button:hover {
+                        transform: none;
                     }
                 }
             `}</style>
