@@ -166,7 +166,7 @@ module.exports = {
     },
     plugins: [
         // Add any additional plugins here
-        function({ addUtilities, theme }) {
+        function({ addUtilities }) {
             const newUtilities = {
                 // Theme-aware utilities
                 '.theme-transition': {

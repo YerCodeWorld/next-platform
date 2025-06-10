@@ -1,11 +1,10 @@
 // apps/web-next/hooks/useAuth.ts
 'use client';
 
-import { useRouter } from 'next/navigation';
+// import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
 export function useAuth() {
-    const router = useRouter();
 
     const login = async (credential: string) => {
         try {

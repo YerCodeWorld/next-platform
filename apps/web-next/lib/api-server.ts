@@ -104,7 +104,7 @@ const serverUserApi = {
         picture?: string;
         role?: 'ADMIN' | 'TEACHER' | 'STUDENT';
         country?: string;
-        [key: string]: any;
+
     }): Promise<User> {
         return serverFetch<User>(`/users/email/${encodeURIComponent(email)}`, {
             method: 'PUT',
@@ -135,6 +135,7 @@ const serverUserApi = {
             await this.getUserByEmail(email);
             return true;
         } catch (err) {
+            console.log(err)
             return false;
         }
     }

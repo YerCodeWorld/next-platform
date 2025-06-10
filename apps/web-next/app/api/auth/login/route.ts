@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'No credential provided' }, { status: 400 });
         }
 
-        const decoded = jwtDecode<any>(credential);
+        const decoded = jwtDecode<never>(credential);
         const { email, name, picture, sub } = decoded;
 
         // Try to get user from your external API first
