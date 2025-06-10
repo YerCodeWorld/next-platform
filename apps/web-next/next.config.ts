@@ -38,11 +38,7 @@ const nextConfig: NextConfig = {
         };
 
         return config;
-    },
-    // Experimental features for better package support
-    experimental: {
-        esmExternals: 'loose',
-    },
+    }
 };
 
 export default withNextIntl(nextConfig);

@@ -183,7 +183,7 @@ const HelpAssistant: React.FC<HelpComponentProps> = ({ user }) => {
                     {showTooltip && (
                         <div className="help-tooltip">
                             <div className="tooltip-content">
-                                {user?.name.split(' ')[0]}, May I be of help?
+                                {user ? user.name.split(' ')[0]+"," : 'Hey!' } May I be of help?
                             </div>
                             <div className="tooltip-arrow"></div>
                         </div>

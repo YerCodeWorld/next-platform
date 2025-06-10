@@ -6,6 +6,7 @@
 
 import {
     User,
+    CreateUserPayload,
     Testimony,
     Post,
     Dynamic,
@@ -75,16 +76,7 @@ const serverUserApi = {
         };
     },
 
-    async createUser(userData: {
-        id: string;
-        email: string;
-        name: string;
-        picture?: string;
-        role?: 'ADMIN' | 'TEACHER' | 'STUDENT';
-        country: string;
-        preferredColor?: string;
-        preferredLanguage?: 'SPANISH' | 'ENGLISH';
-    }): Promise<User> {
+    async createUser(userData: CreateUserPayload): Promise<User> {
         return serverFetch<User>('/users', {
             method: 'POST',
             headers: {
@@ -97,48 +89,6 @@ const serverUserApi = {
         });
     },
 
-    async updateUserByEmail(email: string, updates: {
-        preferredLanguage?: 'SPANISH' | 'ENGLISH';
-        preferredColor?: string;
-        name?: string;
-        picture?: string;
-        role?: 'ADMIN' | 'TEACHER' | 'STUDENT';
-        country?: string;
-
-    }): Promise<User> {
-        return serverFetch<User>(`/users/email/${encodeURIComponent(email)}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                'Origin': process.env.NODE_ENV === 'production'
-                    ? 'https://ieduguide.com'
-                    : 'http://localhost:3002'
-            },
-            body: JSON.stringify(updates)
-        });
-    },
-
-    async deleteUser(email: string): Promise<void> {
-        return serverFetch<void>(`/users/email/${encodeURIComponent(email)}`, {
-            method: 'DELETE',
-            headers: {
-                'Origin': process.env.NODE_ENV === 'production'
-                    ? 'https://ieduguide.com'
-                    : 'http://localhost:3002'
-            }
-        });
-    },
-
-    // Helper method to check if user exists
-    async userExists(email: string): Promise<boolean> {
-        try {
-            await this.getUserByEmail(email);
-            return true;
-        } catch (err) {
-            console.log(err)
-            return false;
-        }
-    }
 };
 
 // ============================================
