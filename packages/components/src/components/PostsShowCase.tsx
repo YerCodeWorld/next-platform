@@ -1,34 +1,18 @@
 // packages/components/src/components/PostsShowCase.tsx
 'use client';
 
+import React, { useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 // @ts-ignore
 import { BookOpen, Eye, ChatDots, ArrowRight, UserCircle, CaretLeft, CaretRight } from 'phosphor-react';
-import { useRef } from "react";
+import { Post } from "@repo/api-bridge";
 import Slider from "react-slick";
 
 interface SliderRef {
     slickNext: () => void;
     slickPrev: () => void;
     slickGoTo: (slide: number) => void;
-}
-
-interface BlogUser {
-    id: string;
-    name: string;
-    picture?: string | null;
-}
-
-interface BlogPost {
-    id: string;
-    title: string;
-    slug: string;
-    summary?: string;
-    coverImage?: string | null;
-    createdAt: Date;
-    user?: BlogUser;
-    published: boolean;
 }
 
 interface BlogShowCaseTranslations {
@@ -40,7 +24,7 @@ interface BlogShowCaseTranslations {
 }
 
 interface BlogShowCaseProps {
-    posts: BlogPost[];
+    posts: Post[];
     locale: string;
     translations?: BlogShowCaseTranslations;
 }

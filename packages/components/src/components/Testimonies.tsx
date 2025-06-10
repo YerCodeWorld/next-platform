@@ -1,33 +1,17 @@
 // packages/components/src/components/Testimonies.tsx
 'use client';
 
-import { useRef } from "react";
-// @ts-ignore
+import React, { useRef } from "react";
 import Link from "next/link";
-// @ts-ignore
 import Image from "next/image";
 import Slider from "react-slick";
+import { Testimony } from "@repo/api-bridge";
 import StarsRating from "../components/sub/StarsRating";
 
 const Shape1 = '/images/shapes/shape2.png';
 const Quotes = '/images/shapes/shape6.png';
 const Shape4 = '/images/shapes/shape4.png';
 const Real = '/images/icons/quote-two-icon.png';
-
-interface TestimonialUser {
-    id: string;
-    name: string;
-    picture?: string | null;
-    role?: string;
-}
-
-interface Testimonial {
-    id: string;
-    content: string;
-    rating: number;
-    user?: TestimonialUser;
-    createdAt: Date;
-}
 
 interface TestimonialsTranslations {
     title: string;
@@ -41,7 +25,7 @@ interface TestimonialsTranslations {
 }
 
 interface TestimonialsProps {
-    testimonials: Testimonial[];
+    testimonials: Testimony[];
     translations: TestimonialsTranslations;
     locale: string;
 }

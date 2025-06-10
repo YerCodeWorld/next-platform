@@ -140,6 +140,9 @@ importers:
       '@prisma/client':
         specifier: ^6.9.0
         version: 6.9.0(prisma@6.9.0(typescript@5.8.2))(typescript@5.8.2)
+      '@repo/api-bridge':
+        specifier: workspace:*
+        version: link:../api-bridge
       '@repo/eslint-config':
         specifier: workspace:*
         version: link:../eslint-config
