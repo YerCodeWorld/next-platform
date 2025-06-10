@@ -1,8 +1,11 @@
 // apps/web-next/app/api/auth/login/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { jwtDecode } from 'jwt-decode';
-import { prisma } from '@/lib/prisma';
 import { cookies } from 'next/headers';
+
+// Since your API doesn't handle authentication, we need to handle user creation differently
+// Option 1: Keep this route as-is (since it's an API route, not a component)
+// Option 2: Create a hybrid approach
 
 export async function POST(request: NextRequest) {
     try {
@@ -12,42 +15,55 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'No credential provided' }, { status: 400 });
         }
 
-        const decoded = jwtDecode<never>(credential);
+        const decoded = jwtDecode<any>(credential);
         const { email, name, picture, sub } = decoded;
 
-        // Check if user exists
-        let user = await prisma.user.findUnique({
-            where: { email }
-        });
+        // Try to get user from your external API first
+        let user;
+        try {
+            user = await fetch(`https://api.ieduguide.com/api/users/email/${encodeURIComponent(email)}`, {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' }
+            }).then(res => res.json());
 
-        // Create user if doesn't exist
+            if (user.data) {
+                user = user.data;
+            }
+        } catch (error) {
+            // User doesn't exist, we need to create them
+            console.log('User not found in API, creating new user', error);
+        }
+
+        // If user doesn't exist, create them via API
         if (!user) {
-            user = await prisma.user.create({
-                data: {
-                    id: sub,
-                    email,
-                    name,
-                    picture,
-                    role: 'STUDENT',
-                    country: 'Unknown',
-                    preferredColor: 'LAVENDER',
-                    preferredLanguage: 'SPANISH'
-                }
-            });
-
-            // Create teacher profile if teacher
-            if (user.role === 'TEACHER') {
-                await prisma.teacherProfile.create({
-                    data: {
-                        userId: user.id,
-                        displayName: user.name,
-                        themeColor: '#A47BB9',
-                        timezone: 'UTC',
-                        currency: 'USD',
-                        teachingLanguages: ['English'],
-                        availabilityTags: ['flexible']
-                    }
+            try {
+                const createResponse = await fetch('https://api.ieduguide.com/api/users', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Origin': process.env.NODE_ENV === 'production'
+                            ? 'https://ieduguide.com'
+                            : 'http://localhost:3002'
+                    },
+                    body: JSON.stringify({
+                        id: sub,
+                        email,
+                        name,
+                        picture,
+                        role: 'STUDENT',
+                        country: 'Unknown',
+                        preferredColor: 'LAVENDER',
+                        preferredLanguage: 'SPANISH'
+                    })
                 });
+
+                if (createResponse.ok) {
+                    const newUserData = await createResponse.json();
+                    user = newUserData.data;
+                }
+            } catch (createError) {
+                console.error('Failed to create user via API:', createError);
+                return NextResponse.json({ error: 'Failed to create user' }, { status: 500 });
             }
         }
 

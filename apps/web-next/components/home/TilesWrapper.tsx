@@ -1,7 +1,7 @@
 // apps/web-next/components/home/TilesWrapper.tsx
 'use client';
 
-import { useRef } from 'react';
+import React, { useRef } from 'react';
 import Link from 'next/link';
 import "./../../styles/home/tiles.css";
 // import Image from 'next/image';

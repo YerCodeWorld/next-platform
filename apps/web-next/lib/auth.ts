@@ -1,9 +1,13 @@
-// apps/web-next/lib/auth.ts
-import { cookies } from 'next/headers';
-import { jwtDecode } from 'jwt-decode';
-import { prisma } from './prisma';
-import type { User } from '@/types';
 
+// =============================================================================
+// 1. UPDATED AUTH.TS - Replace Prisma with API calls
+// =============================================================================
+
+// apps/web-next/lib/auth.ts
+import {cookies} from 'next/headers';
+import {jwtDecode} from 'jwt-decode';
+import {serverUserApi} from './api-server';
+import type {User} from '@/types';
 
 interface GoogleJwtPayload {
     email: string;
@@ -27,12 +31,12 @@ export async function getCurrentUser(): Promise<User | null> {
             return null;
         }
 
-        // Get user from database
-        const user = await prisma.user.findUnique({
-            where: { email: decoded.email }
-        });
-
-        return user;
+        try {
+            return await serverUserApi.getUserByEmail(decoded.email);
+        } catch (error) {
+            console.error('Error fetching user from API:', error);
+            return null;
+        }
     } catch (error) {
         console.error('Auth error:', error);
         return null;

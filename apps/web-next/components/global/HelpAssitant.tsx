@@ -14,6 +14,12 @@ import 'swiper/css';
 import 'swiper/css/pagination';
 import 'swiper/css/navigation';
 
+interface User {
+    id: string;
+    name: string;
+    role: string;
+}
+
 interface HelpSlide {
     title: string;
     content: string;
@@ -23,6 +29,10 @@ interface HelpSlide {
 interface PageHelp {
     title: string;
     slides: HelpSlide[];
+}
+
+interface HelpComponentProps {
+    user: User | null;
 }
 
 // Help content configuration - easily extensible
@@ -85,7 +95,7 @@ const helpContent: Record<string, PageHelp> = {
     // Add more pages as needed...
 };
 
-const HelpAssistant: React.FC = () => {
+const HelpAssistant: React.FC<HelpComponentProps> = ({ user }) => {
     const pathname = usePathname();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [showTooltip, setShowTooltip] = useState(false);
@@ -113,6 +123,9 @@ const HelpAssistant: React.FC = () => {
 
     // Reset tooltip state when pathname changes
     useEffect(() => {
+        if (user) {
+            console.log("Hi! ", user.name)
+        }
         setTooltipDismissed(false);
         setShowTooltip(false);
         setIsModalOpen(false);
@@ -170,7 +183,7 @@ const HelpAssistant: React.FC = () => {
                     {showTooltip && (
                         <div className="help-tooltip">
                             <div className="tooltip-content">
-                                May I be of help?
+                                {user?.name.split(' ')[0]}, May I be of help?
                             </div>
                             <div className="tooltip-arrow"></div>
                         </div>

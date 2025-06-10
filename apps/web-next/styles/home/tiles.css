@@ -404,7 +404,7 @@
 }
 
 /* High contrast mode adjustments */
-@media (prefers-contrast: high) {
+@media (prefers-contrast: more) {
     .tile-background::before {
         background: linear-gradient(
                 45deg,

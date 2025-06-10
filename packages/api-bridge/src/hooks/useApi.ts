@@ -1,3 +1,4 @@
+// packages/api-bridge/src/hooks/useApi.ts - Simplified version
 import { useState, useCallback, useMemo } from 'react';
 
 export interface ApiOptions {
@@ -11,38 +12,13 @@ export interface ApiResponse<T> {
     loading: boolean;
 }
 
-// Pretty much a joke, refactor or remove completely
+// Simplified API base URL - no complex logic needed
 const getApiBaseUrl = (): string => {
-    // Check if we're in a browser environment
-    if (typeof window !== 'undefined') {
-        const hostname = window.location.hostname;
-        
-        // Production domains
-        if (hostname === 'ieduguide.com' || 
-            hostname === 'www.ieduguide.com' ||
-            hostname === 'ieduguide.com' ||
-            hostname === 'www.ieduguide.com') {
-            return 'https://api.ieduguide.com/api';
-        }
-        
-        // Vercel preview deployments
-        if (hostname.includes('vercel.app')) {
-            return 'https://eduapi-phi.vercel.app/api';
-        }
-        
-        // Local development
-        if (hostname === 'localhost' || hostname === '127.0.0.1') {
-            return 'https://api.ieduguide.com/api';
-        }
-    }
-    
-    // Default fallback - this should be your production API
     return 'https://api.ieduguide.com/api';
 };
 
 export function useApi<T = unknown>() {
-
-    // Default API options - change this if your API URL is different
+    // Simplified default options
     const defaultOptions: ApiOptions = useMemo(() => ({
         headers: {
             'Content-Type': 'application/json',
@@ -83,28 +59,22 @@ export function useApi<T = unknown>() {
                     method,
                     headers: mergedOptions.headers,
                     body: body ? JSON.stringify(body) : undefined,
-                    credentials: 'include',
+                    // Remove credentials since API doesn't handle authentication
+                    // credentials: 'include',
                 });
 
-                const sendError = (err: string | undefined) => {
-                    throw new Error(err);
-                }
-
                 if (!response.ok) {
-                    const errorData = await response.json();
-
-                    if (errorData) {
-                        sendError(errorData);
-                    } else {
-                        sendError("API request failed.");
-                    }
-                    // throw new Error(errorData.message || 'API request failed');
+                    const errorMessage = `API request failed: ${response.status} ${response.statusText}`;
+                    throw new Error(errorMessage);
                 }
 
-                const data = await response.json();
+                const responseData = await response.json();
 
-                setState({ data: data.data, error: null, loading: false });
-                return { data: data.data, error: null, loading: false };
+                // Handle both formats: { data: T } or direct T
+                const data = responseData.data !== undefined ? responseData.data : responseData;
+
+                setState({ data, error: null, loading: false });
+                return { data, error: null, loading: false };
             } catch (error) {
                 const errorObject = error instanceof Error ? error : new Error('Unknown error occurred');
                 setState({ data: null, error: errorObject, loading: false });
@@ -115,8 +85,6 @@ export function useApi<T = unknown>() {
     );
 
     // Convenience methods for common HTTP verbs
-    // ---------------------------------------------------------------------------
-
     const get = useCallback(
         <R = T>(endpoint: string, options?: ApiOptions) => {
             return fetchFromApi<R>(endpoint, 'GET', undefined, options);

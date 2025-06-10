@@ -65,7 +65,7 @@ export default async function LocaleLayout({
                     </div>
 
                     {/* Global Help Assistant */}
-                    <HelpAssistant />
+                    <HelpAssistant user={user}/>
 
                     <Toaster position="bottom-center" richColors />
                 </AuthProvider>

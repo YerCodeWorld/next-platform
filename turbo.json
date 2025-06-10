@@ -19,7 +19,8 @@
       "env": [
         "DATABASE_URL",
         "GOOGLE_CLIENT_SECRET",
-         "NEXT_PUBLIC_GOOGLE_CLIENT_ID"
+         "NEXT_PUBLIC_GOOGLE_CLIENT_ID",
+        "API_BASE_URL"
       ],
       "dependsOn": ["^build", "build:scss", "db:generate"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
@@ -29,7 +30,8 @@
       "env": [
         "DATABASE_URL",
         "GOOGLE_CLIENT_SECRET",
-        "NEXT_PUBLIC_GOOGLE_CLIENT_ID"
+        "NEXT_PUBLIC_GOOGLE_CLIENT_ID",
+        "API_BASE_URL"
       ],
       "dependsOn": ["^dev"],
       "cache": false,
