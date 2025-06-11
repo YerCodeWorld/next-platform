@@ -11,7 +11,7 @@
       "teachers": "EduTeachers",
       "journal": "EduBlog",
       "games": "EduGames",
-      "courses": "EduCourses",
+      "courses": "EduActivities",
       "competitions": "EduMatch",
       "discussion": "EduChat"
     }
@@ -126,5 +126,96 @@
     "loading": "Loading...",
     "viewPost": "View Post",
     "createPost": "Create New Post"
+  },
+  "blogLanding": {
+    "pageTitle": "EduBlog - Teacher Insights",
+    "loading": "Loading...",
+    "viewPost": "View Post",
+    "createPost": "Create New Post",
+    "noArticles": "No articles available",
+    "checkBackSoon": "Check back soon for new content",
+    "sortBy": "Sort by:",
+    "newest": "Newest",
+    "oldest": "Oldest",
+    "title": "Title",
+    "readMore": "Read more",
+    "by": "By",
+    "showing": "Showing",
+    "of": "of",
+    "articles": "articles",
+    "featured": "Featured",
+    "publishedArticles": "Published Articles",
+    "activeAuthors": "Active Authors",
+    "totalViews": "Total Views",
+    "averageRating": "Average Rating",
+    "ourBlogByNumbers": "Our Blog by Numbers",
+    "qualityContent": "Quality educational content created by our community",
+    "shareKnowledge": "Are You an Educator? Share Your Knowledge!",
+    "joinCommunity": "Join our community of educators and share your experiences and insights",
+    "createAccount": "Create Account",
+    "learnMore": "Learn More"
+  },
+  "activities": {
+    "pageTitle": "EduActivities - Educational Dynamics",
+    "loading": "Loading...",
+    "educationalDynamics": "Educational Dynamics",
+    "innovativeStrategies": "Innovative strategies shared by educators",
+    "createDynamic": "Create Dynamic",
+    "filterDynamics": "Filter Dynamics",
+    "type": "Type:",
+    "allTypes": "All Types",
+    "ageGroup": "Age Group:",
+    "allAges": "All Ages",
+    "difficulty": "Difficulty:",
+    "allLevels": "All Levels",
+    "duration": "Duration (minutes):",
+    "min": "Min",
+    "max": "Max",
+    "clearFilters": "Clear Filters",
+    "showing": "Showing",
+    "of": "of",
+    "dynamics": "dynamics",
+    "noDynamicsFound": "No dynamics found",
+    "adjustFilters": "Try adjusting your filters or be the first to create one",
+    "createFirstDynamic": "Create First Dynamic",
+    "viewDynamic": "View Dynamic",
+    "edit": "Edit",
+    "materials": "Materials:",
+    "students": "students",
+    "types": {
+      "reading": "Reading",
+      "conversation": "Conversation",
+      "teachingStrategy": "Teaching Strategy",
+      "grammar": "Grammar",
+      "vocabulary": "Vocabulary",
+      "game": "Game",
+      "competition": "Competition",
+      "general": "General"
+    },
+    "ageGroups": {
+      "kids": "Kids (5-12)",
+      "teens": "Teens (13-17)",
+      "adults": "Adults (18+)",
+      "allAges": "All Ages"
+    },
+    "difficulties": {
+      "beginner": "Beginner",
+      "intermediate": "Intermediate",
+      "advanced": "Advanced"
+    },
+    "statistics": {
+      "availableDynamics": "Available Dynamics",
+      "activeEducators": "Active Educators",
+      "averageDuration": "Average Duration",
+      "reportedEffectiveness": "Reported Effectiveness",
+      "impactTitle": "Impact of Our Dynamics",
+      "impactSubtitle": "Proven and effective strategies shared by expert educators"
+    },
+    "cta": {
+      "title": "Have an Innovative Strategy?",
+      "subtitle": "Share your teaching dynamics and strategies with the educational community",
+      "createButton": "Create Dynamic",
+      "learnButton": "Learn More"
+    }
   }
 }

@@ -9,6 +9,9 @@ export { default as Testimonials } from "./components/Testimonies";
 export { default as SectionsCardsTwo } from "./components/SectionsCardsTwo";
 export { default as Marquee } from "./components/sub/Marquee";
 export { default as BlogShowCase } from "./components/PostsShowCase";
+export { default as Breadcrumb } from "./components/global/BreadCrumb";
+export { default as BlogGrid } from "./components/blog/BlogGrid";
+export { default as DynamicsGrid } from "./components/activities/DynamicsGrid";
 
 // Re-export hooks that are still needed
 export { useIsInView } from "./hooks/useIsInView";

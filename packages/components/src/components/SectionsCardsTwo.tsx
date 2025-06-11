@@ -74,7 +74,7 @@ const SectionsCardsTwo: React.FC<SectionsCardsTwoProps> = ({
             image: image2,
             title: translations.card2.title,
             text: translations.card2.description,
-            link: `/${locale}/dynamics`
+            link: `/${locale}/activities`
         },
         {
             divColor: 'bg-main-three-25',

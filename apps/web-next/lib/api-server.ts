@@ -177,6 +177,14 @@ const serverDynamicsApi = {
 
     async getDynamicBySlug(slug: string): Promise<Dynamic> {
         return serverFetch<Dynamic>(`/dynamics/slug/${slug}`);
+    },
+
+    async getFeaturedDynamics(limit: number = 6): Promise<Dynamic[]> {
+        return serverFetch<Dynamic[]>(`/dynamics?featured=true&published=true&limit=${limit}&orderBy=createdAt&order=desc`);
+    },
+
+    async getDynamicsByAuthor(email: string): Promise<Dynamic[]> {
+        return serverFetch<Dynamic[]>(`/dynamics/user/${encodeURIComponent(email)}`);
     }
 };
 

@@ -266,7 +266,7 @@ const Header: React.FC<HeaderProps> = ({
                             </li>
                             <li className="header__nav-item">
                                 <Link
-                                    href={`/${locale}/construction/courses`}
+                                    href={`/${locale}/activities`}
                                     className="header__nav-link"
                                 >
                                     {translations.navigation.courses}

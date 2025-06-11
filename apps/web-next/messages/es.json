@@ -11,7 +11,7 @@
       "teachers": "EduProfesores",
       "journal": "EduBlog",
       "games": "EduJuegos",
-      "courses": "EduCursos",
+      "courses": "EduDinámicas",
       "competitions": "EduPartida",
       "discussion": "EduDebate"
     }
@@ -126,5 +126,96 @@
     "loading": "Cargando...",
     "viewPost": "Ver Publicación",
     "createPost": "Crear Nueva Publicación"
+  },
+  "blogLanding": {
+    "pageTitle": "EduBlog - Perspectivas de Maestros",
+    "loading": "Cargando...",
+    "viewPost": "Ver Publicación",
+    "createPost": "Crear Nueva Publicación",
+    "noArticles": "No hay artículos disponibles",
+    "checkBackSoon": "Vuelve pronto para ver nuevo contenido",
+    "sortBy": "Ordenar por:",
+    "newest": "Más reciente",
+    "oldest": "Más antiguo",
+    "title": "Título",
+    "readMore": "Leer más",
+    "by": "Por",
+    "showing": "Mostrando",
+    "of": "de",
+    "articles": "artículos",
+    "featured": "Destacado",
+    "publishedArticles": "Artículos Publicados",
+    "activeAuthors": "Autores Activos",
+    "totalViews": "Vistas Totales",
+    "averageRating": "Calificación Promedio",
+    "ourBlogByNumbers": "Nuestro Blog en Números",
+    "qualityContent": "Contenido educativo de calidad creado por nuestra comunidad",
+    "shareKnowledge": "¿Eres Educador? ¡Comparte tu Conocimiento!",
+    "joinCommunity": "Únete a nuestra comunidad de educadores y comparte tus experiencias e ideas",
+    "createAccount": "Crear Cuenta",
+    "learnMore": "Más Información"
+  },
+  "activities": {
+    "pageTitle": "EduActividades - Dinámicas Educativas",
+    "loading": "Cargando...",
+    "educationalDynamics": "Dinámicas Educativas",
+    "innovativeStrategies": "Estrategias innovadoras compartidas por educadores",
+    "createDynamic": "Crear Dinámica",
+    "filterDynamics": "Filtrar Dinámicas",
+    "type": "Tipo:",
+    "allTypes": "Todos los Tipos",
+    "ageGroup": "Grupo de Edad:",
+    "allAges": "Todas las Edades",
+    "difficulty": "Dificultad:",
+    "allLevels": "Todos los Niveles",
+    "duration": "Duración (minutos):",
+    "min": "Mín",
+    "max": "Máx",
+    "clearFilters": "Limpiar Filtros",
+    "showing": "Mostrando",
+    "of": "de",
+    "dynamics": "dinámicas",
+    "noDynamicsFound": "No se encontraron dinámicas",
+    "adjustFilters": "Intenta ajustar los filtros o sé el primero en crear una",
+    "createFirstDynamic": "Crear Primera Dinámica",
+    "viewDynamic": "Ver Dinámica",
+    "edit": "Editar",
+    "materials": "Materiales:",
+    "students": "estudiantes",
+    "types": {
+      "reading": "Lectura",
+      "conversation": "Conversación",
+      "teachingStrategy": "Estrategia de Enseñanza",
+      "grammar": "Gramática",
+      "vocabulary": "Vocabulario",
+      "game": "Juego",
+      "competition": "Competencia",
+      "general": "General"
+    },
+    "ageGroups": {
+      "kids": "Niños (5-12)",
+      "teens": "Adolescentes (13-17)",
+      "adults": "Adultos (18+)",
+      "allAges": "Todas las Edades"
+    },
+    "difficulties": {
+      "beginner": "Principiante",
+      "intermediate": "Intermedio",
+      "advanced": "Avanzado"
+    },
+    "statistics": {
+      "availableDynamics": "Dinámicas Disponibles",
+      "activeEducators": "Educadores Activos",
+      "averageDuration": "Duración Promedio",
+      "reportedEffectiveness": "Efectividad Reportada",
+      "impactTitle": "Impacto de Nuestras Dinámicas",
+      "impactSubtitle": "Estrategias probadas y efectivas compartidas por educadores expertos"
+    },
+    "cta": {
+      "title": "¿Tienes una Estrategia Innovadora?",
+      "subtitle": "Comparte tus dinámicas y estrategias de enseñanza con la comunidad educativa",
+      "createButton": "Crear Dinámica",
+      "learnButton": "Saber Más"
+    }
   }
 }
