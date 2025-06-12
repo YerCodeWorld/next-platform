@@ -5,7 +5,7 @@ import { useApi } from "./useApi";
 export interface TeacherProfile {
     id: string;
     userId: string;
-    displayName?: string;
+    displayName?: string | undefined;
     tagline?: string;
     bio?: string;
     profileImage?: string;

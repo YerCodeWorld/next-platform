@@ -1,7 +1,7 @@
 // apps/web-next/app/[locale]/blog/page.tsx - FIXED VERSION
 import { Suspense } from 'react';
 import { Metadata } from 'next';
-import { getTranslations } from 'next-intl/server';
+// import { getTranslations } from 'next-intl/server';
 import { Breadcrumb } from "@repo/components";
 import BlogGridWrapper from '@/components/blog/BlogGridWrapper';
 import BlogStatsWrapper from '@/components/blog/BlogStatsWrapper';
@@ -51,7 +51,6 @@ export default async function BlogPage({
     params: Promise<{ locale: string }>
 }) {
     const { locale } = await params;
-    const t = await getTranslations();
 
     return (
         <div className="blog-page">

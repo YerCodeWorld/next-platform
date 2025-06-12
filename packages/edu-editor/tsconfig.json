@@ -1,0 +1,19 @@
+{
+  "extends": "@repo/typescript-config/react-library.json",
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "allowSyntheticDefaultImports": true,
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "strict": true,
+    "outDir": "dist",
+    // Add this option to prevent the "Void function return value is used" error
+    "noImplicitReturns": false,
+    // You might also want to add these for a more permissive configuration
+    "noUnusedLocals": false,
+    "noUnusedParameters": false
+  },
+  "include": ["src", "global.d.ts"],
+  "exclude": ["node_modules", "dist"]
+}

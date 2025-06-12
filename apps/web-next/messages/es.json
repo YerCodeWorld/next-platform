@@ -217,5 +217,45 @@
       "createButton": "Crear Dinámica",
       "learnButton": "Saber Más"
     }
+  },
+  "teachers": {
+    "hero": {
+      "title": "EduMaestros",
+      "subtitle": "Conéctate con instructores calificados de todo el mundo"
+    },
+    "breadcrumb": {
+      "home": "Inicio",
+      "teachers": "Profesores"
+    },
+    "grid": {
+      "title": "Nuestros Profesores Expertos",
+      "subtitle": "Aprende con educadores apasionados de todo el mundo"
+    },
+    "statistics": {
+      "title": "Nuestro Impacto Educativo",
+      "subtitle": "Únete a miles de estudiantes que aprenden con nuestros profesores expertos",
+      "teachers": "Profesores Expertos",
+      "teachersDesc": "Instructores calificados",
+      "students": "Estudiantes Felices",
+      "studentsDesc": "Aprendiendo globalmente",
+      "lessons": "Clases Impartidas",
+      "lessonsDesc": "Sesiones exitosas",
+      "rating": "Calificación Promedio",
+      "ratingDesc": "Satisfacción estudiantil",
+      "countries": "Países",
+      "countriesDesc": "Alcance global",
+      "languages": "Idiomas",
+      "languagesDesc": "Soporte multilingüe"
+    },
+    "comments": {
+      "title": "Lo que Dicen Nuestros Estudiantes",
+      "subtitle": "Experiencias reales de estudiantes aprendiendo con nuestros profesores"
+    },
+    "cta": {
+      "title": "¿Listo para Empezar a Aprender?",
+      "subtitle": "Únete a miles de estudiantes que han encontrado su profesor perfecto de inglés",
+      "findTeacher": "Encuentra tu Profesor",
+      "learnMore": "Saber Más"
+    }
   }
 }

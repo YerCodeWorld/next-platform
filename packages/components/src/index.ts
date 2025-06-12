@@ -12,6 +12,10 @@ export { default as BlogShowCase } from "./components/PostsShowCase";
 export { default as Breadcrumb } from "./components/global/BreadCrumb";
 export { default as BlogGrid } from "./components/blog/BlogGrid";
 export { default as DynamicsGrid } from "./components/activities/DynamicsGrid";
+// Temporarily commented out to fix React version conflict
+export { default as TeacherCard } from "./components/TeacherCard";
+export { default as TeachersGrid } from "./components/TeachersGrid";
+export { default as TeacherComments } from "./components/TeacherComments";
 
 // Re-export hooks that are still needed
 export { useIsInView } from "./hooks/useIsInView";
@@ -27,6 +31,7 @@ export {
 
 // Export types for better TypeScript support
 export type { StatItem } from "./components/StatisticsOne";
+export type { TeacherProfile } from "@repo/api-bridge";
 
 import "../assets/css/global.css";
 import "../assets/css/teacherProfile.css";

@@ -217,5 +217,45 @@
       "createButton": "Create Dynamic",
       "learnButton": "Learn More"
     }
+  },
+  "teachers": {
+    "hero": {
+      "title": "EduTeachers",
+      "subtitle": "Connect with qualified instructors from around the world"
+    },
+    "breadcrumb": {
+      "home": "Home",
+      "teachers": "Teachers"
+    },
+    "grid": {
+      "title": "Our Expert Teachers",
+      "subtitle": "Learn from passionate educators around the world"
+    },
+    "statistics": {
+      "title": "Our Teaching Impact",
+      "subtitle": "Join thousands of students learning with our expert teachers",
+      "teachers": "Expert Teachers",
+      "teachersDesc": "Qualified instructors",
+      "students": "Happy Students",
+      "studentsDesc": "Learning worldwide",
+      "lessons": "Lessons Taught",
+      "lessonsDesc": "Successful sessions",
+      "rating": "Average Rating",
+      "ratingDesc": "Student satisfaction",
+      "countries": "Countries",
+      "countriesDesc": "Global reach",
+      "languages": "Languages",
+      "languagesDesc": "Multilingual support"
+    },
+    "comments": {
+      "title": "What Our Students Say",
+      "subtitle": "Real experiences from students learning with our teachers"
+    },
+    "cta": {
+      "title": "Ready to Start Learning?",
+      "subtitle": "Join thousands of students who have found their perfect English teacher",
+      "findTeacher": "Find Your Teacher",
+      "learnMore": "Learn More"
+    }
   }
 }

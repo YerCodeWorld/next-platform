@@ -3,11 +3,8 @@
 
 import * as React from "react";
 import { useState, useEffect } from 'react';
-// @ts-ignore
 import Link from 'next/link';
-// @ts-ignore
 import { useRouter, usePathname } from 'next/navigation';
-// @ts-ignore
 import { Translate } from 'phosphor-react';
 import Menu from './Menu';
 import { useThemeManager } from '../hooks/useThemeManager';
@@ -66,7 +63,7 @@ const Header: React.FC<HeaderProps> = ({
     const isAuthenticated = !!user;
 
     // Initialize theme manager with user preferences
-    const { changeTheme, isLoading, currentTheme } = useThemeManager({
+    const { isLoading } = useThemeManager({
         userPreferredColor: user?.preferredColor,
         isAuthenticated,
         onThemeChange: async (newTheme) => {

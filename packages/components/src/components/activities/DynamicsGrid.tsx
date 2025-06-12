@@ -468,7 +468,7 @@ const DynamicsGrid: React.FC<DynamicsGridProps> = ({ dynamics, user, locale }) =
 
                 .dynamics-layout {
                     display: grid;
-                    grid-template-columns: 300px 1fr;
+                    grid-template-columns: minmax(280px, 300px) 1fr;
                     gap: 2rem;
                 }
 
@@ -616,7 +616,7 @@ const DynamicsGrid: React.FC<DynamicsGridProps> = ({ dynamics, user, locale }) =
 
                 .dynamics-grid {
                     display: grid;
-                    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+                    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
                     gap: 1.5rem;
                     margin-bottom: 3rem;
                 }
@@ -869,9 +869,11 @@ const DynamicsGrid: React.FC<DynamicsGridProps> = ({ dynamics, user, locale }) =
                     cursor: not-allowed;
                 }
 
+                /* Tablet and below - Layout changes */
                 @media (max-width: 1024px) {
                     .dynamics-layout {
                         grid-template-columns: 1fr;
+                        gap: 1.5rem;
                     }
 
                     .filters-sidebar {
@@ -886,16 +888,35 @@ const DynamicsGrid: React.FC<DynamicsGridProps> = ({ dynamics, user, locale }) =
                     .dynamics-header {
                         flex-direction: column;
                         align-items: flex-start;
+                        gap: 1rem;
                     }
 
                     .create-button {
                         align-self: flex-start;
                     }
+
+                    .filters-container {
+                        padding: 1rem;
+                    }
                 }
 
+                /* Small tablets and large phones */
                 @media (max-width: 768px) {
+                    .dynamics-grid-section {
+                        padding: 0 1rem;
+                    }
+
+                    .dynamics-layout {
+                        gap: 1rem;
+                    }
+
                     .dynamics-grid {
                         grid-template-columns: 1fr;
+                        gap: 1rem;
+                    }
+
+                    .dynamic-card {
+                        padding: 1rem;
                     }
 
                     .card-meta {
@@ -908,6 +929,292 @@ const DynamicsGrid: React.FC<DynamicsGridProps> = ({ dynamics, user, locale }) =
                         align-items: flex-start;
                         gap: 1rem;
                     }
+
+                    .header-title {
+                        font-size: 1.5rem;
+                    }
+
+                    /* Improved filter layout for mobile */
+                    .filters-container {
+                        border-radius: 0.75rem;
+                        box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.1);
+                    }
+
+                    .filter-group {
+                        margin-bottom: 1rem;
+                    }
+
+                    .duration-inputs {
+                        flex-direction: column;
+                        gap: 0.75rem;
+                    }
+
+                    .duration-separator {
+                        display: none;
+                    }
+                }
+
+                /* Mobile phones */
+                @media (max-width: 640px) {
+                    .dynamics-grid-section {
+                        padding: 0 0.75rem;
+                    }
+
+                    .dynamics-header {
+                        margin-bottom: 1.5rem;
+                    }
+
+                    .header-title {
+                        font-size: 1.25rem;
+                    }
+
+                    .header-subtitle {
+                        font-size: 0.875rem;
+                    }
+
+                    .create-button {
+                        padding: 0.625rem 1.25rem;
+                        font-size: 0.875rem;
+                    }
+
+                    .dynamics-grid {
+                        gap: 0.75rem;
+                    }
+
+                    .dynamic-card {
+                        padding: 0.875rem;
+                        border-radius: 0.75rem;
+                    }
+
+                    .card-title {
+                        font-size: 1.125rem;
+                        line-height: 1.3;
+                        word-wrap: break-word;
+                        hyphens: auto;
+                    }
+
+                    .card-objective,
+                    .card-description {
+                        font-size: 0.875rem;
+                        word-wrap: break-word;
+                        hyphens: auto;
+                    }
+
+                    .card-badges {
+                        gap: 0.5rem;
+                    }
+
+                    .type-badge,
+                    .difficulty-badge {
+                        padding: 0.375rem 0.625rem;
+                        font-size: 0.75rem;
+                    }
+
+                    .filters-container {
+                        padding: 0.875rem;
+                    }
+
+                    .filters-title {
+                        font-size: 1.125rem;
+                        margin-bottom: 1rem;
+                    }
+
+                    .filter-select,
+                    .duration-input {
+                        padding: 0.625rem;
+                        font-size: 0.875rem;
+                    }
+
+                    .clear-filters-btn {
+                        padding: 0.625rem;
+                        font-size: 0.875rem;
+                    }
+
+                    .pagination-btn {
+                        width: 2.25rem;
+                        height: 2.25rem;
+                        font-size: 0.875rem;
+                    }
+                }
+
+                /* Very small phones */
+                @media (max-width: 480px) {
+                    .dynamics-grid-section {
+                        padding: 0 0.5rem;
+                    }
+
+                    .dynamics-layout {
+                        gap: 0.75rem;
+                    }
+
+                    .dynamics-header {
+                        gap: 0.75rem;
+                        margin-bottom: 1rem;
+                    }
+
+                    .header-title {
+                        font-size: 1.125rem;
+                    }
+
+                    .create-button {
+                        width: 100%;
+                        justify-content: center;
+                        padding: 0.75rem;
+                    }
+
+                    .dynamics-grid {
+                        gap: 0.5rem;
+                    }
+
+                    .dynamic-card {
+                        padding: 0.75rem;
+                        margin: 0;
+                        border-radius: 0.5rem;
+                    }
+
+                    .card-title {
+                        font-size: 1rem;
+                        margin-bottom: 0.375rem;
+                    }
+
+                    .card-objective {
+                        font-size: 0.8125rem;
+                        margin-bottom: 0.5rem;
+                    }
+
+                    .card-description {
+                        font-size: 0.8125rem;
+                        margin-bottom: 0.75rem;
+                    }
+
+                    .card-meta {
+                        font-size: 0.75rem;
+                        gap: 0.375rem;
+                    }
+
+                    .meta-item i {
+                        font-size: 1rem;
+                    }
+
+                    .materials-needed {
+                        padding: 0.5rem;
+                        font-size: 0.75rem;
+                        margin-bottom: 0.75rem;
+                    }
+
+                    .card-footer {
+                        padding-top: 0.75rem;
+                        gap: 0.75rem;
+                    }
+
+                    .author-avatar {
+                        width: 1.5rem;
+                        height: 1.5rem;
+                    }
+
+                    .author-details {
+                        font-size: 0.75rem;
+                    }
+
+                    .publish-date {
+                        font-size: 0.6875rem;
+                    }
+
+                    .view-link {
+                        font-size: 0.75rem;
+                    }
+
+                    .edit-button {
+                        padding: 0.375rem 0.5rem;
+                        font-size: 0.75rem;
+                        top: 0.75rem;
+                        right: 0.75rem;
+                    }
+
+                    .filters-container {
+                        padding: 0.75rem;
+                        border-radius: 0.5rem;
+                    }
+
+                    .filters-title {
+                        font-size: 1rem;
+                        margin-bottom: 0.75rem;
+                    }
+
+                    .filter-group {
+                        margin-bottom: 0.75rem;
+                    }
+
+                    .filter-label {
+                        font-size: 0.75rem;
+                        margin-bottom: 0.375rem;
+                    }
+
+                    .filter-select,
+                    .duration-input {
+                        padding: 0.5rem;
+                        font-size: 0.75rem;
+                    }
+
+                    .clear-filters-btn {
+                        padding: 0.5rem;
+                        font-size: 0.75rem;
+                    }
+
+                    .no-results {
+                        padding: 2rem 0;
+                    }
+
+                    .no-results-icon {
+                        font-size: 3rem;
+                    }
+
+                    .no-results-title {
+                        font-size: 1.25rem;
+                    }
+
+                    .no-results-subtitle {
+                        font-size: 0.875rem;
+                    }
+
+                    .create-first-btn {
+                        padding: 0.625rem 1.25rem;
+                        font-size: 0.875rem;
+                    }
+
+                    .pagination-wrapper {
+                        margin-top: 2rem;
+                    }
+
+                    .pagination-btn {
+                        width: 2rem;
+                        height: 2rem;
+                        font-size: 0.75rem;
+                    }
+
+                    .pagination-nav {
+                        gap: 0.25rem;
+                        flex-wrap: wrap;
+                        justify-content: center;
+                    }
+                }
+
+                /* Global overflow and word-wrap fixes */
+                * {
+                    word-wrap: break-word;
+                    overflow-wrap: break-word;
+                }
+
+                .dynamics-grid-section,
+                .dynamics-layout,
+                .dynamics-content,
+                .filters-sidebar {
+                    max-width: 100%;
+                    overflow-x: hidden;
+                }
+
+                .dynamic-card * {
+                    max-width: 100%;
                 }
             `}</style>
         </div>

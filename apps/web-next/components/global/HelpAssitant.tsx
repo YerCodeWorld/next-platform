@@ -129,7 +129,7 @@ const HelpAssistant: React.FC<HelpComponentProps> = ({ user }) => {
         setTooltipDismissed(false);
         setShowTooltip(false);
         setIsModalOpen(false);
-    }, [pathname]);
+    }, [pathname, user]);
 
     const handleButtonClick = () => {
         setShowTooltip(false);
