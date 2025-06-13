@@ -1,4 +1,4 @@
-// components-ui/src/components/sub/StarsRating - Updated with both static and interactive modes
+// components-ui/src/components/min/StarsRating - Updated with both static and interactive modes
 import { useState } from 'react';
 
 type StarsRatingProps = {

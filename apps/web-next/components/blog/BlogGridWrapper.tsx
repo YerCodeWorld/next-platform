@@ -1,17 +1,21 @@
 // apps/web-next/components/blog/BlogGridWrapper.tsx - PROPER IMPLEMENTATION
 import { serverPostApi } from '@/lib/api-server';
 import { BlogGrid } from '@repo/components';
+import { getCurrentUser } from '@/lib/auth';
 
 export default async function BlogGridWrapper({ locale }: { locale: string }) {
     try {
-        const posts = await serverPostApi.getAllPosts({
-            published: true,
-            limit: 50, // Get more posts for pagination
-            orderBy: 'createdAt',
-            order: 'desc'
-        });
+        const [posts, currentUser] = await Promise.all([
+            serverPostApi.getAllPosts({
+                published: true,
+                limit: 50, // Get more posts for pagination
+                orderBy: 'createdAt',
+                order: 'desc'
+            }),
+            getCurrentUser()
+        ]);
 
-        return <BlogGrid posts={posts} locale={locale} />;
+        return <BlogGrid posts={posts} locale={locale} currentUser={currentUser} />;
     } catch (error) {
         console.error('Error fetching blog posts:', error);
         return (

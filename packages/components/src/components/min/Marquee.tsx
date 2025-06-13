@@ -1,4 +1,4 @@
-// packages/components/src/components/sub/Marquee.tsx
+// packages/components/src/components/min/Marquee.tsx
 'use client';
 
 import React from 'react';

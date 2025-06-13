@@ -110,7 +110,7 @@ import { WebsocketProvider } from 'y-websocket'
 
 const CollaborativeEditor = () => {
   const ydoc = new Y.Doc()
-  const provider = new WebsocketProvider('ws://localhost:1234', 'example-document', ydoc)
+  const provider = new WebsocketProvider('ws://localhost:1234', 'DynamicEditExample-document', ydoc)
 
   const editor = useEditor({
     extensions: [

@@ -7,11 +7,12 @@ import { Post } from '@repo/api-bridge';
 interface BlogGridProps {
     posts: Post[];
     locale: string;
+    currentUser?: { email: string; role: string } | null;
 }
 
 const POSTS_PER_PAGE = 9;
 
-const BlogGrid: React.FC<BlogGridProps> = ({ posts, locale }) => {
+const BlogGrid: React.FC<BlogGridProps> = ({ posts, locale, currentUser }) => {
     const [currentPage, setCurrentPage] = useState(1);
     const [sortBy, setSortBy] = useState('newest');
 
@@ -154,14 +155,27 @@ const BlogGrid: React.FC<BlogGridProps> = ({ posts, locale }) => {
                                     </div>
                                 </div>
 
-                                {/* Read More Link */}
-                                <Link
-                                    href={`/${locale}/blog/${post.slug}`}
-                                    className="read-more-link"
-                                >
-                                    {locale === 'es' ? 'Leer más' : 'Read more'}
-                                    <i className="ph ph-arrow-right" />
-                                </Link>
+                                {/* Action Buttons */}
+                                <div className="post-actions">
+                                    <Link
+                                        href={`/${locale}/blog/${post.slug}`}
+                                        className="read-more-link"
+                                    >
+                                        {locale === 'es' ? 'Leer más' : 'Read more'}
+                                        <i className="ph ph-arrow-right" />
+                                    </Link>
+                                    
+                                    {/* Edit button for post owner or admin */}
+                                    {currentUser && (currentUser.role === 'ADMIN' || currentUser.email === post.authorEmail) && (
+                                        <Link
+                                            href={`/${locale}/blog/${post.slug}/edit`}
+                                            className="edit-link"
+                                            title={locale === 'es' ? 'Editar artículo' : 'Edit article'}
+                                        >
+                                            <i className="ph ph-pencil-simple" />
+                                        </Link>
+                                    )}
+                                </div>
                             </div>
                         </article>
                     ))}
@@ -455,6 +469,36 @@ const BlogGrid: React.FC<BlogGridProps> = ({ posts, locale }) => {
 
                 .read-more-link i {
                     transition: transform 0.3s ease;
+                }
+
+                .post-actions {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    margin-top: auto;
+                }
+
+                .edit-link {
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                    width: 2rem;
+                    height: 2rem;
+                    color: #6b7280;
+                    background: #f3f4f6;
+                    border-radius: 50%;
+                    transition: all 0.3s ease;
+                    text-decoration: none;
+                }
+
+                .edit-link:hover {
+                    color: #8b5cf6;
+                    background: #ede9fe;
+                    transform: scale(1.1);
+                }
+
+                .edit-link i {
+                    font-size: 1rem;
                 }
 
                 .blog-pagination {

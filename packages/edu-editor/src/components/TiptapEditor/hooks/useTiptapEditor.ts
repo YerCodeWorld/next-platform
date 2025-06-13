@@ -1,3 +1,5 @@
+"use client"
+
 import { Ref, useEffect, useImperativeHandle } from "react";
 import { useEditor, type UseEditorOptions } from "@tiptap/react";  // removed editor
 import useForceUpdate from "./useForceUpdate";
@@ -14,10 +16,14 @@ export type UseTiptapEditorOptions = UseEditorOptions & {
 export default function useTiptapEditor({
   ref,
   placeholder,
+    
   ...editorOptions
 }: UseTiptapEditorOptions) {
   const forceUpdate = useForceUpdate();
-  const editor = useEditor(editorOptions, []);
+  const editor = useEditor({
+    ...editorOptions,
+    immediatelyRender: false
+  }, []);
 
   useImperativeHandle(
     ref,
@@ -40,6 +46,30 @@ export default function useTiptapEditor({
     editor.setOptions({ editorProps: { placeholder } });
     forceUpdate();
   }, [editor, placeholder]);
+
+  // Handle content updates when initialContent changes
+  useEffect(() => {
+    if (!editor || !editorOptions.content) return;
+    
+    // Only update if the content is different from current editor content
+    const currentContent = editor.getHTML();
+    const newContent = typeof editorOptions.content === 'string' ? editorOptions.content : '';
+    
+    if (currentContent !== newContent && newContent !== '') {
+      // Preserve cursor position
+      const { from, to } = editor.state.selection;
+      editor.commands.setContent(editorOptions.content, false, {
+        preserveWhitespace: "full"
+      });
+      // Restore cursor position if it's still valid
+      try {
+        editor.commands.setTextSelection({ from, to });
+      } catch {
+        // If cursor position is invalid, just focus at the end
+        editor.commands.focus('end');
+      }
+    }
+  }, [editor, editorOptions.content]);
 
   useEffect(() => {
     return () => {

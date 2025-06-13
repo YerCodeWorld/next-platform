@@ -5,6 +5,8 @@ import { Metadata } from 'next';
 import { Breadcrumb } from "@repo/components";
 import BlogGridWrapper from '@/components/blog/BlogGridWrapper';
 import BlogStatsWrapper from '@/components/blog/BlogStatsWrapper';
+// import { getCurrentUser } from '@/lib/auth';
+// import Link from 'next/link';
 
 export async function generateMetadata({
                                            params
@@ -51,6 +53,8 @@ export default async function BlogPage({
     params: Promise<{ locale: string }>
 }) {
     const { locale } = await params;
+    // const currentUser = await getCurrentUser();
+    // const canCreatePost = currentUser && (currentUser.role === 'ADMIN' || currentUser.role === 'TEACHER');
 
     return (
         <div className="blog-page">
@@ -66,6 +70,7 @@ export default async function BlogPage({
                     { label: 'EduBlog' }
                 ]}
                 theme="blog"
+
             />
 
             {/* Main Content */}

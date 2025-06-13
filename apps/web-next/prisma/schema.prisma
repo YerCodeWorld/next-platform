@@ -84,7 +84,7 @@ model ExtraPost {
 
 // This is suupposed to be a table to show stadistics
 // It should be autoincrease or something like that |From our queries I would increase the value depending on the data we get along the way
-// For example, when a new student is registered, this value here would upload automatically
+// For DynamicEditExample, when a new student is registered, this value here would upload automatically
 model Statistic {
   id           Int @id @default(autoincrement())
   countries    Int

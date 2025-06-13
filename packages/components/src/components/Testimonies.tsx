@@ -6,7 +6,7 @@ import Link from "next/link";
 import Image from "next/image";
 import Slider from "react-slick";
 import { Testimony } from "@repo/api-bridge";
-import StarsRating from "../components/sub/StarsRating";
+import StarsRating from "./min/StarsRating";
 
 const Shape1 = '/images/shapes/shape2.png';
 const Quotes = '/images/shapes/shape6.png';

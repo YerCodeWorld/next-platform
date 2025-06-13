@@ -1,6 +1,6 @@
 // Todo:
 /**
- * This is your contact component example for creating the contact section.
+ * This is your contact component DynamicEditExample for creating the contact section.
  * You may notice we could separate this into two components, but let them be one.
  * You may add more things to the contact page if you think it could be good, and
  * ḿake sure to add the amazing BreadCrumb you are going to create (EduContact).

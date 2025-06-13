@@ -136,7 +136,7 @@ const DynamicsGrid: React.FC<DynamicsGridProps> = ({ dynamics, user, locale }) =
 
                 {user && (user.role === 'TEACHER' || user.role === 'ADMIN') && (
                     <Link
-                        href={`/${locale}/activities/create`}
+                        href={`/${locale}/activities/new`}
                         className="create-button"
                     >
                         <i className="ph ph-plus" />
@@ -271,7 +271,7 @@ const DynamicsGrid: React.FC<DynamicsGridProps> = ({ dynamics, user, locale }) =
                             </p>
                             {user && (user.role === 'TEACHER' || user.role === 'ADMIN') && (
                                 <Link
-                                    href={`/${locale}/activities/create`}
+                                    href={`/${locale}/activities/new`}
                                     className="create-first-btn"
                                 >
                                     <i className="ph ph-plus" />
@@ -286,11 +286,12 @@ const DynamicsGrid: React.FC<DynamicsGridProps> = ({ dynamics, user, locale }) =
                                 {paginatedDynamics.map((dynamic) => (
                                     <article key={dynamic.id} className="dynamic-card">
                                         {/* Edit Button for Authors */}
-                                        {isCurrentUserAuthor(dynamic) && (
+                                        {(user && (user.role === 'ADMIN' || isCurrentUserAuthor(dynamic))) && (
                                             <Link
-                                                href={`/${locale}/activities/edit/${dynamic.slug}`}
+                                                href={`/${locale}/activities/${dynamic.slug}/edit`}
                                                 className="edit-button"
                                             >
+                                                <i className="ph ph-pencil-simple" />
                                                 {locale === 'es' ? 'Editar' : 'Edit'}
                                             </Link>
                                         )}

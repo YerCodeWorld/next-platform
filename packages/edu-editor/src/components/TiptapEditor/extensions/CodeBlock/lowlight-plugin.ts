@@ -44,8 +44,8 @@ export function LowlightPlugin({
             // OR transaction adds/removes named node,
             newNodes.length !== oldNodes.length ||
             // OR transaction has changes that completely encapsulte a node
-            // (for example, a transaction that affects the entire document).
-            // Such transactions can happen during collab syncing via y-prosemirror, for example.
+            // (for DynamicEditExample, a transaction that affects the entire document).
+            // Such transactions can happen during collab syncing via y-prosemirror, for DynamicEditExample.
             tr.steps.some((step) => {
               return (
                 // @ts-ignore

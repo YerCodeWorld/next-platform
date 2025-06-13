@@ -112,7 +112,7 @@ if ($('ul').length) {
     
   // ========================== Select2 Js Start =================================
   $(document).ready(function() {
-    $('.js-example-basic-single').select2();
+    $('.js-DynamicEditExample-basic-single').select2();
   });
   // ========================== Select2 Js End =================================
   

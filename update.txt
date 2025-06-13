@@ -1,1 +1,50 @@
-Why doesnt git listen to me lol
+## Update Summary - Blog and Dynamics Editing Implementation
+
+### 1. Blog Editing Features Completed
+- Fixed Tiptap SSR error by setting `immediatelyRender: false` in useTiptapEditor hook
+- Added edit buttons to blog cards that show for post owners and admins
+- Added "Create Post" button in blog landing page header for teachers/admins
+- Fixed 404 error after post update by including locale in navigation routes
+- Added pencil icon to blog edit buttons for better UX
+
+### 2. Dynamics Editing Implementation
+Based on the DynamicEditExample, I've implemented:
+
+#### New Files Created:
+- `/app/[locale]/activities/[slug]/edit/page.tsx` - Edit existing dynamics
+- `/app/[locale]/activities/new/page.tsx` - Create new dynamics
+- `/styles/activities/dynamicsEditor.css` - Styling for dynamics editor
+
+#### Key Features:
+- Full form implementation matching the example with all fields:
+  - Title, Objective, Description, Content
+  - Materials Needed, Duration, Student limits
+  - Age Group, Difficulty, Dynamic Type
+  - Publishing options (draft/published, featured for admins)
+- Permission checks - only teachers/admins can create/edit
+- Authors can edit their own dynamics, admins can edit all
+- Rich text editor (TiptapEditor) for content creation
+- Proper navigation with locale support
+- Form validation and error handling
+
+#### Grid Updates:
+- Updated DynamicsGrid component to show edit buttons for authorized users
+- Fixed create dynamic button URLs (changed from `/create` to `/new`)
+- Added pencil icon to edit buttons
+- Added "Create Dynamic" button in activities page header
+
+### 3. Technical Improvements
+- All navigation routes now properly include locale
+- Consistent permission checking across blog and dynamics
+- Proper error handling with toast notifications
+- Form state management with controlled components
+- Responsive design for all screen sizes
+
+### 4. User Experience
+- Teachers and admins see create buttons in landing pages
+- Post/dynamic owners see edit buttons on their content
+- Admins can edit all content
+- Clear visual feedback for actions (hover states, loading states)
+- Consistent styling between blog and dynamics editors
+
+The implementation follows the same patterns as the blog editing feature, ensuring consistency across the platform.
