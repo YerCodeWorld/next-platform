@@ -5,7 +5,8 @@ import {
     serverPostApi,
     serverUserApi,
     serverTeacherProfileApi,
-    serverDynamicsApi
+    serverDynamicsApi,
+    serverExerciseApi
 } from './api-server';
 
 /**
@@ -268,6 +269,71 @@ export async function getBlogStatistics() {
             averageReadTime: 0,
             totalComments: 0,
             totalShares: 0
+        };
+    }
+}
+
+/**
+ * Get all exercise packages using external API
+ * For exercise packages landing page
+ */
+export async function getExercisePackages(filters?: {
+    category?: string;
+    difficulty?: string;
+    search?: string;
+    isPublished?: boolean;
+    limit?: number;
+    page?: number;
+}) {
+    try {
+        return await serverExerciseApi.getAllPackages(filters);
+    } catch (error) {
+        console.error('Error fetching exercise packages from API:', error);
+        return [];
+    }
+}
+
+/**
+ * Get exercise package by ID using external API
+ * For individual package page
+ */
+export async function getExercisePackageById(id: string) {
+    try {
+        return await serverExerciseApi.getPackageById(id);
+    } catch (error) {
+        console.error('Error fetching exercise package by ID from API:', error);
+        return null;
+    }
+}
+
+/**
+ * Get exercise package by slug using external API
+ * For individual package page with SEO-friendly URLs
+ */
+export async function getExercisePackageBySlug(slug: string) {
+    try {
+        return await serverExerciseApi.getPackageBySlug(slug);
+    } catch (error) {
+        console.error('Error fetching exercise package by slug from API:', error);
+        return null;
+    }
+}
+
+/**
+ * Get exercise statistics using external API
+ * For exercise landing page statistics section
+ */
+export async function getExerciseStatistics() {
+    try {
+        return await serverExerciseApi.getExerciseStatistics();
+    } catch (error) {
+        console.error('Error fetching exercise statistics from API:', error);
+        return {
+            totalPackages: 0,
+            totalExercises: 0,
+            totalCompletions: 0,
+            activeStudents: 0,
+            satisfactionRate: 0
         };
     }
 }

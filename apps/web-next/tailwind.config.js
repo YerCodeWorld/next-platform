@@ -8,7 +8,7 @@ module.exports = {
         '../../packages/components/src/**/*.{js,ts,jsx,tsx}',
         '../../packages/components-ui/src/**/*.{js,ts,jsx,tsx}',
         '../../packages/edu-editor/src/**/*.{js,ts,jsx,tsx}',
-        '../../packages/exercises/src/**/*.{js,ts,jsx,tsx}',
+        '../../packages/edu-exercises/src/**/*.{js,ts,jsx,tsx}',
     ],
     theme: {
         extend: {

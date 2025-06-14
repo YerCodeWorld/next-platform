@@ -6,6 +6,7 @@ export { usePostApi, type UpdatePostPayload } from './hooks/userPostApi';
 export { useDynamicsApi, type UpdateDynamicPayload, type DynamicsFilters } from './hooks/useDynamicsApi';
 export { useTeacherProfileApi } from './hooks/useTeacherProfileApi';
 export { useExerciseApi } from './hooks/useExerciseApi';
+export { useExercisePackagesApi, type ExercisePackage, type CreateExercisePackagePayload, type UpdateExercisePackagePayload, type ExercisePackageFilters, type UserProgress, type PackageExercise } from './hooks/useExercisePackagesApi';
 
 export {
     type User,
@@ -18,8 +19,16 @@ export {
 
 export type {
     Exercise,
-    CreateExercisePayload
-} from '../src/hooks/types';
+    CreateExercisePayload,
+    ExerciseType,
+    ExerciseDifficulty,
+    ExerciseCategory,
+    FillBlankContent,
+    MatchingContent,
+    MultipleChoiceContent,
+    OrderingContent,
+    ExerciseContent
+} from './hooks/types';
 
 // Export dynamics types directly
 export type {

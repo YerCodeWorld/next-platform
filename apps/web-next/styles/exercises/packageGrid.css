@@ -1,0 +1,127 @@
+/* Exercise Package Grid Styles */
+.packages-grid-container {
+    margin-top: 48px;
+}
+
+.packages-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 24px;
+}
+
+@media (min-width: 768px) {
+    .packages-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 1024px) {
+    .packages-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (min-width: 1280px) {
+    .packages-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+.empty-state {
+    text-align: center;
+    padding: 64px 0;
+    background: white;
+    border-radius: 16px;
+    border: 1px solid #e5e7eb;
+}
+
+.empty-state-icon {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 16px;
+    color: #9ca3af;
+}
+
+.empty-state-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #4b5563;
+    margin-bottom: 8px;
+}
+
+.empty-state-description {
+    color: #6b7280;
+    margin-bottom: 24px;
+}
+
+.create-package-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    background: #2563eb;
+    color: white;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: background-color 0.2s ease;
+}
+
+.create-package-button:hover {
+    background: #1d4ed8;
+}
+
+.create-package-button .icon {
+    width: 20px;
+    height: 20px;
+}
+
+.empty-state-note {
+    font-size: 0.875rem;
+    color: #9ca3af;
+}
+
+/* Loading Skeleton */
+.loading-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 24px;
+    margin-top: 48px;
+}
+
+@media (min-width: 768px) {
+    .loading-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 1024px) {
+    .loading-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (min-width: 1280px) {
+    .loading-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+.loading-card {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.loading-skeleton {
+    background: #e5e7eb;
+    border-radius: 12px;
+    height: 256px;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}

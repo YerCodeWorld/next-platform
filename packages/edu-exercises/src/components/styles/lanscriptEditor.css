@@ -1,0 +1,407 @@
+/* packages/exercises/src/components/styles/lanscriptEditor.css */
+
+.lanscript-editor-container {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    background: #f8f9fa;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+/* Toolbar */
+.lanscript-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    background: white;
+    border-bottom: 1px solid #e5e7eb;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.lanscript-toolbar-left,
+.lanscript-toolbar-right {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.lanscript-toolbar button {
+    padding: 6px 10px;
+    background: #f3f4f6;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    color: #4b5563;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    white-space: nowrap;
+}
+
+.lanscript-toolbar button:hover {
+    background: #e5e7eb;
+    color: #1f2937;
+}
+
+.lanscript-toolbar button.active {
+    background: #7c3aed;
+    color: white;
+    border-color: #7c3aed;
+}
+
+.toolbar-separator {
+    width: 1px;
+    height: 20px;
+    background: #e5e7eb;
+    margin: 0 4px;
+}
+
+.parse-status {
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.parse-status.success {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.parse-status.error {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.save-button {
+    background: #10b981 !important;
+    color: white !important;
+    border-color: #10b981 !important;
+    font-weight: 500;
+}
+
+.save-button:hover:not(:disabled) {
+    background: #059669 !important;
+}
+
+.save-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed !important;
+}
+
+/* Editor Content - Vertical Layout */
+.lanscript-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    min-height: 0;
+}
+
+.lanscript-editor-wrapper {
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: column;
+    height: 350px;
+    min-height: 250px;
+    max-height: 60vh;
+    resize: vertical;
+    overflow: auto;
+    position: relative;
+}
+
+.lanscript-editor-wrapper::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: #e5e7eb;
+    cursor: ns-resize;
+}
+
+.lanscript-monaco-editor {
+    flex: 1;
+    min-height: 100%;
+}
+
+/* Preview Panel - Below Editor */
+.lanscript-preview {
+    flex: 1;
+    background: white;
+    overflow-y: auto;
+    padding: 16px;
+    border-top: 1px solid #e5e7eb;
+    min-height: 200px;
+}
+
+.lanscript-preview h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1f2937;
+    margin: 0 0 16px 0;
+}
+
+.preview-exercises {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.preview-exercises .exs-preview {
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 12px;
+}
+
+.preview-errors {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+    padding: 12px;
+}
+
+.preview-errors h4 {
+    color: #dc2626;
+    font-size: 14px;
+    font-weight: 600;
+    margin: 0 0 8px 0;
+}
+
+.preview-errors ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.preview-errors li {
+    color: #991b1b;
+    font-size: 13px;
+    padding: 3px 0;
+}
+
+.preview-errors li::before {
+    content: "• ";
+    color: #dc2626;
+    font-weight: bold;
+}
+
+.preview-empty {
+    text-align: center;
+    color: #9ca3af;
+    padding: 20px;
+}
+
+/* Monaco Editor Customizations */
+.monaco-editor {
+    min-height: 100% !important;
+}
+
+.monaco-editor .margin {
+    background-color: #fafafa !important;
+}
+
+.monaco-editor .line-numbers {
+    color: #9ca3af !important;
+}
+
+.monaco-editor .selected-text {
+    background-color: #ddd6fe !important;
+}
+
+.monaco-editor .monaco-hover {
+    border: 1px solid #e5e7eb !important;
+    background-color: white !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+}
+
+.monaco-editor .monaco-hover-content {
+    font-size: 13px;
+    padding: 8px 12px !important;
+}
+
+/* Scrollbars */
+.monaco-editor .scrollbar {
+    background: transparent !important;
+}
+
+.monaco-editor .scrollbar .slider {
+    background: rgba(0, 0, 0, 0.1) !important;
+    border-radius: 4px !important;
+}
+
+.monaco-editor .scrollbar .slider:hover {
+    background: rgba(0, 0, 0, 0.2) !important;
+}
+
+.toolbar-hint {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    color: #6b7280;
+    padding: 0 8px;
+}
+
+.toolbar-hint i {
+    color: #3b82f6;
+}
+
+/* Preview Tips */
+.preview-tips {
+    margin-top: 16px;
+    background: #f3f4f6;
+    border-radius: 8px;
+    padding: 12px;
+}
+
+.preview-tips h4 {
+    font-size: 14px;
+    font-weight: 600;
+    color: #4b5563;
+    margin: 0 0 8px 0;
+}
+
+.preview-tips ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.preview-tips li {
+    font-size: 12px;
+    color: #6b7280;
+    padding: 3px 0;
+}
+
+.preview-tips code {
+    background: #e5e7eb;
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-family: 'Monaco', 'Consolas', monospace;
+    font-size: 11px;
+    color: #1f2937;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .lanscript-toolbar {
+        padding: 6px 8px;
+    }
+
+    .lanscript-toolbar button {
+        padding: 5px 8px;
+        font-size: 12px;
+    }
+
+    .lanscript-toolbar button i {
+        font-size: 14px;
+    }
+
+    /* Hide button text on mobile, show only icons */
+    .lanscript-toolbar button span {
+        display: none;
+    }
+
+    .toolbar-separator {
+        margin: 0 2px;
+    }
+
+    .lanscript-editor-wrapper {
+        height: 300px;
+        max-height: 50vh;
+    }
+
+    .lanscript-preview {
+        padding: 12px;
+    }
+
+    .parse-status {
+        font-size: 11px;
+        padding: 3px 8px;
+    }
+
+    .save-button {
+        font-size: 12px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .lanscript-toolbar-right {
+        width: 100%;
+        justify-content: flex-end;
+        margin-top: 4px;
+    }
+
+    .lanscript-editor-wrapper {
+        height: 250px;
+    }
+}
+
+/* Large screens - can use side-by-side if preferred */
+@media (min-width: 1280px) {
+    /* Optional: Enable side-by-side on very large screens */
+    .lanscript-content.side-by-side {
+        flex-direction: row;
+    }
+
+    .lanscript-content.side-by-side .lanscript-editor-wrapper {
+        flex: 1;
+        height: auto;
+        max-height: none;
+        resize: none;
+    }
+
+    .lanscript-content.side-by-side .lanscript-editor-wrapper::after {
+        display: none;
+    }
+
+    .lanscript-content.side-by-side .lanscript-preview {
+        width: 400px;
+        border-top: none;
+        border-left: 1px solid #e5e7eb;
+    }
+}
+
+/* Exercise type template buttons */
+.exs-example-buttons {
+    display: flex;
+    gap: 6px;
+    margin-top: 6px;
+    flex-wrap: wrap;
+}
+
+.exs-example-buttons button {
+    padding: 4px 8px;
+    font-size: 11px;
+    background: #f3f4f6;
+    border: 1px solid #e5e7eb;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.exs-example-buttons button.active {
+    background: #7c3aed;
+    color: white;
+    border-color: #7c3aed;
+}
+
+/* Resize handle styling */
+.lanscript-editor-wrapper:hover::after {
+    background: #d1d5db;
+}
+
+/* Ensure Monaco editor fills container properly */
+.lanscript-monaco-editor > div {
+    height: 100% !important;
+}

@@ -11,7 +11,11 @@ import {
     Post,
     Dynamic,
     Exercise,
-    TeacherProfile
+    TeacherProfile,
+    ExercisePackage,
+    ExercisePackageFilters,
+    UserProgress,
+    PackageExercise
 } from '@repo/api-bridge';
 
 const API_BASE_URL = 'https://api.ieduguide.com/api';
@@ -368,6 +372,69 @@ const serverExerciseApi = {
 
     async getExercise(id: string): Promise<Exercise> {
         return serverFetch<Exercise>(`/exercises/${id}`);
+    },
+
+    // Exercise Packages API - matching PACKAGES_ENDPOINT.md routes
+    async getAllPackages(filters?: ExercisePackageFilters): Promise<ExercisePackage[]> {
+        const queryParams = new URLSearchParams();
+        if (filters) {
+            Object.entries(filters).forEach(([key, value]) => {
+                if (value !== undefined) {
+                    queryParams.append(key, value.toString());
+                }
+            });
+        }
+
+        const query = queryParams.toString();
+        return serverFetch<ExercisePackage[]>(`/exercise-packages${query ? `?${query}` : ''}`);
+    },
+
+    async searchPackagesByExercises(searchTerm: string): Promise<ExercisePackage[]> {
+        return serverFetch<ExercisePackage[]>(`/exercise-packages/search?q=${encodeURIComponent(searchTerm)}`);
+    },
+
+    async getPackageById(id: string): Promise<ExercisePackage> {
+        return serverFetch<ExercisePackage>(`/exercise-packages/${id}`);
+    },
+
+    async getPackageBySlug(slug: string): Promise<ExercisePackage> {
+        return serverFetch<ExercisePackage>(`/exercise-packages/slug/${slug}`);
+    },
+
+    async getPackageExercises(id: string): Promise<PackageExercise[]> {
+        return serverFetch<PackageExercise[]>(`/exercise-packages/${id}/exercises`);
+    },
+
+    async getUserProgress(id: string): Promise<UserProgress> {
+        return serverFetch<UserProgress>(`/exercise-packages/${id}/progress`);
+    },
+
+    async getExerciseStatistics(): Promise<{
+        totalPackages: number;
+        totalExercises: number;
+        totalCompletions: number;
+        activeStudents: number;
+        satisfactionRate: number;
+    }> {
+        try {
+            // For now, return mock data. This should be implemented in the API
+            return {
+                totalPackages: 250,
+                totalExercises: 1250,
+                totalCompletions: 125000,
+                activeStudents: 15420,
+                satisfactionRate: 98
+            };
+        } catch (error) {
+            console.error('Error fetching exercise statistics:', error);
+            return {
+                totalPackages: 0,
+                totalExercises: 0,
+                totalCompletions: 0,
+                activeStudents: 0,
+                satisfactionRate: 0
+            };
+        }
     }
 };
 
@@ -439,3 +506,15 @@ export {
     serverExerciseApi,
     serverStatsApi,
 };
+
+// ============================================
+// DIRECT FUNCTION EXPORTS (for easier usage)
+// ============================================
+
+// Exercise Package functions
+export const getAllExercisePackages = serverExerciseApi.getAllPackages;
+export const getExercisePackageBySlug = serverExerciseApi.getPackageBySlug;
+export const getPackageExercises = serverExerciseApi.getPackageExercises;
+export const getUserPackageProgress = serverExerciseApi.getUserProgress;
+export const getExerciseById = serverExerciseApi.getExercise;
+export const getAllExercises = serverExerciseApi.getAllExercises;

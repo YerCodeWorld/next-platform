@@ -257,5 +257,59 @@
       "findTeacher": "Find Your Teacher",
       "learnMore": "Learn More"
     }
+  },
+  "exercises": {
+    "pageTitle": "Exercise Packages - Practice and Learn",
+    "breadcrumbTitle": "EduExercises",
+    "hero": {
+      "title": "Exercise Packages",
+      "subtitle": "Explore, practice, and master new skills",
+      "searchPlaceholder": "Search exercise packages...",
+      "filterCategory": "Category",
+      "filterDifficulty": "Difficulty",
+      "categories": {
+        "all": "All",
+        "mathematics": "Mathematics",
+        "language": "Language",
+        "science": "Science",
+        "history": "History",
+        "geography": "Geography",
+        "arts": "Arts"
+      },
+      "difficulties": {
+        "all": "All Levels",
+        "beginner": "Beginner",
+        "intermediate": "Intermediate",
+        "advanced": "Advanced"
+      },
+      "stats": {
+        "exercises": "Exercises",
+        "trackProgress": "Track Progress",
+        "certificates": "Certificates"
+      }
+    },
+    "card": {
+      "exercises": "exercises",
+      "completed": "completed",
+      "startNow": "Start now",
+      "users": "users",
+      "rating": "rating"
+    },
+    "statistics": {
+      "title": "Our Impact",
+      "subtitle": "Transforming education with interactive exercises",
+      "packages": "Exercise Packages",
+      "packagesDesc": "Available to learn",
+      "students": "Active Students",
+      "studentsDesc": "Learning every day",
+      "satisfaction": "Satisfaction Rate",
+      "satisfactionDesc": "From our users",
+      "completions": "Exercises Completed",
+      "completionsDesc": "This month"
+    },
+    "empty": {
+      "title": "No packages available",
+      "subtitle": "Check back soon for new exercise packages"
+    }
   }
 }

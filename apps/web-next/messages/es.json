@@ -257,5 +257,59 @@
       "findTeacher": "Encuentra tu Profesor",
       "learnMore": "Saber Más"
     }
+  },
+  "exercises": {
+    "pageTitle": "Paquetes de Ejercicios - Practica y Aprende",
+    "breadcrumbTitle": "Ejercicios Educativos",
+    "hero": {
+      "title": "Paquetes de Ejercicios",
+      "subtitle": "Explora, practica y domina nuevas habilidades",
+      "searchPlaceholder": "Buscar paquetes de ejercicios...",
+      "filterCategory": "Categoría",
+      "filterDifficulty": "Dificultad",
+      "categories": {
+        "all": "Todos",
+        "mathematics": "Matemáticas",
+        "language": "Lenguaje",
+        "science": "Ciencias",
+        "history": "Historia",
+        "geography": "Geografía",
+        "arts": "Arte"
+      },
+      "difficulties": {
+        "all": "Todos los niveles",
+        "beginner": "Principiante",
+        "intermediate": "Intermedio",
+        "advanced": "Avanzado"
+      },
+      "stats": {
+        "exercises": "Ejercicios",
+        "trackProgress": "Progreso Trackeable",
+        "certificates": "Certificados"
+      }
+    },
+    "card": {
+      "exercises": "ejercicios",
+      "completed": "completado",
+      "startNow": "Comenzar ahora",
+      "users": "usuarios",
+      "rating": "calificación"
+    },
+    "statistics": {
+      "title": "Nuestro Impacto",
+      "subtitle": "Transformando la educación con ejercicios interactivos",
+      "packages": "Paquetes de Ejercicios",
+      "packagesDesc": "Disponibles para aprender",
+      "students": "Estudiantes Activos",
+      "studentsDesc": "Aprendiendo cada día",
+      "satisfaction": "Tasa de Satisfacción",
+      "satisfactionDesc": "De nuestros usuarios",
+      "completions": "Ejercicios Completados",
+      "completionsDesc": "Este mes"
+    },
+    "empty": {
+      "title": "No hay paquetes disponibles",
+      "subtitle": "Vuelve pronto para nuevos paquetes de ejercicios"
+    }
   }
 }
