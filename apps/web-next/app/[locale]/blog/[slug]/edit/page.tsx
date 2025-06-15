@@ -1,8 +1,9 @@
 "use client"
 
-import { useEffect, useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useEffect, useState, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import { usePostApi, Post, CreatePostPayload } from '@repo/api-bridge';
+import Image from 'next/image';
 import { TiptapEditor } from '@repo/edu-editor';
 import { toast } from 'sonner';
 import { useAuthContext } from '@/components/providers/AuthProvider';
@@ -54,16 +55,16 @@ export default function EditPostPage({
     };
 
     // Check if user can create/edit posts
-    const canEditPosts = (): boolean => {
+    const canEditPosts = useCallback((): boolean => {
         if (!isAuthenticated || !user) return false;
         return user.role === 'TEACHER' || user.role === 'ADMIN';
-    };
+    }, [isAuthenticated, user]);
 
     // Check if user can edit this specific post
-    const canEditThisPost = (post: Post): boolean => {
+    const canEditThisPost = useCallback((post: Post): boolean => {
         if (!user) return false;
         return user.role === 'ADMIN' || user.email === post.authorEmail;
-    };
+    }, [user]);
 
     // Load existing post for editing
     useEffect(() => {
@@ -105,7 +106,7 @@ export default function EditPostPage({
 
             fetchPost();
         }
-    }, [mode, postSlug, router]);
+    }, [mode, postSlug, router, canEditThisPost, postApi]);
 
     // Check permissions
     useEffect(() => {
@@ -114,7 +115,7 @@ export default function EditPostPage({
             const currentLocale = window.location.pathname.split('/')[1];
             router.push(`/${currentLocale}/blog`);
         }
-    }, [isAuthenticated, user, router]);
+    }, [isAuthenticated, user, router, canEditPosts]);
 
     // Set page title
     useEffect(() => {
@@ -180,18 +181,22 @@ export default function EditPostPage({
             } else {
                 toast.error('Failed to save post');
             }
-        } catch (err: any) {
+        } catch (err: unknown) {
             console.error('Error saving post:', err);
-            toast.error(err.message || 'Failed to save post');
+            toast.error(err instanceof Error ? err.message : 'Failed to save post');
         } finally {
             setSaving(false);
         }
     };
 
     // Handle content change from TiptapEditor
-    const handleContentChange = (newContent: string | any) => {
-        setContent(newContent);
-    };
+    const handleContentChange = useCallback((newContent: unknown) => {
+        if (typeof newContent === 'string') {
+            setContent(newContent);
+        } else {
+            setContent(JSON.stringify(newContent));
+        }
+    }, []);
 
     return (
         <div className="post-editor-page">
@@ -291,9 +296,12 @@ export default function EditPostPage({
                         />
                         {coverImage && (
                             <div className="image-preview">
-                                <img
+                                <Image
                                     src={coverImage}
                                     alt="Cover preview"
+                                    width={300}
+                                    height={200}
+                                    style={{ objectFit: 'cover' }}
                                     onError={(e) => {
                                         e.currentTarget.style.display = 'none';
                                     }}
@@ -310,9 +318,7 @@ export default function EditPostPage({
                         <div className="editor-wrapper">
                             <TiptapEditor
                                 initialContent={content}
-                                onContentChange={(html) => {
-                                    handleContentChange(html);
-                                }}
+                                onContentChange={handleContentChange}
                                 placeholder={{
                                     paragraph: "Start writing your post content...",
                                     imageCaption: "Add a caption for your image..."

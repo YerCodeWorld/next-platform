@@ -179,13 +179,13 @@ export function useExercisePackagesApi() {
     };
 
     // Get user progress for a package
-    const getUserProgress = async (id: string): Promise<UserProgress> => {
+    const getUserProgress = async (id: string, userEmail: string): Promise<UserProgress> => {
         setLoading(true);
         setError(null);
         
         try {
             const response = await api.get<UserProgress>(
-                `/exercise-packages/${id}/progress`
+                `/exercise-packages/${id}/progress?userEmail=${encodeURIComponent(userEmail)}`
             );
             
             return response.data!;

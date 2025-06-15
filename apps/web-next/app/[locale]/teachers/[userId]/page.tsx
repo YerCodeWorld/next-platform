@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useTeacherProfileApi, TeacherProfile, useDynamicsApi, Dynamic, usePostApi, Post, useExerciseApi, Exercise } from '@repo/api-bridge';
 import { useAuthContext } from '@/components/providers/AuthProvider';
@@ -106,7 +106,7 @@ interface TeacherStats {
 const TeacherProfilePage: React.FC = () => {
     const params = useParams();
     const router = useRouter();
-    const { user, isAuthenticated } = useAuthContext();
+    const { user } = useAuthContext();
     const teacherProfileApi = useTeacherProfileApi();
     const dynamicsApi = useDynamicsApi();
     const postApi = usePostApi();
@@ -136,37 +136,7 @@ const TeacherProfilePage: React.FC = () => {
         ? profileThemes[profile.themeColor as keyof typeof profileThemes] || profileThemes['#A47BB9']
         : profileThemes['#A47BB9'];
 
-    useEffect(() => {
-        if (userId) {
-            fetchProfile();
-        }
-    }, [userId]);
-
-    const fetchProfile = async () => {
-        if (!userId) {
-            console.error('No Teacher Profile Provided');
-            return;
-        }
-
-        try {
-            setLoading(true);
-            const response = await teacherProfileApi.getTeacherProfile(userId);
-            if (response.data) {
-                setProfile(response.data);
-                await teacherProfileApi.recordProfileView(userId);
-                if (response.data.user?.email) {
-                    await fetchTeacherContent(response.data.user.email);
-                }
-            }
-        } catch (error) {
-            console.error('Error fetching profile:', error);
-            toast.error('Failed to load teacher profile');
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const fetchTeacherContent = async (email: string) => {
+    const fetchTeacherContent = useCallback(async (email: string) => {
         try {
             const [dynamicsResponse, postsResponse, exercisesResponse] = await Promise.all([
                 dynamicsApi.getDynamicsByEmail(email, { published: true }),
@@ -196,7 +166,37 @@ const TeacherProfilePage: React.FC = () => {
         } catch (error) {
             console.error('Error fetching teacher content:', error);
         }
-    };
+    }, [dynamicsApi, postApi, exerciseApi, profile?.yearsExperience]);
+
+    const fetchProfile = useCallback(async () => {
+        if (!userId) {
+            console.error('No Teacher Profile Provided');
+            return;
+        }
+
+        try {
+            setLoading(true);
+            const response = await teacherProfileApi.getTeacherProfile(userId);
+            if (response.data) {
+                setProfile(response.data);
+                await teacherProfileApi.recordProfileView(userId);
+                if (response.data.user?.email) {
+                    await fetchTeacherContent(response.data.user.email);
+                }
+            }
+        } catch (error) {
+            console.error('Error fetching profile:', error);
+            toast.error('Failed to load teacher profile');
+        } finally {
+            setLoading(false);
+        }
+    }, [userId, teacherProfileApi, fetchTeacherContent]);
+
+    useEffect(() => {
+        if (userId) {
+            fetchProfile();
+        }
+    }, [userId, fetchProfile]);
 
     const calculateProfileCompleteness = (): number => {
         if (!profile) return 0;
@@ -281,7 +281,7 @@ const TeacherProfilePage: React.FC = () => {
         );
     }
 
-    const teacherName = profile.displayName || profile.user?.name || 'Teacher';
+    // const teacherName = profile.displayName || profile.user?.name || 'Teacher';
 
     return (
         <div className="tp-profile-page" style={{

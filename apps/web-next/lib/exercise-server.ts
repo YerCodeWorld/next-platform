@@ -1,5 +1,5 @@
 import { getAllExercisePackages, getUserPackageProgress } from './api-server';
-import type { ExercisePackage } from '@repo/db';
+import type { ExercisePackage } from '@repo/api-bridge';
 
 export async function getExercisePackagesWithProgress(userEmail?: string) {
   try {
@@ -28,6 +28,7 @@ export async function getExercisePackagesWithProgress(userEmail?: string) {
           completionRate: progress.completionRate || 0
         };
       } catch (error) {
+        console.log(error);
         // Set default progress if error fetching
         userProgress[pkg.id] = {
           completedExercises: [],

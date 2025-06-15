@@ -1,6 +1,7 @@
 // packages/exercises/src/components/create/ManualBuilder.tsx
 import React, { useState, useEffect } from 'react';
 import { ExerciseBuilder } from '../../builder';
+import '../styles/exercises.css';
 import {
     CreateExercisePayload,
     ExerciseType,

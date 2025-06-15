@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useDynamicsApi, Dynamic, CreateDynamicPayload } from '@repo/api-bridge';
 import { TiptapEditor } from '@repo/edu-editor';
@@ -61,16 +61,16 @@ export default function EditDynamicPage({
     };
 
     // Check if user can create/edit dynamics
-    const canEditDynamics = (): boolean => {
+    const canEditDynamics = useCallback((): boolean => {
         if (!isAuthenticated || !user) return false;
         return user.role === 'TEACHER' || user.role === 'ADMIN';
-    };
+    }, [isAuthenticated, user]);
 
     // Check if user can edit this specific dynamic
-    const canEditThisDynamic = (dynamic: Dynamic): boolean => {
+    const canEditThisDynamic = useCallback((dynamic: Dynamic): boolean => {
         if (!user) return false;
         return user.role === 'ADMIN' || user.email === dynamic.authorEmail;
-    };
+    }, [user]);
 
     // Load existing dynamic for editing
     useEffect(() => {
@@ -119,7 +119,7 @@ export default function EditDynamicPage({
 
             fetchDynamic();
         }
-    }, [mode, dynamicSlug, router]);
+    }, [mode, dynamicSlug, router, canEditThisDynamic, dynamicsApi]);
 
     // Check permissions
     useEffect(() => {
@@ -128,7 +128,7 @@ export default function EditDynamicPage({
             const currentLocale = window.location.pathname.split('/')[1];
             router.push(`/${currentLocale}/activities`);
         }
-    }, [isAuthenticated, user, router]);
+    }, [isAuthenticated, user, router, canEditDynamics]);
 
     // Set page title
     useEffect(() => {
@@ -207,18 +207,22 @@ export default function EditDynamicPage({
             } else {
                 toast.error('Failed to save dynamic');
             }
-        } catch (err: any) {
+        } catch (err: unknown) {
             console.error('Error saving dynamic:', err);
-            toast.error(err.message || 'Failed to save dynamic');
+            toast.error(err instanceof Error ? err.message : 'Failed to save dynamic');
         } finally {
             setSaving(false);
         }
     };
 
     // Handle content change from TiptapEditor
-    const handleContentChange = (newContent: string | any) => {
-        setContent(newContent);
-    };
+    const handleContentChange = useCallback((newContent: unknown) => {
+        if (typeof newContent === 'string') {
+            setContent(newContent);
+        } else {
+            setContent(JSON.stringify(newContent));
+        }
+    }, []);
 
     return (
         <div className="dynamic-editor-page">
@@ -344,7 +348,7 @@ export default function EditDynamicPage({
                                 <select
                                     id="dynamicType"
                                     value={dynamicType}
-                                    onChange={(e) => setDynamicType(e.target.value as any)}
+                                    onChange={(e) => setDynamicType(e.target.value as typeof dynamicType)}
                                     className="form-select"
                                     required
                                     disabled={saving}
@@ -423,7 +427,7 @@ export default function EditDynamicPage({
                                     <select
                                         id="ageGroup"
                                         value={ageGroup}
-                                        onChange={(e) => setAgeGroup(e.target.value as any)}
+                                        onChange={(e) => setAgeGroup(e.target.value as typeof ageGroup)}
                                         className="form-select"
                                         required
                                         disabled={saving}
@@ -442,7 +446,7 @@ export default function EditDynamicPage({
                                     <select
                                         id="difficulty"
                                         value={difficulty}
-                                        onChange={(e) => setDifficulty(e.target.value as any)}
+                                        onChange={(e) => setDifficulty(e.target.value as typeof difficulty)}
                                         className="form-select"
                                         required
                                         disabled={saving}
@@ -504,9 +508,7 @@ export default function EditDynamicPage({
                         <div className="editor-wrapper">
                             <TiptapEditor
                                 initialContent={content}
-                                onContentChange={(html) => {
-                                    handleContentChange(html);
-                                }}
+                                onContentChange={handleContentChange}
                                 placeholder={{
                                     paragraph: "Describe how to execute this dynamic step by step...",
                                     imageCaption: "Add a caption for your image..."

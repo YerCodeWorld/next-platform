@@ -1,4 +1,5 @@
 import React from 'react';
+import Image from 'next/image';
 import { Post as PostData, Dynamic as DynamicData } from "@repo/api-bridge";
 
 interface PostHeaderProps {
@@ -33,10 +34,12 @@ export const PostHeader: React.FC<PostHeaderProps> = ({ post, locale }) => {
         <div className="content-meta">
           <div className="author-info">
             {post.user?.picture && (
-              <img 
+              <Image 
                 src={post.user.picture}
                 alt={post.user.name || 'Author'} 
                 className="author-avatar"
+                width={48}
+                height={48}
               />
             )}
             <div className="author-details">
@@ -222,10 +225,12 @@ export const DynamicHeader: React.FC<DynamicHeaderProps> = ({ dynamic, locale })
         <div className="content-meta">
           <div className="author-info">
             {dynamic.user?.picture && (
-              <img 
+              <Image 
                 src={dynamic.user.picture}
                 alt={dynamic.user.name || 'Author'} 
                 className="author-avatar"
+                width={48}
+                height={48}
               />
             )}
             <div className="author-details">

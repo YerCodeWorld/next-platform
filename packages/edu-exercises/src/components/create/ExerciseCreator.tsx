@@ -5,6 +5,7 @@ import { LanScriptEditor } from './LanScriptEditor';
 import { ManualBuilder } from './ManualBuilder';
 import { ExercisePreview } from './ExercisePreview';
 import { toast } from 'sonner';
+import '../styles/exercises.css';
 import {
     Exercise,
     CreateExercisePayload,
@@ -14,7 +15,15 @@ import {
 } from '../../types';
 
 interface ExerciseCreatorProps {
-    onSave?: (exercise: any) => void;
+    mode?: 'script' | 'manual';
+    authorEmail: string;
+    defaultMetadata?: {
+        difficulty: ExerciseDifficulty;
+        category: ExerciseCategory;
+        tags: string[];
+    };
+    onAdd?: (exercise: any) => void;
+    onSaveAll?: (exercises: any[]) => void;
     onCancel?: () => void;
     packageId?: string;
     defaultType?: ExerciseType;
@@ -22,7 +31,11 @@ interface ExerciseCreatorProps {
 }
 
 export const ExerciseCreator: React.FC<ExerciseCreatorProps> = ({
-    onSave,
+    mode: initialMode = 'manual',
+    authorEmail,
+    defaultMetadata: propDefaultMetadata,
+    onAdd,
+    onSaveAll,
     onCancel,
     packageId,
     defaultType,
@@ -31,16 +44,16 @@ export const ExerciseCreator: React.FC<ExerciseCreatorProps> = ({
     const exerciseApi = useExerciseApi();
 
     const isEditing = !!editingExercise;
-    const [mode, setMode] = useState<'script' | 'manual'>('manual');
+    const [mode, setMode] = useState<'script' | 'manual'>(initialMode);
     const [exercises, setExercises] = useState<CreateExercisePayload[]>([]);
     const [currentExercise, setCurrentExercise] = useState<CreateExercisePayload | null>(null);
     const [saving, setSaving] = useState(false);
 
     // Default metadata for exercises
     const [defaultMetadata, setDefaultMetadata] = useState({
-        difficulty: (editingExercise?.difficulty || 'INTERMEDIATE') as ExerciseDifficulty,
-        category: (editingExercise?.category || 'GENERAL') as ExerciseCategory,
-        tags: editingExercise?.tags || [] as string[]
+        difficulty: (propDefaultMetadata?.difficulty || editingExercise?.difficulty || 'INTERMEDIATE') as ExerciseDifficulty,
+        category: (propDefaultMetadata?.category || editingExercise?.category || 'GENERAL') as ExerciseCategory,
+        tags: propDefaultMetadata?.tags || editingExercise?.tags || [] as string[]
     });
 
     // Initialize editing state
@@ -95,7 +108,7 @@ export const ExerciseCreator: React.FC<ExerciseCreatorProps> = ({
                 const response = await exerciseApi.createExercise(exercise);
                 if (response.data) {
                     toast.success('Exercise created successfully!');
-                    onSave?.(response.data);
+                    onAdd?.(response.data);
                 } else {
                     toast.error('Failed to create exercise');
                 }
@@ -130,7 +143,7 @@ export const ExerciseCreator: React.FC<ExerciseCreatorProps> = ({
 
             if (response.data) {
                 toast.success('Exercise updated successfully!');
-                onSave?.(response.data);
+                onAdd?.(response.data);
             } else {
                 toast.error('Failed to update exercise');
             }
@@ -169,7 +182,7 @@ export const ExerciseCreator: React.FC<ExerciseCreatorProps> = ({
         setSaving(true);
         try {
             // Create exercises one by one and collect results
-            const createdExercises = [];
+            const createdExercises: any[] = [];
             for (const exercise of exercises) {
                 const response = await exerciseApi.createExercise(exercise);
                 if (response.data) {
@@ -180,7 +193,7 @@ export const ExerciseCreator: React.FC<ExerciseCreatorProps> = ({
             if (createdExercises.length > 0) {
                 toast.success(`Created ${createdExercises.length} exercises successfully!`);
                 setExercises([]);
-                onSave?.(createdExercises[0]); // Return first exercise for package addition
+                onSaveAll?.(createdExercises); // Return all created exercises
             }
         } catch (error) {
             console.error('Error saving exercises:', error);
@@ -255,7 +268,7 @@ export const ExerciseCreator: React.FC<ExerciseCreatorProps> = ({
         return script;
     };
 
-    if (!user) {
+    if (!authorEmail) {
         return (
             <div className="exs-creator-login">
                 <p>Please log in to {isEditing ? 'edit' : 'create'} exercises</p>
@@ -330,7 +343,7 @@ export const ExerciseCreator: React.FC<ExerciseCreatorProps> = ({
             <div className="exs-creator-content">
                 {mode === 'manual' ? (
                     <ManualBuilder
-                        authorEmail={user.email}
+                        authorEmail={authorEmail}
                         defaultType={defaultType || editingExercise?.type}
                         defaultMetadata={defaultMetadata}
                         currentExercise={currentExercise}
@@ -339,7 +352,7 @@ export const ExerciseCreator: React.FC<ExerciseCreatorProps> = ({
                 ) : (
                     <div className="exs-lanscript-container">
                         <LanScriptEditor
-                            authorEmail={user.email}
+                            authorEmail={authorEmail}
                             onExercisesParsed={handleLanScriptParse}
                             onSaveAll={handleSaveAll}
                             exercises={isEditing ? (currentExercise ? [currentExercise] : []) : exercises}

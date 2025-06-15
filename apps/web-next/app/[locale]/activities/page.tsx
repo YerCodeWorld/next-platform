@@ -5,8 +5,7 @@ import { getTranslations } from 'next-intl/server';
 import { Breadcrumb } from '@repo/components';
 import DynamicsGridWrapper from "@/components/activities/DynamicsGridWrapper";
 import DynamicsStatsWrapper from '@/components/activities/DynamicsStatisticsWrapper';
-import { getCurrentUser } from '@/lib/auth';
-import Link from 'next/link';
+// import { getCurrentUser } from '@/lib/auth';
 
 export async function generateMetadata({
                                            params
@@ -72,8 +71,8 @@ export default async function ActivitiesPage({
 }) {
     const { locale } = await params;
     const t = await getTranslations();
-    const currentUser = await getCurrentUser();
-    const canCreateDynamic = currentUser && (currentUser.role === 'ADMIN' || currentUser.role === 'TEACHER');
+    // const currentUser = await getCurrentUser();
+    // const canCreateDynamic = currentUser && (currentUser.role === 'ADMIN' || currentUser.role === 'TEACHER');
 
     const breadcrumbItems = [
         { label: t('common.navigation.home'), href: `/${locale}` },
