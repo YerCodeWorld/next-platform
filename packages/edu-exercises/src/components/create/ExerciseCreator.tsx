@@ -1,8 +1,5 @@
 // packages/exercises/src/components/create/ExerciseCreator.tsx - Updated with Edit Support
 import React, { useState, useEffect } from 'react';
-// @ts-ignore
-import { useAuth } from '@repo/auth';
-// @ts-ignore
 import { useExerciseApi } from '@repo/api-bridge';
 import { LanScriptEditor } from './LanScriptEditor';
 import { ManualBuilder } from './ManualBuilder';
@@ -15,20 +12,22 @@ import {
     ExerciseDifficulty,
     ExerciseCategory
 } from '../../types';
-import '../styles/exercises.css';
 
 interface ExerciseCreatorProps {
-    onSuccess?: (exercises: Exercise[]) => void;
+    onSave?: (exercise: any) => void;
+    onCancel?: () => void;
+    packageId?: string;
     defaultType?: ExerciseType;
     editingExercise?: Exercise | null;
 }
 
 export const ExerciseCreator: React.FC<ExerciseCreatorProps> = ({
-                                                                    onSuccess,
-                                                                    defaultType,
-                                                                    editingExercise
-                                                                }) => {
-    const { user } = useAuth();
+    onSave,
+    onCancel,
+    packageId,
+    defaultType,
+    editingExercise
+}) => {
     const exerciseApi = useExerciseApi();
 
     const isEditing = !!editingExercise;
@@ -91,9 +90,21 @@ export const ExerciseCreator: React.FC<ExerciseCreatorProps> = ({
             await handleUpdate(exercise);
         } else {
             // Handle creation of new exercise
-            setExercises([...exercises, exercise]);
-            setCurrentExercise(null);
-            toast.success('Exercise added!');
+            setSaving(true);
+            try {
+                const response = await exerciseApi.createExercise(exercise);
+                if (response.data) {
+                    toast.success('Exercise created successfully!');
+                    onSave?.(response.data);
+                } else {
+                    toast.error('Failed to create exercise');
+                }
+            } catch (error) {
+                console.error('Error creating exercise:', error);
+                toast.error('Failed to create exercise');
+            } finally {
+                setSaving(false);
+            }
         }
     };
 
@@ -112,20 +123,20 @@ export const ExerciseCreator: React.FC<ExerciseCreatorProps> = ({
                 hints: updatedExercise.hints,
                 explanation: updatedExercise.explanation,
                 tags: updatedExercise.tags,
-                isPublished: editingExercise.isPublished // Keep original published status
+                isPublished: editingExercise.isPublished
             };
 
             const response = await exerciseApi.updateExercise(editingExercise.id, updatePayload);
 
             if (response.data) {
-                onSuccess?.([response.data]);
-            } else if (response.error) {
-                console.error('API Error:', response.error);
-                toast.error(`Failed to update: ${response.error.message}`);
+                toast.success('Exercise updated successfully!');
+                onSave?.(response.data);
+            } else {
+                toast.error('Failed to update exercise');
             }
         } catch (error) {
             console.error('Error updating exercise:', error);
-            toast.error('Failed to update exercise. Please check the console for details.');
+            toast.error('Failed to update exercise');
         } finally {
             setSaving(false);
         }
@@ -145,15 +156,11 @@ export const ExerciseCreator: React.FC<ExerciseCreatorProps> = ({
     };
 
     const handleSaveAll = async () => {
-        if (isEditing) {
-            // Handle LanScript editing
-            if (currentExercise && editingExercise) {
-                await handleUpdate(currentExercise);
-            }
+        if (isEditing && currentExercise && editingExercise) {
+            await handleUpdate(currentExercise);
             return;
         }
 
-        // Handle creation of multiple exercises
         if (exercises.length === 0) {
             toast.error('No exercises to save');
             return;
@@ -161,19 +168,23 @@ export const ExerciseCreator: React.FC<ExerciseCreatorProps> = ({
 
         setSaving(true);
         try {
-            const response = await exerciseApi.createExercisesBulk(exercises);
-
-            if (response.data) {
-                toast.success(`Saved ${exercises.length} exercises successfully!`);
-                setExercises([]); // Clear exercises after saving
-                onSuccess?.(response.data);
-            } else if (response.error) {
-                console.error('API Error:', response.error);
-                toast.error(`Failed to save: ${response.error.message}`);
+            // Create exercises one by one and collect results
+            const createdExercises = [];
+            for (const exercise of exercises) {
+                const response = await exerciseApi.createExercise(exercise);
+                if (response.data) {
+                    createdExercises.push(response.data);
+                }
+            }
+            
+            if (createdExercises.length > 0) {
+                toast.success(`Created ${createdExercises.length} exercises successfully!`);
+                setExercises([]);
+                onSave?.(createdExercises[0]); // Return first exercise for package addition
             }
         } catch (error) {
             console.error('Error saving exercises:', error);
-            toast.error('Failed to save exercises. Please check the console for details.');
+            toast.error('Failed to save exercises');
         } finally {
             setSaving(false);
         }

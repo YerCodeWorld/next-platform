@@ -17,6 +17,7 @@ import {
     UserProgress,
     PackageExercise
 } from '@repo/api-bridge';
+import { cookies } from 'next/headers';
 
 const API_BASE_URL = 'https://api.ieduguide.com/api';
 
@@ -49,6 +50,29 @@ async function serverFetch<T>(endpoint: string, options: RequestInit = {}): Prom
         // This maintains server-side rendering even if API is temporarily down
         throw error; // Or return fallback data based on your preference
     }
+}
+
+// Authenticated server-side fetch utility
+async function serverFetchWithAuth<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
+    // Get auth token from cookies
+    const cookieStore = await cookies();
+    const authToken = cookieStore.get('auth_token');
+    
+    const headers: HeadersInit = {
+        'Content-Type': 'application/json',
+        'User-Agent': 'EduGuiders-NextJS/1.0',
+        ...options.headers,
+    };
+    
+    // Add authorization header if token exists
+    if (authToken) {
+        headers['Authorization'] = `Bearer ${authToken.value}`;
+    }
+    
+    return serverFetch<T>(endpoint, {
+        ...options,
+        headers
+    });
 }
 
 // ============================================
@@ -406,7 +430,7 @@ const serverExerciseApi = {
     },
 
     async getUserProgress(id: string): Promise<UserProgress> {
-        return serverFetch<UserProgress>(`/exercise-packages/${id}/progress`);
+        return serverFetchWithAuth<UserProgress>(`/exercise-packages/${id}/progress`);
     },
 
     async getExerciseStatistics(): Promise<{

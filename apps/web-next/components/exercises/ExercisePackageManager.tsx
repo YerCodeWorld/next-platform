@@ -2,8 +2,9 @@
 'use client';
 
 import { useState } from 'react';
-import { Save, Plus, Trash2, Search, Filter, ChevronDown } from 'lucide-react';
+import { Save, Plus, Trash2, Search, Filter, ChevronDown, PlusCircle } from 'lucide-react';
 import { useExercisePackagesApi } from '@repo/api-bridge';
+import { ExerciseCreator } from '@repo/exercises';
 import type { ExercisePackage, PackageExercise } from '@repo/api-bridge';
 
 interface Exercise {
@@ -40,6 +41,7 @@ export function ExercisePackageManager({
   const [selectedType, setSelectedType] = useState('');
   const [selectedDifficulty, setSelectedDifficulty] = useState('');
   const [showFilters, setShowFilters] = useState(false);
+  const [showCreateModal, setShowCreateModal] = useState(false);
   const [packageInfo, setPackageInfo] = useState({
     title: exercisePackage.title,
     description: exercisePackage.description,
@@ -93,6 +95,14 @@ export function ExercisePackageManager({
     } catch (err) {
       console.error('Failed to update package:', err);
     }
+  };
+
+  const handleExerciseCreated = async (createdExercise: any) => {
+    // Add the newly created exercise to the package
+    if (createdExercise && createdExercise.id) {
+      await handleAddExercise(createdExercise.id);
+    }
+    setShowCreateModal(false);
   };
 
   const getTypeLabel = (type: string) => {
@@ -236,9 +246,18 @@ export function ExercisePackageManager({
 
       {/* Add Exercises */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <h2 className="text-xl font-bold text-gray-900 mb-6">
-          {locale === 'es' ? 'Agregar Ejercicios' : 'Add Exercises'}
-        </h2>
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-xl font-bold text-gray-900">
+            {locale === 'es' ? 'Agregar Ejercicios' : 'Add Exercises'}
+          </h2>
+          <button
+            onClick={() => setShowCreateModal(true)}
+            className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+          >
+            <PlusCircle className="w-4 h-4" />
+            {locale === 'es' ? 'Crear Nuevo Ejercicio' : 'Create New Exercise'}
+          </button>
+        </div>
         
         {/* Search and Filters */}
         <div className="space-y-4 mb-6">
@@ -339,6 +358,46 @@ export function ExercisePackageManager({
           )}
         </div>
       </div>
+
+      {/* Create Exercise Modal */}
+      {showCreateModal && (
+        <div className="fixed inset-0 z-50 overflow-y-auto">
+          <div className="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+            {/* Background overlay */}
+            <div 
+              className="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75"
+              onClick={() => setShowCreateModal(false)}
+            />
+
+            {/* Modal panel */}
+            <div className="inline-block w-full max-w-6xl px-4 pt-5 pb-4 overflow-hidden text-left align-bottom transition-all transform bg-white rounded-lg shadow-xl sm:my-8 sm:align-middle sm:p-6">
+              <div className="absolute top-0 right-0 pt-4 pr-4">
+                <button
+                  onClick={() => setShowCreateModal(false)}
+                  className="text-gray-400 hover:text-gray-500 focus:outline-none"
+                >
+                  <span className="sr-only">Close</span>
+                  <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+
+              <div className="mt-3">
+                <h3 className="text-2xl font-bold text-gray-900 mb-6">
+                  {locale === 'es' ? 'Crear Nuevo Ejercicio' : 'Create New Exercise'}
+                </h3>
+                
+                <ExerciseCreator
+                  onSave={handleExerciseCreated}
+                  onCancel={() => setShowCreateModal(false)}
+                  packageId={exercisePackage.id}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

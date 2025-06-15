@@ -3,6 +3,7 @@
 
 import { useState, useEffect } from 'react';
 import type { MultipleChoiceContent } from '@repo/api-bridge';
+import { CheckCircle, XCircle, Lightbulb, BookOpen } from 'lucide-react';
 
 interface MultipleChoicePlayerProps {
   content: MultipleChoiceContent;
@@ -103,113 +104,115 @@ export function MultipleChoicePlayer({ content, currentIndex, onAnswer, onHintUs
     return '';
   };
 
+  const isCorrectAnswer = submitted && 
+    selectedIndices.length === currentQuestion.correctIndices.length &&
+    selectedIndices.every(i => currentQuestion.correctIndices.includes(i));
+
   return (
     <div className="multiple-choice-player">
-      <div className="bg-white rounded-2xl shadow-lg p-8">
+      <div className="exercise-question-card">
         {/* Question */}
-        <div className="mb-8 text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">
+        <div className="question-section">
+          <h2 className="question-text">
             {currentQuestion.question}
           </h2>
           {isMultipleAnswer && (
-            <p className="text-sm text-gray-600 bg-blue-100 inline-block px-4 py-2 rounded-full">
+            <div className="multi-answer-hint">
               ℹ️ Select all correct answers
-            </p>
+            </div>
           )}
         </div>
 
         {/* Options */}
-        <div className="space-y-4 mb-8">
-          {currentQuestion.options.map((option, index) => (
-            <button
-              key={index}
-              onClick={() => handleOptionClick(index)}
-              disabled={submitted}
-              className={`
-                w-full p-6 rounded-xl border-2 text-left transition-all duration-200
-                flex items-center justify-between group
-                ${getOptionStyle(index)}
-                ${!submitted && 'hover:shadow-md'}
-              `}
-            >
-              <div className="flex items-center gap-4">
-                <div className={`
-                  w-8 h-8 rounded-full border-2 flex items-center justify-center
-                  font-bold text-sm transition-all duration-200
-                  ${selectedIndices.includes(index) 
-                    ? submitted
-                      ? currentQuestion.correctIndices.includes(index)
-                        ? 'border-green-500 bg-green-500 text-white'
-                        : 'border-red-500 bg-red-500 text-white'
-                      : 'border-blue-500 bg-blue-500 text-white'
-                    : 'border-gray-300 text-gray-600'
-                  }
-                `}>
-                  {getOptionIcon(index) || String.fromCharCode(65 + index)}
+        <div className="choice-options">
+          {currentQuestion.options.map((option, index) => {
+            const isSelected = selectedIndices.includes(index);
+            const isCorrect = currentQuestion.correctIndices.includes(index);
+            
+            let optionClass = 'choice-option';
+            if (isSelected && !submitted) optionClass += ' selected';
+            if (submitted && isCorrect) optionClass += ' correct';
+            if (submitted && isSelected && !isCorrect) optionClass += ' incorrect';
+            if (submitted && !isCorrect && !isSelected) optionClass += ' disabled';
+
+            return (
+              <button
+                key={index}
+                onClick={() => handleOptionClick(index)}
+                disabled={submitted}
+                className={optionClass}
+              >
+                <div className="choice-content">
+                  <div className={`choice-indicator ${isSelected ? 'selected' : ''} ${submitted ? (isCorrect ? 'correct' : (isSelected ? 'incorrect' : '')) : ''}`}>
+                    {submitted && isCorrect ? (
+                      <CheckCircle className="choice-icon" />
+                    ) : submitted && isSelected && !isCorrect ? (
+                      <XCircle className="choice-icon" />
+                    ) : isSelected ? (
+                      '✓'
+                    ) : (
+                      String.fromCharCode(65 + index)
+                    )}
+                  </div>
+                  <span className="choice-text">
+                    {option}
+                  </span>
                 </div>
-                <span className="text-lg font-medium text-gray-800">
-                  {option}
-                </span>
-              </div>
-              
-              {/* Feedback icons */}
-              {submitted && (
-                <div className="text-2xl">
-                  {currentQuestion.correctIndices.includes(index) && (
-                    <span className="text-green-600">✓</span>
-                  )}
-                  {selectedIndices.includes(index) && !currentQuestion.correctIndices.includes(index) && (
-                    <span className="text-red-600">✗</span>
-                  )}
-                </div>
-              )}
-            </button>
-          ))}
+                
+                {/* Feedback icons */}
+                {submitted && (
+                  <div className="choice-feedback">
+                    {isCorrect && (
+                      <CheckCircle className="feedback-icon correct" />
+                    )}
+                    {isSelected && !isCorrect && (
+                      <XCircle className="feedback-icon incorrect" />
+                    )}
+                  </div>
+                )}
+              </button>
+            );
+          })}
         </div>
 
         {/* Hint */}
         {showHint && currentQuestion.hint && !submitted && (
-          <div className="mb-6 p-4 bg-yellow-100 rounded-xl text-yellow-800">
-            <p className="flex items-center gap-2">
-              <span className="text-xl">💡</span>
-              {currentQuestion.hint}
-            </p>
+          <div className="hint-box">
+            <div className="hint-content">
+              <Lightbulb className="hint-icon" />
+              <span>{currentQuestion.hint}</span>
+            </div>
           </div>
         )}
 
         {/* Explanation */}
         {showExplanation && currentQuestion.explanation && (
-          <div className="mb-6 p-4 bg-blue-100 rounded-xl text-blue-800">
-            <p className="flex items-start gap-2">
-              <span className="text-xl">📖</span>
+          <div className="explanation-box">
+            <div className="explanation-content">
+              <BookOpen className="explanation-icon" />
               <span>{currentQuestion.explanation}</span>
-            </p>
+            </div>
           </div>
         )}
 
         {/* Action buttons */}
-        <div className="flex justify-center gap-4">
+        <div className="action-buttons">
           {!submitted && (
             <>
               {currentQuestion.hint && !showHint && (
                 <button
                   onClick={handleShowHint}
-                  className="px-6 py-3 bg-yellow-100 text-yellow-800 rounded-xl font-medium hover:bg-yellow-200 transition-colors"
+                  className="hint-button"
                 >
-                  💡 Show Hint
+                  <Lightbulb className="button-icon" />
+                  Show Hint
                 </button>
               )}
               
               <button
                 onClick={handleSubmit}
                 disabled={selectedIndices.length === 0}
-                className={`
-                  px-8 py-3 rounded-xl font-medium transition-all duration-200
-                  ${selectedIndices.length === 0
-                    ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                    : 'bg-blue-600 text-white hover:bg-blue-700 transform hover:scale-105'
-                  }
-                `}
+                className={`submit-button ${selectedIndices.length === 0 ? 'disabled' : ''}`}
               >
                 Submit Answer
               </button>
@@ -219,39 +222,14 @@ export function MultipleChoicePlayer({ content, currentIndex, onAnswer, onHintUs
 
         {/* Feedback message */}
         {submitted && (
-          <div className={`
-            mt-6 p-4 rounded-xl text-center font-medium
-            ${selectedIndices.length === currentQuestion.correctIndices.length &&
-              selectedIndices.every(i => currentQuestion.correctIndices.includes(i))
-              ? 'bg-green-100 text-green-800' 
-              : 'bg-red-100 text-red-800'
-            }
-          `}>
-            {selectedIndices.length === currentQuestion.correctIndices.length &&
-             selectedIndices.every(i => currentQuestion.correctIndices.includes(i))
+          <div className={`feedback-message ${isCorrectAnswer ? 'success' : 'error'}`}>
+            {isCorrectAnswer
               ? '🎉 Correct! Well done!' 
               : '💭 Not quite right. Check the correct answers above.'
             }
           </div>
         )}
       </div>
-
-      <style jsx>{`
-        .multiple-choice-player {
-          animation: fadeInUp 0.4s ease-out;
-        }
-        
-        @keyframes fadeInUp {
-          from {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-      `}</style>
     </div>
   );
 }

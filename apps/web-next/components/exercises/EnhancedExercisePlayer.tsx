@@ -1,4 +1,4 @@
-// components/exercises/ExercisePlayer.tsx
+// components/exercises/EnhancedExercisePlayer.tsx
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
@@ -10,7 +10,7 @@ import { LazyFillBlankPlayer, LazyMultipleChoicePlayer, LazyMatchingPlayer, Lazy
 import { ExerciseResults } from './ExerciseResults';
 import { ParticleEffects } from './effects/ParticleEffects';
 import { AudioFeedback } from './effects/AudioFeedback';
-import { ArrowLeft, Clock, Heart } from 'lucide-react';
+import { ArrowLeft, Clock, Heart, Lightbulb, SkipForward, Check, X } from 'lucide-react';
 import '../../styles/exercise-player.css';
 
 interface ExercisePlayerProps {
@@ -20,7 +20,7 @@ interface ExercisePlayerProps {
     title: string;
     slug: string;
   };
-  user: any; // TODO: Define proper user type
+  user: any;
   locale: string;
 }
 
@@ -36,12 +36,13 @@ interface ExerciseSession {
   answers: { questionIndex: number; answer: unknown; isCorrect: boolean }[];
 }
 
-export function ExercisePlayer({ exercise, packageInfo, user, locale }: ExercisePlayerProps) {
+export function EnhancedExercisePlayer({ exercise, packageInfo, user, locale }: ExercisePlayerProps) {
   const router = useRouter();
   const { markExerciseComplete, loading: apiLoading } = useExercisePackagesApi();
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [isCompleted, setIsCompleted] = useState(false);
   const [showResults, setShowResults] = useState(false);
+  const [showFeedback, setShowFeedback] = useState<'success' | 'error' | null>(null);
   const [session, setSession] = useState<ExerciseSession>({
     startTime: Date.now(),
     totalQuestions: 0,
@@ -54,8 +55,8 @@ export function ExercisePlayer({ exercise, packageInfo, user, locale }: Exercise
   });
   
   // Game features
-  const [enableTimer, setEnableTimer] = useState(false);
-  const [enableLives, setEnableLives] = useState(false);
+  const [enableTimer, setEnableTimer] = useState(true);
+  const [enableLives, setEnableLives] = useState(true);
   const [lives, setLives] = useState(3);
   const [timer, setTimer] = useState(0);
   const [questionStartTime, setQuestionStartTime] = useState(Date.now());
@@ -100,45 +101,41 @@ export function ExercisePlayer({ exercise, packageInfo, user, locale }: Exercise
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const handleAnswer = useCallback((isCorrect: boolean, answer: unknown) => {
-    // Record time for this question
-    const questionTime = (Date.now() - questionStartTime) / 1000;
+  const handleAnswer = useCallback((answer: any, isCorrect: boolean) => {
+    // Show feedback
+    setShowFeedback(isCorrect ? 'success' : 'error');
     
-    // Update session
+    // Update session stats
+    const timeSpent = Date.now() - questionStartTime;
     setSession(prev => ({
       ...prev,
       correctAnswers: isCorrect ? prev.correctAnswers + 1 : prev.correctAnswers,
       wrongAnswers: !isCorrect ? prev.wrongAnswers + 1 : prev.wrongAnswers,
-      timePerQuestion: [...prev.timePerQuestion, questionTime],
+      timePerQuestion: [...prev.timePerQuestion, timeSpent],
       answers: [...prev.answers, { questionIndex: currentQuestionIndex, answer, isCorrect }]
     }));
 
     // Handle lives
-    if (enableLives && !isCorrect) {
+    if (!isCorrect && enableLives) {
       setLives(prev => {
         const newLives = prev - 1;
         if (newLives <= 0) {
-          // Game over
-          handleComplete();
+          setTimeout(() => setShowResults(true), 1500);
         }
         return newLives;
       });
     }
 
-    // Show effects
+    // Trigger effects
     setShowParticles(isCorrect ? 'success' : 'error');
     setPlaySound(isCorrect ? 'success' : 'error');
-    
-    // Clear effects after animation
-    setTimeout(() => {
-      setShowParticles(null);
-      setPlaySound(null);
-    }, 2000);
 
-    // Move to next question after a delay
+    // Move to next question after delay
     setTimeout(() => {
+      setShowFeedback(null);
+      setShowParticles(null);
       handleNext();
-    }, isCorrect ? 1500 : 2000);
+    }, 2000);
   }, [currentQuestionIndex, questionStartTime, enableLives]);
 
   const handleNext = useCallback(() => {
@@ -146,38 +143,21 @@ export function ExercisePlayer({ exercise, packageInfo, user, locale }: Exercise
       setCurrentQuestionIndex(prev => prev + 1);
       setQuestionStartTime(Date.now());
     } else {
-      handleComplete();
+      // Exercise completed
+      setIsCompleted(true);
+      setShowResults(true);
+      markExerciseComplete(packageInfo.id, exercise.id, {
+        score: (session.correctAnswers / session.totalQuestions) * 100,
+        timeSpent: timer,
+        completedAt: new Date().toISOString()
+      });
     }
-  }, [currentQuestionIndex, session.totalQuestions]);
+  }, [currentQuestionIndex, session.totalQuestions, session.correctAnswers, timer, packageInfo.id, exercise.id, markExerciseComplete]);
 
   const handleSkip = useCallback(() => {
-    setSession(prev => ({
-      ...prev,
-      skippedQuestions: prev.skippedQuestions + 1
-    }));
+    setSession(prev => ({ ...prev, skippedQuestions: prev.skippedQuestions + 1 }));
     handleNext();
   }, [handleNext]);
-
-  const handleComplete = useCallback(async () => {
-    const endTime = Date.now();
-    setSession(prev => ({
-      ...prev,
-      endTime
-    }));
-    setIsCompleted(true);
-    setShowResults(true);
-
-    // Save progress to API if user is logged in
-    if (user && !apiLoading) {
-      try {
-        await markExerciseComplete(packageInfo.id, exercise.id);
-        console.log('Exercise completion saved successfully');
-      } catch (error) {
-        console.error('Failed to save exercise completion:', error);
-        // Don't block the user experience, just log the error
-      }
-    }
-  }, [user, packageInfo.id, exercise.id, markExerciseComplete, apiLoading]);
 
   const handleRestart = () => {
     setCurrentQuestionIndex(0);
@@ -185,6 +165,7 @@ export function ExercisePlayer({ exercise, packageInfo, user, locale }: Exercise
     setShowResults(false);
     setLives(3);
     setTimer(0);
+    setQuestionStartTime(Date.now());
     setSession({
       startTime: Date.now(),
       totalQuestions: session.totalQuestions,
@@ -195,7 +176,6 @@ export function ExercisePlayer({ exercise, packageInfo, user, locale }: Exercise
       timePerQuestion: [],
       answers: []
     });
-    setQuestionStartTime(Date.now());
   };
 
   const renderExerciseContent = () => {
@@ -252,22 +232,22 @@ export function ExercisePlayer({ exercise, packageInfo, user, locale }: Exercise
   }
 
   return (
-    <div className="exercise-player">
+    <div className="exercise-player min-h-screen flex flex-col">
       {/* Header */}
       <div className="exercise-header">
         <div className="exercise-header-content">
           {/* Left: Back button and title */}
-          <div className="exercise-header-left">
+          <div className="flex items-center gap-4">
             <Link
               href={`/${locale}/exercises/${packageInfo.slug}`}
               className="exercise-back-button"
             >
-              <ArrowLeft className="exercise-back-icon" />
-              <span className="exercise-back-text-full">Back to {packageInfo.title}</span>
-              <span className="exercise-back-text-short">Back</span>
+              <ArrowLeft className="w-5 h-5" />
+              <span className="hidden sm:inline">Back to {packageInfo.title}</span>
+              <span className="sm:hidden">Back</span>
             </Link>
-            <div className="exercise-header-divider"></div>
-            <h1 className="exercise-title">
+            <div className="h-6 w-px bg-gray-300"></div>
+            <h1 className="exercise-title truncate max-w-xs sm:max-w-md">
               {exercise.title}
             </h1>
           </div>
@@ -276,8 +256,8 @@ export function ExercisePlayer({ exercise, packageInfo, user, locale }: Exercise
           <div className="game-controls">
             {enableTimer && (
               <div className="timer-display">
-                <Clock className="timer-icon" />
-                <span className="timer-text">{formatTime(timer)}</span>
+                <Clock className="w-5 h-5" />
+                <span className="font-mono">{formatTime(timer)}</span>
               </div>
             )}
             
@@ -287,7 +267,7 @@ export function ExercisePlayer({ exercise, packageInfo, user, locale }: Exercise
                   <Heart 
                     key={i} 
                     className={`life-heart ${i < lives ? 'active' : 'lost'}`}
-                    fill={i < lives ? '#ef4444' : 'none'}
+                    fill={i < lives ? '#ef4444' : '#e5e7eb'}
                   />
                 ))}
               </div>
@@ -295,7 +275,7 @@ export function ExercisePlayer({ exercise, packageInfo, user, locale }: Exercise
 
             <button
               onClick={() => setShowResults(true)}
-              className="exit-button"
+              className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors"
             >
               Exit
             </button>
@@ -308,14 +288,14 @@ export function ExercisePlayer({ exercise, packageInfo, user, locale }: Exercise
         <div 
           className="progress-bar"
           style={{ width: `${((currentQuestionIndex + 1) / session.totalQuestions) * 100}%` }}
-        ></div>
+        />
       </div>
 
       {/* Main Content */}
       <div className="exercise-content-wrapper">
-        <div className="exercise-content-container">
+        <div className="exercise-content">
           {/* Question Counter */}
-          <div className="question-counter-wrapper">
+          <div className="text-center mb-8">
             <div className="question-counter">
               <span className="question-counter-text">Question</span>
               <span className="question-counter-number">{currentQuestionIndex + 1}</span>
@@ -325,74 +305,46 @@ export function ExercisePlayer({ exercise, packageInfo, user, locale }: Exercise
           </div>
 
           {/* Exercise Content */}
-          <div className="exercise-content">
+          <div className="exercise-question-card">
             {renderExerciseContent()}
           </div>
 
           {/* Skip Button (if not matching exercise) */}
           {exercise.type !== 'MATCHING' && (
-            <div className="skip-button-wrapper">
+            <div className="text-center mt-8">
               <button
                 onClick={handleSkip}
                 className="skip-button"
               >
-                Skip this question →
+                Skip this question
               </button>
             </div>
           )}
         </div>
       </div>
 
-      {/* Game Settings (initially hidden, can be toggled) */}
-      <div className="fixed bottom-4 right-4">
-        <button
-          onClick={() => {
-            const showSettings = confirm('Enable game features?\n\n• Timer\n• Lives system');
-            if (showSettings) {
-              setEnableTimer(true);
-              setEnableLives(true);
-            }
-          }}
-          className="p-3 bg-white rounded-full shadow-lg hover:shadow-xl transition-shadow"
-          title="Game Settings"
-        >
-          <span className="text-2xl">⚙️</span>
-        </button>
-      </div>
+      {/* Feedback Messages */}
+      {showFeedback && (
+        <div className={showFeedback === 'success' ? 'success-message' : 'error-message'}>
+          {showFeedback === 'success' ? (
+            <>
+              <Check className="w-12 h-12 mx-auto mb-2" />
+              Correct! Well done!
+            </>
+          ) : (
+            <>
+              <X className="w-12 h-12 mx-auto mb-2" />
+              Not quite. Try again!
+            </>
+          )}
+        </div>
+      )}
 
-      {/* Effects */}
+      {/* Particle Effects */}
       {showParticles && <ParticleEffects type={showParticles} />}
-      {playSound && <AudioFeedback type={playSound} />}
-
-      <style jsx>{`
-        .exercise-player {
-          animation: fadeIn 0.3s ease-out;
-        }
-        
-        .exercise-content {
-          animation: slideInUp 0.4s ease-out;
-        }
-        
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-          }
-          to {
-            opacity: 1;
-          }
-        }
-        
-        @keyframes slideInUp {
-          from {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-      `}</style>
+      
+      {/* Audio Feedback */}
+      {playSound && <AudioFeedback type={playSound} onComplete={() => setPlaySound(null)} />}
     </div>
   );
 }
