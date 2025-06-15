@@ -1,13 +1,9 @@
-// apps/web-next/app/[locale]/exercises/[slug]/page.tsx
 import { notFound } from 'next/navigation';
 import { getCurrentUser } from '@/lib/auth';
 import { getAllExercisePackages, getExercisePackageBySlug, getPackageExercises, getUserPackageProgress } from '@/lib/api-server';
 import type { UserProgress } from '@repo/api-bridge';
 import { Breadcrumb } from '@repo/components';
-import { ExercisePackageHeader } from '@/components/exercises/ExercisePackageHeader';
-import { ExercisePackageContent } from '@/components/exercises/ExercisePackageContent';
-import { ExerciseErrorBoundary } from '@/components/exercises/ExerciseErrorBoundary';
-// import { ExercisePackageHeaderSkeleton, ExercisePackageContentSkeleton } from '@/components/exercises/LoadingSkeletons';
+import ExercisePackageDetail from '@/components/exercises/package-detail/ExercisePackageDetail';
 import type { Metadata } from 'next';
 
 interface ExercisePackagePageProps {
@@ -83,7 +79,7 @@ export default async function ExercisePackagePage({ params }: ExercisePackagePag
     // If user is logged in, fetch their progress
     if (userData) {
       try {
-        userProgress = await getUserPackageProgress(exercisePackage.id);
+        userProgress = await getUserPackageProgress(exercisePackage.id, userData.email);
       } catch (error) {
         console.error('Error fetching user progress:', error);
         // Continue without progress data - set default progress
@@ -102,17 +98,6 @@ export default async function ExercisePackagePage({ params }: ExercisePackagePag
     notFound();
   }
 
-  // Calculate completion statistics
-  const totalExercises = exercises.length;
-  const completedExercises = userProgress?.completedExercises?.length || 0;
-  const completionRate = totalExercises > 0 ? Math.round((completedExercises / totalExercises) * 100) : 0;
-  
-  // Check if user can manage this package
-  const canManage = userData && (
-    userData.role === 'ADMIN' || 
-    userData.role === 'TEACHER'
-  );
-
   const breadcrumbItems = [
     { label: 'Home', href: `/${locale}` },
     { label: 'Exercises', href: `/${locale}/exercises` },
@@ -120,36 +105,23 @@ export default async function ExercisePackagePage({ params }: ExercisePackagePag
   ];
 
   return (
-    <ExerciseErrorBoundary>
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
-        <div className="container mx-auto px-4 py-6">
-          {/* Breadcrumb */}
-          <Breadcrumb 
-            items={breadcrumbItems}
-            title="EduExercises"
-          />
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+      <div className="container mx-auto px-4 py-6">
+        {/* Breadcrumb */}
+        <Breadcrumb 
+          items={breadcrumbItems}
+          title="EduExercises"
+        />
 
-          {/* Package Header */}
-          <ExercisePackageHeader
-            package={exercisePackage}
-            totalExercises={totalExercises}
-            completedExercises={completedExercises}
-            completionRate={completionRate}
-            userProgress={userProgress}
-            isLoggedIn={!!userData}
-            canManage={canManage || false}
-            locale={locale}
-          />
-
-          {/* Exercise Content with Tabs and List */}
-          <ExercisePackageContent
-            exercises={exercises}
-            userProgress={userProgress}
-            packageSlug={exercisePackage.slug}
-            isLoggedIn={!!userData}
-          />
-        </div>
+        {/* Package Detail Component */}
+        <ExercisePackageDetail
+          package={exercisePackage}
+          exercises={exercises}
+          userData={userData}
+          userProgress={userProgress}
+          locale={locale}
+        />
       </div>
-    </ExerciseErrorBoundary>
+    </div>
   );
 }

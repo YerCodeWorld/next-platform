@@ -1,9 +1,8 @@
-// apps/web-next/app/[locale]/exercises/[slug]/exercise/[exerciseId]/page.tsx
 import { notFound } from 'next/navigation';
 import { getCurrentUser } from '@/lib/auth';
-import { getExerciseById, getExercisePackageBySlug } from '@/lib/api-server';
-import { ExercisePlayer } from '@/components/exercises/ExercisePlayer';
-import { ExerciseErrorBoundary } from '@/components/exercises/ExerciseErrorBoundary';
+import { getExerciseById, getExercisePackageBySlug, getPackageExercises } from '@/lib/api-server';
+import ExercisePractice from '@/components/exercises/practice/ExercisePractice';
+// Error boundary temporarily removed for build
 import type { Metadata } from 'next';
 
 interface ExercisePageProps {
@@ -43,12 +42,14 @@ export default async function ExercisePage({ params }: ExercisePageProps) {
 
   let exercise;
   let exercisePackage;
+  let exercises;
 
   try {
-    // Fetch exercise and package data
-    [exercise, exercisePackage] = await Promise.all([
+    // Fetch exercise, package data, and all exercises for navigation
+    [exercise, exercisePackage, exercises] = await Promise.all([
       getExerciseById(exerciseId),
-      getExercisePackageBySlug(slug)
+      getExercisePackageBySlug(slug),
+      getPackageExercises(await getExercisePackageBySlug(slug).then(pkg => pkg.id))
     ]);
   } catch (error) {
     console.error('Error fetching exercise:', error);
@@ -56,19 +57,18 @@ export default async function ExercisePage({ params }: ExercisePageProps) {
   }
 
   return (
-    <ExerciseErrorBoundary>
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
-        <ExercisePlayer
-          exercise={exercise}
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+        <ExercisePractice
+          exercises={exercises}
+          currentExerciseId={exerciseId}
           packageInfo={{
             id: exercisePackage.id,
             title: exercisePackage.title,
             slug: exercisePackage.slug,
           }}
-          user={userData}
+          userData={userData}
           locale={locale}
         />
       </div>
-    </ExerciseErrorBoundary>
   );
 }

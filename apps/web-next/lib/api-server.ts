@@ -17,8 +17,6 @@ import {
     UserProgress,
     PackageExercise
 } from '@repo/api-bridge';
-import { cookies } from 'next/headers';
-
 const API_BASE_URL = 'https://api.ieduguide.com/api';
 
 // Generic server-side fetch utility
@@ -54,7 +52,8 @@ async function serverFetch<T>(endpoint: string, options: RequestInit = {}): Prom
 
 // Authenticated server-side fetch utility
 async function serverFetchWithAuth<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
-    // Get auth token from cookies
+    // Get auth token from cookies - import here to avoid client-side issues
+    const { cookies } = await import('next/headers');
     const cookieStore = await cookies();
     const authToken = cookieStore.get('auth_token');
     
@@ -429,8 +428,8 @@ const serverExerciseApi = {
         return serverFetch<PackageExercise[]>(`/exercise-packages/${id}/exercises`);
     },
 
-    async getUserProgress(id: string): Promise<UserProgress> {
-        return serverFetchWithAuth<UserProgress>(`/exercise-packages/${id}/progress`);
+    async getUserProgress(id: string, userEmail: string): Promise<UserProgress> {
+        return serverFetchWithAuth<UserProgress>(`/exercise-packages/${id}/progress?userEmail=${encodeURIComponent(userEmail)}`);
     },
 
     async getExerciseStatistics(): Promise<{

@@ -1,373 +1,296 @@
-// components/exercises/players/MatchingPlayer.tsx
 'use client';
 
-import { useState, useMemo } from 'react';
-import type { MatchingContent } from '@repo/api-bridge';
+import React, { useState, useEffect } from 'react';
+import '../../../styles/exercises/variables.css';
+import '../../../styles/exercises/base.css';
 
 interface MatchingPlayerProps {
-  content: MatchingContent;
-  onComplete: (isCorrect: boolean, answer: unknown) => void;
+  question: {
+    id: string;
+    text: string;
+    pairs: Array<{
+      id: string;
+      left: string;
+      right: string;
+    }>;
+    hint?: string;
+  };
+  locale: string;
+  showImmediateFeedback: boolean;
+  onAnswerSubmit: (answer: any, isCorrect: boolean) => void;
+  showHint: boolean;
+  disabled: boolean;
 }
 
-export function MatchingPlayer({ content, onComplete }: MatchingPlayerProps) {
-  const [matches, setMatches] = useState<Record<number, number>>({});
-  const [selectedLeft, setSelectedLeft] = useState<number | null>(null);
-  const [submitted, setSubmitted] = useState(false);
-  const [draggedItem, setDraggedItem] = useState<number | null>(null);
+export default function MatchingPlayer({
+  question,
+  locale,
+  showImmediateFeedback,
+  onAnswerSubmit,
+  showHint,
+  disabled
+}: MatchingPlayerProps) {
+  const [leftItems, setLeftItems] = useState<Array<{ id: string; text: string }>>([]);
+  const [rightItems, setRightItems] = useState<Array<{ id: string; text: string }>>([]);
+  const [matches, setMatches] = useState<Record<string, string>>({});
+  const [selectedLeft, setSelectedLeft] = useState<string | null>(null);
+  const [hasSubmitted, setHasSubmitted] = useState(false);
+  const [submittedAnswer, setSubmittedAnswer] = useState<{ isCorrect: boolean; correctMatches: Record<string, string> } | null>(null);
 
-  // Determine if we should use drag-and-drop or sequential mode
-  const isSequentialMode = useMemo(() => {
-    const avgLeftLength = content.pairs.reduce((sum, pair) => sum + pair.left.length, 0) / content.pairs.length;
-    const avgRightLength = content.pairs.reduce((sum, pair) => sum + pair.right.length, 0) / content.pairs.length;
-    return avgLeftLength > 50 || avgRightLength > 50;
-  }, [content.pairs]);
-
-  // Shuffle right items for display
-  const shuffledRightIndices = useMemo(() => {
-    if (!content.randomize) return content.pairs.map((_, i) => i);
-    
-    const indices = content.pairs.map((_, i) => i);
-    for (let i = indices.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [indices[i], indices[j]] = [indices[j], indices[i]];
-    }
-    return indices;
-  }, [content]);
-
-  const handleLeftClick = (leftIndex: number) => {
-    if (submitted) return;
-    
-    if (isSequentialMode) {
-      setSelectedLeft(leftIndex);
-    }
-  };
-
-  const handleRightClick = (rightIndex: number) => {
-    if (submitted) return;
-
-    if (isSequentialMode && selectedLeft !== null) {
-      // Sequential mode: match selected left with clicked right
-      const newMatches = { ...matches };
-      
-      // Remove any existing match for this left item
-      Object.keys(newMatches).forEach(key => {
-        if (parseInt(key) === selectedLeft) {
-          delete newMatches[key];
-        }
-      });
-      
-      // Add new match
-      newMatches[selectedLeft] = rightIndex;
-      setMatches(newMatches);
-      
-      // Move to next unmatched item
-      const nextUnmatched = content.pairs.findIndex((_, index) => 
-        !newMatches.hasOwnProperty(index) && index > selectedLeft
-      );
-      
-      if (nextUnmatched !== -1) {
-        setSelectedLeft(nextUnmatched);
-      } else {
-        // Check if there's any unmatched item before current
-        const firstUnmatched = content.pairs.findIndex((_, index) => 
-          !newMatches.hasOwnProperty(index)
-        );
-        setSelectedLeft(firstUnmatched !== -1 ? firstUnmatched : null);
-      }
+  const labels = {
+    en: {
+      matchItems: 'Click items to match them together',
+      checkMatches: 'Check Matches',
+      correct: 'Correct!',
+      incorrect: 'Incorrect',
+      hint: 'Hint',
+      selectLeft: 'Select from left column first',
+      matched: 'Matched',
+      correctMatch: 'Correct match'
+    },
+    es: {
+      matchItems: 'Haz clic en los elementos para emparejarlos',
+      checkMatches: 'Verificar Emparejamientos',
+      correct: '¡Correcto!',
+      incorrect: 'Incorrecto',
+      hint: 'Pista',
+      selectLeft: 'Selecciona primero de la columna izquierda',
+      matched: 'Emparejado',
+      correctMatch: 'Emparejamiento correcto'
     }
   };
 
-  // Drag and drop handlers
-  const handleDragStart = (leftIndex: number) => {
-    if (submitted || isSequentialMode) return;
-    setDraggedItem(leftIndex);
+  const t = labels[locale as 'en' | 'es'] || labels.en;
+
+  useEffect(() => {
+    const left = question.pairs.map(pair => ({ id: pair.id, text: pair.left }));
+    const right = question.pairs.map(pair => ({ id: pair.id, text: pair.right })).sort(() => Math.random() - 0.5);
+    
+    setLeftItems(left);
+    setRightItems(right);
+  }, [question]);
+
+  const handleLeftClick = (itemId: string) => {
+    if (disabled || hasSubmitted) return;
+    setSelectedLeft(selectedLeft === itemId ? null : itemId);
   };
 
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-  };
-
-  const handleDrop = (e: React.DragEvent, rightIndex: number) => {
-    e.preventDefault();
-    if (draggedItem === null || submitted) return;
-
-    const newMatches = { ...matches };
+  const handleRightClick = (itemId: string) => {
+    if (disabled || hasSubmitted || !selectedLeft) return;
     
-    // Remove any existing match for this left item
-    Object.keys(newMatches).forEach(key => {
-      if (parseInt(key) === draggedItem) {
-        delete newMatches[key];
-      }
-    });
-    
-    // Add new match
-    newMatches[draggedItem] = rightIndex;
-    setMatches(newMatches);
-    setDraggedItem(null);
+    setMatches(prev => ({
+      ...prev,
+      [selectedLeft]: itemId
+    }));
+    setSelectedLeft(null);
   };
 
   const handleSubmit = () => {
-    if (Object.keys(matches).length !== content.pairs.length) return;
+    if (disabled || hasSubmitted) return;
 
-    setSubmitted(true);
+    const correctMatches: Record<string, string> = {};
+    question.pairs.forEach(pair => {
+      correctMatches[pair.id] = pair.id;
+    });
+
+    const isCorrect = Object.keys(matches).length === question.pairs.length &&
+      Object.entries(matches).every(([leftId, rightId]) => leftId === rightId);
+
+    setSubmittedAnswer({ isCorrect, correctMatches });
+    setHasSubmitted(true);
+    onAnswerSubmit({ matches }, isCorrect);
+  };
+
+  const getLeftItemClassName = (itemId: string) => {
+    const baseClasses = 'p-4 border-2 rounded-lg cursor-pointer transition-all duration-200';
     
-    // Check if all matches are correct
-    const isCorrect = content.pairs.every((_, leftIndex) => 
-      matches[leftIndex] === leftIndex
-    );
+    if (!hasSubmitted) {
+      if (selectedLeft === itemId) {
+        return `${baseClasses} border-blue-500 bg-blue-50 text-blue-800`;
+      }
+      if (matches[itemId]) {
+        return `${baseClasses} border-green-500 bg-green-50 text-green-800`;
+      }
+      return `${baseClasses} border-gray-200 bg-white hover:border-gray-300`;
+    }
 
-    // Call onComplete after a short delay
-    setTimeout(() => {
-      onComplete(isCorrect, matches);
-    }, isCorrect ? 1500 : 2500);
+    if (showImmediateFeedback) {
+      const isCorrect = matches[itemId] === itemId;
+      return `${baseClasses} ${
+        isCorrect 
+          ? 'border-green-500 bg-green-50 text-green-800'
+          : 'border-red-500 bg-red-50 text-red-800'
+      }`;
+    }
+
+    return `${baseClasses} border-gray-200 bg-gray-50`;
   };
 
-  const handleReset = () => {
-    setMatches({});
-    setSelectedLeft(isSequentialMode ? 0 : null);
+  const getRightItemClassName = (itemId: string) => {
+    const baseClasses = 'p-4 border-2 rounded-lg cursor-pointer transition-all duration-200';
+    const isMatched = Object.values(matches).includes(itemId);
+    
+    if (!hasSubmitted) {
+      if (isMatched) {
+        return `${baseClasses} border-green-500 bg-green-50 text-green-800`;
+      }
+      return `${baseClasses} border-gray-200 bg-white hover:border-gray-300`;
+    }
+
+    if (showImmediateFeedback) {
+      const matchedLeftId = Object.entries(matches).find(([_, rightId]) => rightId === itemId)?.[0];
+      const isCorrect = matchedLeftId === itemId;
+      return `${baseClasses} ${
+        isMatched && isCorrect
+          ? 'border-green-500 bg-green-50 text-green-800'
+          : isMatched
+          ? 'border-red-500 bg-red-50 text-red-800'
+          : 'border-gray-200 bg-gray-50'
+      }`;
+    }
+
+    return `${baseClasses} border-gray-200 bg-gray-50`;
   };
 
-  const getMatchLineCoordinates = (leftIndex: number, rightIndex: number) => {
-    // This would calculate SVG line coordinates in a real implementation
-    // For now, return placeholder
-    return { x1: 0, y1: 0, x2: 100, y2: 100 };
-  };
-
-  if (isSequentialMode) {
-    // Sequential mode for long sentences
-    return (
-      <div className="matching-player sequential-mode">
-        <div className="bg-white rounded-2xl shadow-lg p-8">
-          <div className="mb-8 text-center">
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Match the Items</h2>
-            <p className="text-gray-600">Select the correct match for each item</p>
-          </div>
-
-          {/* Current item to match */}
-          {selectedLeft !== null && (
-            <div className="mb-8">
-              <div className="text-sm text-gray-600 mb-2">Match this:</div>
-              <div className="p-6 bg-blue-50 border-2 border-blue-300 rounded-xl">
-                <p className="text-lg font-medium text-gray-900">
-                  {content.pairs[selectedLeft].left}
-                </p>
-              </div>
-            </div>
-          )}
-
-          {/* Options */}
-          <div className="space-y-3 mb-8">
-            <div className="text-sm text-gray-600 mb-2">Select the matching item:</div>
-            {shuffledRightIndices.map((rightIndex) => {
-              const isMatched = Object.values(matches).includes(rightIndex);
-              const isCurrentMatch = matches[selectedLeft!] === rightIndex;
-              
-              return (
-                <button
-                  key={rightIndex}
-                  onClick={() => handleRightClick(rightIndex)}
-                  disabled={submitted || (isMatched && !isCurrentMatch)}
-                  className={`
-                    w-full p-4 rounded-xl border-2 text-left transition-all duration-200
-                    ${isCurrentMatch
-                      ? 'border-blue-500 bg-blue-50'
-                      : isMatched
-                        ? 'border-gray-300 bg-gray-100 opacity-50'
-                        : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
-                    }
-                    ${submitted && matches[selectedLeft!] === rightIndex && rightIndex === selectedLeft
-                      ? 'border-green-400 bg-green-50'
-                      : submitted && matches[selectedLeft!] === rightIndex && rightIndex !== selectedLeft
-                        ? 'border-red-400 bg-red-50'
-                        : ''
-                    }
-                  `}
-                >
-                  <p className="text-lg">{content.pairs[rightIndex].right}</p>
-                </button>
-              );
-            })}
-          </div>
-
-          {/* Progress */}
-          <div className="mb-6">
-            <div className="flex justify-between text-sm text-gray-600 mb-2">
-              <span>Progress</span>
-              <span>{Object.keys(matches).length} / {content.pairs.length}</span>
-            </div>
-            <div className="w-full bg-gray-200 rounded-full h-2">
-              <div 
-                className="h-full bg-blue-500 rounded-full transition-all duration-300"
-                style={{ width: `${(Object.keys(matches).length / content.pairs.length) * 100}%` }}
-              />
-            </div>
-          </div>
-
-          {/* Actions */}
-          <div className="flex justify-center gap-4">
-            {!submitted && (
-              <>
-                <button
-                  onClick={handleReset}
-                  className="px-6 py-3 bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-200 transition-colors"
-                >
-                  Reset All
-                </button>
-                <button
-                  onClick={handleSubmit}
-                  disabled={Object.keys(matches).length !== content.pairs.length}
-                  className={`
-                    px-8 py-3 rounded-xl font-medium transition-all duration-200
-                    ${Object.keys(matches).length !== content.pairs.length
-                      ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                      : 'bg-blue-600 text-white hover:bg-blue-700 transform hover:scale-105'
-                    }
-                  `}
-                >
-                  Check Answers
-                </button>
-              </>
-            )}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // Drag and drop mode for short items
   return (
-    <div className="matching-player drag-drop-mode">
-      <div className="bg-white rounded-2xl shadow-lg p-8">
-        <div className="mb-8 text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Match the Pairs</h2>
-          <p className="text-gray-600">Drag items from the left to their matching pairs on the right</p>
-        </div>
+    <div className="exercise-container">
+      <div className="mb-6">
+        <h3 className="text-xl font-semibold text-gray-800 mb-4">
+          {question.text}
+        </h3>
+        <p className="text-sm text-gray-600">{t.matchItems}</p>
+      </div>
 
-        <div className="grid grid-cols-2 gap-8 mb-8">
-          {/* Left column */}
+      {showHint && question.hint && (
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+          <h4 className="font-semibold text-yellow-800 mb-1">{t.hint}</h4>
+          <p className="text-sm text-yellow-700">{question.hint}</p>
+        </div>
+      )}
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-6">
+        {/* Left Column */}
+        <div>
+          <h4 className="font-semibold text-gray-700 mb-4 text-center">
+            {locale === 'es' ? 'Columna Izquierda' : 'Left Column'}
+          </h4>
           <div className="space-y-3">
-            {content.pairs.map((pair, leftIndex) => (
+            {leftItems.map((item) => (
               <div
-                key={leftIndex}
-                draggable={!submitted}
-                onDragStart={() => handleDragStart(leftIndex)}
-                className={`
-                  p-4 rounded-xl border-2 cursor-move transition-all duration-200
-                  ${Object.hasOwnProperty.call(matches, leftIndex)
-                    ? 'border-blue-300 bg-blue-50'
-                    : 'border-gray-200 bg-white hover:border-gray-300'
-                  }
-                  ${draggedItem === leftIndex ? 'opacity-50' : ''}
-                `}
+                key={item.id}
+                onClick={() => handleLeftClick(item.id)}
+                className={getLeftItemClassName(item.id)}
               >
-                <p className="font-medium text-gray-900">{pair.left}</p>
+                <div className="flex items-center justify-between">
+                  <span className="font-medium">{item.text}</span>
+                  {matches[item.id] && !hasSubmitted && (
+                    <span className="text-xs text-green-600 font-medium">
+                      {t.matched}
+                    </span>
+                  )}
+                  {hasSubmitted && showImmediateFeedback && (
+                    <span className="text-xs font-medium">
+                      {matches[item.id] === item.id ? '✓' : '✗'}
+                    </span>
+                  )}
+                </div>
               </div>
             ))}
           </div>
+        </div>
 
-          {/* Right column */}
+        {/* Right Column */}
+        <div>
+          <h4 className="font-semibold text-gray-700 mb-4 text-center">
+            {locale === 'es' ? 'Columna Derecha' : 'Right Column'}
+          </h4>
           <div className="space-y-3">
-            {shuffledRightIndices.map((rightIndex) => {
-              const matchedLeftIndex = Object.entries(matches).find(([, r]) => r === rightIndex)?.[0];
-              const isCorrect = matchedLeftIndex ? parseInt(matchedLeftIndex) === rightIndex : false;
-              
-              return (
-                <div
-                  key={rightIndex}
-                  onDragOver={handleDragOver}
-                  onDrop={(e) => handleDrop(e, rightIndex)}
-                  onClick={() => {
-                    // Allow click to remove match
-                    if (matchedLeftIndex && !submitted) {
-                      const newMatches = { ...matches };
-                      delete newMatches[parseInt(matchedLeftIndex)];
-                      setMatches(newMatches);
-                    }
-                  }}
-                  className={`
-                    p-4 rounded-xl border-2 transition-all duration-200 min-h-[60px]
-                    ${matchedLeftIndex !== undefined
-                      ? submitted
-                        ? isCorrect
-                          ? 'border-green-400 bg-green-50'
-                          : 'border-red-400 bg-red-50'
-                        : 'border-blue-300 bg-blue-50 cursor-pointer'
-                      : 'border-gray-200 bg-gray-50'
-                    }
-                  `}
-                >
-                  <p className="font-medium text-gray-900">{content.pairs[rightIndex].right}</p>
-                  {matchedLeftIndex !== undefined && (
-                    <p className="text-sm text-gray-600 mt-1">
-                      ← {content.pairs[parseInt(matchedLeftIndex)].left}
-                    </p>
+            {rightItems.map((item) => (
+              <div
+                key={item.id}
+                onClick={() => handleRightClick(item.id)}
+                className={getRightItemClassName(item.id)}
+              >
+                <div className="flex items-center justify-between">
+                  <span className="font-medium">{item.text}</span>
+                  {Object.values(matches).includes(item.id) && !hasSubmitted && (
+                    <span className="text-xs text-green-600 font-medium">
+                      {t.matched}
+                    </span>
+                  )}
+                  {hasSubmitted && showImmediateFeedback && Object.values(matches).includes(item.id) && (
+                    <span className="text-xs font-medium">
+                      {Object.entries(matches).find(([_, rightId]) => rightId === item.id)?.[0] === item.id ? '✓' : '✗'}
+                    </span>
                   )}
                 </div>
-              );
-            })}
+              </div>
+            ))}
           </div>
         </div>
-
-        {/* Actions */}
-        <div className="flex justify-center gap-4">
-          {!submitted && (
-            <>
-              <button
-                onClick={handleReset}
-                className="px-6 py-3 bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-200 transition-colors"
-              >
-                Reset All
-              </button>
-              <button
-                onClick={handleSubmit}
-                disabled={Object.keys(matches).length !== content.pairs.length}
-                className={`
-                  px-8 py-3 rounded-xl font-medium transition-all duration-200
-                  ${Object.keys(matches).length !== content.pairs.length
-                    ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                    : 'bg-blue-600 text-white hover:bg-blue-700 transform hover:scale-105'
-                  }
-                `}
-              >
-                Check Matches
-              </button>
-            </>
-          )}
-        </div>
-
-        {/* Feedback */}
-        {submitted && (
-          <div className={`
-            mt-6 p-4 rounded-xl text-center font-medium
-            ${content.pairs.every((_, i) => matches[i] === i)
-              ? 'bg-green-100 text-green-800' 
-              : 'bg-red-100 text-red-800'
-            }
-          `}>
-            {content.pairs.every((_, i) => matches[i] === i)
-              ? '🎉 Perfect! All matches are correct!' 
-              : '💭 Some matches are incorrect. Check the results above.'
-            }
-          </div>
-        )}
       </div>
 
-      <style jsx>{`
-        .matching-player {
-          animation: fadeInUp 0.4s ease-out;
-        }
-        
-        @keyframes fadeInUp {
-          from {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-      `}</style>
+      {/* Instructions */}
+      {selectedLeft && !hasSubmitted && (
+        <div className="mb-6 p-3 bg-blue-50 border border-blue-200 rounded-lg text-center">
+          <p className="text-sm text-blue-700">
+            {locale === 'es' 
+              ? 'Ahora selecciona un elemento de la columna derecha para emparejarlo'
+              : 'Now select an item from the right column to match it'
+            }
+          </p>
+        </div>
+      )}
+
+      {/* Submit Button */}
+      {!hasSubmitted && (
+        <div className="flex justify-center">
+          <button
+            onClick={handleSubmit}
+            disabled={Object.keys(matches).length !== question.pairs.length || disabled}
+            className={`
+              btn btn-lg px-8
+              ${Object.keys(matches).length === question.pairs.length && !disabled
+                ? 'btn-primary' 
+                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+              }
+            `}
+          >
+            {t.checkMatches}
+          </button>
+        </div>
+      )}
+
+      {/* Results */}
+      {hasSubmitted && showImmediateFeedback && submittedAnswer && (
+        <div className="mt-6 p-4 bg-white border rounded-lg">
+          <div className="flex items-center justify-between">
+            <span className="font-medium text-gray-700">
+              {locale === 'es' ? 'Resultado:' : 'Result:'}
+            </span>
+            <span className={`font-bold ${submittedAnswer.isCorrect ? 'text-green-600' : 'text-red-600'}`}>
+              {submittedAnswer.isCorrect ? t.correct : t.incorrect}
+            </span>
+          </div>
+          
+          {!submittedAnswer.isCorrect && (
+            <div className="mt-4 pt-4 border-t border-gray-200">
+              <h5 className="font-medium text-gray-700 mb-2">
+                {locale === 'es' ? 'Emparejamientos correctos:' : 'Correct matches:'}
+              </h5>
+              <div className="space-y-1 text-sm">
+                {question.pairs.map(pair => (
+                  <div key={pair.id} className="flex justify-between">
+                    <span className="text-gray-600">{pair.left}</span>
+                    <span className="text-gray-400">→</span>
+                    <span className="text-gray-600">{pair.right}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

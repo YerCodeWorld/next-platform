@@ -1,229 +1,254 @@
-// components/exercises/players/FillBlankPlayer.tsx
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
-import type { FillBlankContent } from '@repo/api-bridge';
+import React, { useState, useEffect } from 'react';
+import '../../../styles/exercises/variables.css';
+import '../../../styles/exercises/base.css';
 
 interface FillBlankPlayerProps {
-  content: FillBlankContent;
-  currentIndex: number;
-  onAnswer: (isCorrect: boolean, answer: unknown) => void;
-  onHintUsed: () => void;
+  question: {
+    id: string;
+    text: string;
+    blanks: Array<{
+      id: string;
+      answer: string;
+      alternatives?: string[];
+      hint?: string;
+    }>;
+    hint?: string;
+  };
+  locale: string;
+  showImmediateFeedback: boolean;
+  onAnswerSubmit: (answer: any, isCorrect: boolean) => void;
+  showHint: boolean;
+  disabled: boolean;
 }
 
-export function FillBlankPlayer({ content, currentIndex, onAnswer, onHintUsed }: FillBlankPlayerProps) {
-  const [userAnswers, setUserAnswers] = useState<string[]>([]);
-  const [showHint, setShowHint] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
-  const [results, setResults] = useState<boolean[]>([]);
-  const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+export default function FillBlankPlayer({
+  question,
+  locale,
+  showImmediateFeedback,
+  onAnswerSubmit,
+  showHint,
+  disabled
+}: FillBlankPlayerProps) {
+  const [answers, setAnswers] = useState<Record<string, string>>({});
+  const [submittedAnswers, setSubmittedAnswers] = useState<Record<string, { value: string; isCorrect: boolean }>>({});
+  const [hasSubmitted, setHasSubmitted] = useState(false);
 
-  const currentSentence = content.sentences[currentIndex];
-
-  useEffect(() => {
-    // Reset state when moving to new question
-    setUserAnswers(new Array(currentSentence.blanks.length).fill(''));
-    setShowHint(false);
-    setSubmitted(false);
-    setResults([]);
-    
-    // Focus first input
-    setTimeout(() => {
-      inputRefs.current[0]?.focus();
-    }, 100);
-  }, [currentIndex, currentSentence]);
-
-  const handleInputChange = (index: number, value: string) => {
-    const newAnswers = [...userAnswers];
-    newAnswers[index] = value;
-    setUserAnswers(newAnswers);
-  };
-
-  const handleKeyPress = (e: React.KeyboardEvent, index: number) => {
-    if (e.key === 'Enter') {
-      if (index < inputRefs.current.length - 1) {
-        // Move to next input
-        inputRefs.current[index + 1]?.focus();
-      } else {
-        // Submit if on last input
-        handleSubmit();
-      }
+  const labels = {
+    en: {
+      fillBlank: 'Fill in the blank',
+      checkAnswers: 'Check Answers',
+      correct: 'Correct!',
+      incorrect: 'Incorrect',
+      hint: 'Hint'
+    },
+    es: {
+      fillBlank: 'Completa el espacio',
+      checkAnswers: 'Verificar Respuestas',
+      correct: '¡Correcto!',
+      incorrect: 'Incorrecto',
+      hint: 'Pista'
     }
   };
 
-  const handleSubmit = () => {
-    if (userAnswers.some(answer => answer.trim() === '')) return;
+  const t = labels[locale as 'en' | 'es'] || labels.en;
 
-    const results = currentSentence.blanks.map((blank, index) => {
-      const userAnswer = userAnswers[index].trim().toLowerCase();
-      return blank.answers.some(answer => answer.toLowerCase() === userAnswer);
+  // Initialize answers
+  useEffect(() => {
+    const initialAnswers: Record<string, string> = {};
+    question.blanks.forEach(blank => {
+      initialAnswers[blank.id] = '';
+    });
+    setAnswers(initialAnswers);
+  }, [question]);
+
+  const handleInputChange = (blankId: string, value: string) => {
+    if (disabled) return;
+    setAnswers(prev => ({ ...prev, [blankId]: value }));
+  };
+
+  const handleSubmit = () => {
+    if (disabled || hasSubmitted) return;
+
+    const results: Record<string, { value: string; isCorrect: boolean }> = {};
+    let allCorrect = true;
+
+    question.blanks.forEach(blank => {
+      const userAnswer = answers[blank.id]?.trim().toLowerCase() || '';
+      const correctAnswer = blank.answer.toLowerCase();
+      const alternatives = blank.alternatives?.map(alt => alt.toLowerCase()) || [];
+      
+      const isCorrect = userAnswer === correctAnswer || alternatives.includes(userAnswer);
+      
+      results[blank.id] = {
+        value: answers[blank.id] || '',
+        isCorrect
+      };
+
+      if (!isCorrect) {
+        allCorrect = false;
+      }
     });
 
-    setResults(results);
-    setSubmitted(true);
-
-    const isCorrect = results.every(result => result);
-    
-    // Call onAnswer after a short delay to show results
-    setTimeout(() => {
-      onAnswer(isCorrect, userAnswers);
-    }, 1500);
+    setSubmittedAnswers(results);
+    setHasSubmitted(true);
+    onAnswerSubmit(answers, allCorrect);
   };
 
-  const handleShowHint = () => {
-    setShowHint(true);
-    onHintUsed();
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !disabled && !hasSubmitted) {
+      handleSubmit();
+    }
   };
 
-  const renderSentenceWithBlanks = () => {
-    const sentenceParts = currentSentence.text.split('___');
-    const elements: React.ReactNode[] = [];
+  // Parse text and render with input fields
+  const renderTextWithBlanks = () => {
+    let text = question.text;
+    const parts: React.ReactNode[] = [];
+    let lastIndex = 0;
+    let blankIndex = 0;
 
-    sentenceParts.forEach((part, index) => {
-      elements.push(
-        <span key={`text-${index}`} className="text-lg leading-relaxed">
-          {part}
-        </span>
-      );
+    // Find all blank placeholders (e.g., {{blank1}}, [blank], etc.)
+    const blankRegex = /\{\{.*?\}\}|\[.*?\]|___+/g;
+    let match;
 
-      if (index < currentSentence.blanks.length) {
-        const blank = currentSentence.blanks[index];
-        const isCorrect = results[index];
+    while ((match = blankRegex.exec(text)) !== null) {
+      // Add text before the blank
+      if (match.index > lastIndex) {
+        parts.push(text.substring(lastIndex, match.index));
+      }
+
+      // Add the input field for the blank
+      const blank = question.blanks[blankIndex];
+      if (blank) {
+        const submittedAnswer = submittedAnswers[blank.id];
+        const isSubmitted = hasSubmitted && submittedAnswer;
         
-        elements.push(
-          <span key={`blank-${index}`} className="inline-block mx-1 relative">
+        parts.push(
+          <span key={blank.id} className="inline-block mx-1">
             <input
-              ref={el => { inputRefs.current[index] = el; }}
               type="text"
-              value={userAnswers[index] || ''}
-              onChange={(e) => handleInputChange(index, e.target.value)}
-              onKeyPress={(e) => handleKeyPress(e, index)}
-              disabled={submitted}
-              aria-label={`Fill in blank ${index + 1} of ${currentSentence.blanks.length}`}
-              aria-describedby={showHint && blank.hint ? `hint-${index}` : undefined}
-              aria-invalid={submitted && !isCorrect ? 'true' : 'false'}
+              value={answers[blank.id] || ''}
+              onChange={(e) => handleInputChange(blank.id, e.target.value)}
+              onKeyPress={handleKeyPress}
+              disabled={disabled}
               className={`
-                px-3 py-1 rounded-lg border-2 font-medium text-center
-                transition-all duration-300 min-w-[120px]
-                ${submitted 
-                  ? isCorrect 
-                    ? 'bg-green-100 border-green-400 text-green-800' 
-                    : 'bg-red-100 border-red-400 text-red-800'
-                  : 'bg-white border-blue-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200'
+                inline-block w-32 px-3 py-2 border-2 rounded-md text-center font-medium
+                transition-all duration-200 focus:outline-none focus:ring-2
+                ${isSubmitted 
+                  ? submittedAnswer.isCorrect
+                    ? 'border-green-500 bg-green-50 text-green-800 focus:ring-green-200'
+                    : 'border-red-500 bg-red-50 text-red-800 focus:ring-red-200'
+                  : 'border-gray-300 bg-white focus:border-blue-500 focus:ring-blue-200'
                 }
               `}
-              placeholder="Type answer..."
+              placeholder={t.fillBlank}
             />
-            
-            {/* Show correct answer if wrong */}
-            {submitted && !isCorrect && (
-              <div className="absolute top-full mt-1 left-0 text-sm text-green-700 font-medium whitespace-nowrap">
-                ✓ {blank.answers[0]}
-              </div>
-            )}
-            
-            {/* Show hint if requested */}
-            {showHint && blank.hint && !submitted && (
-              <div 
-                id={`hint-${index}`}
-                className="absolute top-full mt-1 left-0 text-sm text-gray-600 bg-yellow-100 px-2 py-1 rounded"
-                role="tooltip"
-                aria-live="polite"
-              >
-                💡 {blank.hint}
+            {isSubmitted && showImmediateFeedback && (
+              <div className="absolute mt-1 text-sm">
+                {submittedAnswer.isCorrect ? (
+                  <span className="text-green-600 font-medium">✓ {t.correct}</span>
+                ) : (
+                  <div className="text-red-600">
+                    <span className="font-medium">✗ {t.incorrect}</span>
+                    <div className="text-xs text-gray-600 mt-1">
+                      {locale === 'es' ? 'Respuesta:' : 'Answer:'} {blank.answer}
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </span>
         );
       }
-    });
 
-    return elements;
+      lastIndex = blankRegex.lastIndex;
+      blankIndex++;
+    }
+
+    // Add remaining text
+    if (lastIndex < text.length) {
+      parts.push(text.substring(lastIndex));
+    }
+
+    return parts;
   };
 
+  const allFieldsFilled = question.blanks.every(blank => answers[blank.id]?.trim());
+
   return (
-    <div className="fill-blank-player">
-      <div className="bg-white rounded-2xl shadow-lg p-8">
-        {/* Instructions */}
-        <div className="mb-6 text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Fill in the Blanks</h2>
-          <p className="text-gray-600">Complete the sentence with the correct words</p>
+    <div className="exercise-container">
+      <div className="bg-gray-50 rounded-lg p-6 mb-6">
+        <div className="text-lg leading-relaxed text-gray-800">
+          {renderTextWithBlanks()}
         </div>
-
-        {/* Sentence with blanks */}
-        <div className="sentence-container mb-8 p-6 bg-gray-50 rounded-xl">
-          <div className="text-center">
-            {renderSentenceWithBlanks()}
-          </div>
-        </div>
-
-        {/* Action buttons */}
-        <div className="flex justify-center gap-4">
-          {!submitted && (
-            <>
-              {currentSentence.blanks.some(b => b.hint) && !showHint && (
-                <button
-                  onClick={handleShowHint}
-                  className="px-6 py-3 bg-yellow-100 text-yellow-800 rounded-xl font-medium hover:bg-yellow-200 transition-colors"
-                >
-                  💡 Show Hint
-                </button>
-              )}
-              
-              <button
-                onClick={handleSubmit}
-                disabled={userAnswers.some(answer => answer.trim() === '')}
-                className={`
-                  px-8 py-3 rounded-xl font-medium transition-all duration-200
-                  ${userAnswers.some(answer => answer.trim() === '')
-                    ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                    : 'bg-blue-600 text-white hover:bg-blue-700 transform hover:scale-105'
-                  }
-                `}
-              >
-                Check Answer
-              </button>
-            </>
-          )}
-        </div>
-
-        {/* Feedback message */}
-        {submitted && (
-          <div className={`
-            mt-6 p-4 rounded-xl text-center font-medium
-            ${results.every(r => r) 
-              ? 'bg-green-100 text-green-800' 
-              : 'bg-red-100 text-red-800'
-            }
-          `}>
-            {results.every(r => r) 
-              ? '🎉 Excellent! All answers are correct!' 
-              : '💭 Not quite right. Check the correct answers above.'
-            }
-          </div>
-        )}
       </div>
 
-      <style jsx>{`
-        .fill-blank-player {
-          animation: fadeInUp 0.4s ease-out;
-        }
-        
-        @keyframes fadeInUp {
-          from {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        
-        .sentence-container {
-          line-height: 2.5;
-        }
-      `}</style>
+      {/* Hint Display */}
+      {showHint && (question.hint || question.blanks.some(b => b.hint)) && (
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+          <div className="flex items-start">
+            <svg className="w-5 h-5 text-yellow-600 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+            </svg>
+            <div>
+              <h4 className="font-semibold text-yellow-800 mb-1">{t.hint}</h4>
+              {question.hint && (
+                <p className="text-sm text-yellow-700 mb-2">{question.hint}</p>
+              )}
+              {question.blanks.some(b => b.hint) && (
+                <div className="space-y-1">
+                  {question.blanks.map((blank, index) => 
+                    blank.hint && (
+                      <p key={blank.id} className="text-sm text-yellow-700">
+                        <span className="font-medium">Blank {index + 1}:</span> {blank.hint}
+                      </p>
+                    )
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Submit Button */}
+      {!hasSubmitted && (
+        <div className="flex justify-center">
+          <button
+            onClick={handleSubmit}
+            disabled={!allFieldsFilled || disabled}
+            className={`
+              btn btn-lg px-8
+              ${allFieldsFilled && !disabled 
+                ? 'btn-primary' 
+                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+              }
+            `}
+          >
+            {t.checkAnswers}
+          </button>
+        </div>
+      )}
+
+      {/* Results Summary */}
+      {hasSubmitted && showImmediateFeedback && (
+        <div className="mt-6 p-4 bg-white border rounded-lg">
+          <div className="flex items-center justify-between">
+            <span className="font-medium text-gray-700">
+              {locale === 'es' ? 'Resultado:' : 'Result:'}
+            </span>
+            <span className={`font-bold ${
+              Object.values(submittedAnswers).every(a => a.isCorrect)
+                ? 'text-green-600'
+                : 'text-red-600'
+            }`}>
+              {Object.values(submittedAnswers).filter(a => a.isCorrect).length} / {question.blanks.length}
+            </span>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

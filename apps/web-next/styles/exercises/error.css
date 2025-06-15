@@ -1,0 +1,101 @@
+/* Error Boundary Styles */
+
+.error-boundary {
+  min-height: 60vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--ex-spacing-8);
+}
+
+.error-boundary-content {
+  background: var(--ex-white);
+  border-radius: var(--ex-radius-xl);
+  padding: var(--ex-spacing-8);
+  max-width: 500px;
+  width: 100%;
+  text-align: center;
+  box-shadow: var(--ex-shadow-xl);
+  border: 1px solid var(--ex-red-200);
+}
+
+.error-boundary-icon {
+  margin-bottom: var(--ex-spacing-6);
+}
+
+.error-icon {
+  font-size: 4rem;
+  filter: grayscale(100%);
+  animation: pulse 2s infinite;
+}
+
+.error-boundary-text h2 {
+  font-size: var(--ex-text-2xl);
+  font-weight: var(--ex-font-bold);
+  color: var(--ex-red-700);
+  margin-bottom: var(--ex-spacing-3);
+}
+
+.error-boundary-text p {
+  color: var(--ex-gray-600);
+  line-height: var(--ex-leading-relaxed);
+  margin-bottom: var(--ex-spacing-6);
+}
+
+.error-details {
+  margin-top: var(--ex-spacing-4);
+  text-align: left;
+}
+
+.error-details summary {
+  cursor: pointer;
+  font-weight: var(--ex-font-medium);
+  color: var(--ex-gray-700);
+  margin-bottom: var(--ex-spacing-2);
+}
+
+.error-details summary:hover {
+  color: var(--ex-red-600);
+}
+
+.error-stack {
+  background: var(--ex-gray-50);
+  border: 1px solid var(--ex-gray-200);
+  border-radius: var(--ex-radius-md);
+  padding: var(--ex-spacing-4);
+  font-family: var(--ex-font-mono);
+  font-size: var(--ex-text-xs);
+  color: var(--ex-gray-800);
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-break: break-all;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.error-boundary-actions {
+  display: flex;
+  justify-content: center;
+  gap: var(--ex-spacing-3);
+  flex-wrap: wrap;
+}
+
+@media (max-width: 768px) {
+  .error-boundary {
+    padding: var(--ex-spacing-4);
+  }
+  
+  .error-boundary-content {
+    padding: var(--ex-spacing-6);
+  }
+  
+  .error-boundary-actions {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .error-boundary-actions .btn {
+    width: 100%;
+    max-width: 200px;
+  }
+}

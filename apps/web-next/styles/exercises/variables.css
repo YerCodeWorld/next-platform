@@ -1,0 +1,200 @@
+/* Exercise System CSS Variables */
+:root {
+  /* Primary Colors */
+  --ex-primary-50: #f0f9ff;
+  --ex-primary-100: #e0f2fe;
+  --ex-primary-200: #bae6fd;
+  --ex-primary-300: #7dd3fc;
+  --ex-primary-400: #38bdf8;
+  --ex-primary-500: #0ea5e9;
+  --ex-primary-600: #0284c7;
+  --ex-primary-700: #0369a1;
+  --ex-primary-800: #075985;
+  --ex-primary-900: #0c4a6e;
+
+  /* Difficulty Colors */
+  --ex-difficulty-beginner: #10b981;
+  --ex-difficulty-elementary: #06b6d4;
+  --ex-difficulty-intermediate: #f59e0b;
+  --ex-difficulty-upper-intermediate: #f97316;
+  --ex-difficulty-advanced: #ef4444;
+  --ex-difficulty-super-advanced: #dc2626;
+
+  /* Semantic Colors */
+  --ex-success: #059669;
+  --ex-success-light: #34d399;
+  --ex-warning: #d97706;
+  --ex-warning-light: #fbbf24;
+  --ex-error: #dc2626;
+  --ex-error-light: #f87171;
+  --ex-info: #0284c7;
+  --ex-info-light: #38bdf8;
+
+  /* Neutral Colors */
+  --ex-gray-50: #f9fafb;
+  --ex-gray-100: #f3f4f6;
+  --ex-gray-200: #e5e7eb;
+  --ex-gray-300: #d1d5db;
+  --ex-gray-400: #9ca3af;
+  --ex-gray-500: #6b7280;
+  --ex-gray-600: #4b5563;
+  --ex-gray-700: #374151;
+  --ex-gray-800: #1f2937;
+  --ex-gray-900: #111827;
+
+  /* Gradients */
+  --ex-gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --ex-gradient-secondary: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  --ex-gradient-success: linear-gradient(135deg, #13f1fc 0%, #0470dc 100%);
+  --ex-gradient-card: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+  --ex-gradient-dark: linear-gradient(135deg, #434343 0%, #000000 100%);
+  --ex-gradient-beginner: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);
+  --ex-gradient-intermediate: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+  --ex-gradient-advanced: linear-gradient(135deg, #f43b47 0%, #453a94 100%);
+
+  /* Spacing */
+  --ex-space-xs: 0.25rem;
+  --ex-space-sm: 0.5rem;
+  --ex-space-md: 1rem;
+  --ex-space-lg: 1.5rem;
+  --ex-space-xl: 2rem;
+  --ex-space-2xl: 3rem;
+  --ex-space-3xl: 4rem;
+
+  /* Border Radius */
+  --ex-radius-sm: 0.25rem;
+  --ex-radius-md: 0.5rem;
+  --ex-radius-lg: 1rem;
+  --ex-radius-xl: 1.5rem;
+  --ex-radius-full: 9999px;
+
+  /* Shadows */
+  --ex-shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --ex-shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --ex-shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --ex-shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  --ex-shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+  --ex-shadow-3d: 0 20px 40px rgba(0, 0, 0, 0.15);
+  --ex-shadow-hover: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
+
+  /* Transitions */
+  --ex-transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --ex-transition-normal: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  --ex-transition-slow: 500ms cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Typography */
+  --ex-font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --ex-font-mono: "SF Mono", "Monaco", "Inconsolata", "Fira Code", "Fira Mono", "Roboto Mono", monospace;
+  --ex-font-size-xs: 0.75rem;
+  --ex-font-size-sm: 0.875rem;
+  --ex-font-size-base: 1rem;
+  --ex-font-size-lg: 1.125rem;
+  --ex-font-size-xl: 1.25rem;
+  --ex-font-size-2xl: 1.5rem;
+  --ex-font-size-3xl: 1.875rem;
+  --ex-font-size-4xl: 2.25rem;
+  --ex-font-size-5xl: 3rem;
+
+  /* Z-index */
+  --ex-z-negative: -1;
+  --ex-z-normal: 0;
+  --ex-z-10: 10;
+  --ex-z-20: 20;
+  --ex-z-30: 30;
+  --ex-z-40: 40;
+  --ex-z-50: 50;
+  --ex-z-modal: 1000;
+  --ex-z-tooltip: 1100;
+
+  /* Animations */
+  --ex-animation-bounce: bounce 1s infinite;
+  --ex-animation-pulse: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  --ex-animation-spin: spin 1s linear infinite;
+}
+
+/* Animation Keyframes */
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(-25%);
+    animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+  }
+  50% {
+    transform: none;
+    animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: .5;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideInUp {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}

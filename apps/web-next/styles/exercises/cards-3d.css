@@ -1,0 +1,293 @@
+/* 3D Card Styles for Exercise Packages */
+@import './variables.css';
+
+/* 3D Card Container */
+.card-3d-container {
+  perspective: 1000px;
+  width: 100%;
+  height: 100%;
+}
+
+/* 3D Card Base */
+.card-3d {
+  position: relative;
+  width: 100%;
+  min-height: 280px;
+  transform-style: preserve-3d;
+  transition: transform var(--ex-transition-normal);
+  cursor: pointer;
+}
+
+.card-3d:hover {
+  transform: translateY(-8px) rotateX(5deg) rotateY(-5deg);
+}
+
+/* 3D Card Layers */
+.card-3d-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: var(--ex-radius-lg);
+  transition: all var(--ex-transition-normal);
+}
+
+/* Background Layer (Creates 3D depth effect) */
+.card-3d-bg-1 {
+  background: var(--ex-gradient-primary);
+  transform: translateZ(-10px) translateX(4px) translateY(4px);
+  opacity: 0.4;
+}
+
+.card-3d-bg-2 {
+  background: var(--ex-gradient-secondary);
+  transform: translateZ(-20px) translateX(8px) translateY(8px);
+  opacity: 0.3;
+}
+
+/* Main Card Content */
+.card-3d-content {
+  position: relative;
+  background: white;
+  border-radius: var(--ex-radius-lg);
+  box-shadow: var(--ex-shadow-lg);
+  overflow: hidden;
+  height: 100%;
+  transform: translateZ(0);
+  transition: all var(--ex-transition-normal);
+}
+
+.card-3d:hover .card-3d-content {
+  box-shadow: var(--ex-shadow-3d);
+}
+
+/* Card Header with Gradient */
+.card-3d-header {
+  position: relative;
+  padding: var(--ex-space-lg);
+  background: var(--ex-gradient-card);
+  overflow: hidden;
+}
+
+.card-3d-header::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  bottom: -50%;
+  left: -50%;
+  background: linear-gradient(
+    45deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.5) 50%,
+    transparent 70%
+  );
+  transform: translateX(-100%) translateY(-100%);
+  transition: transform 0.6s;
+}
+
+.card-3d:hover .card-3d-header::before {
+  transform: translateX(100%) translateY(100%);
+}
+
+/* Card Body */
+.card-3d-body {
+  padding: var(--ex-space-lg);
+  position: relative;
+}
+
+/* Card Footer */
+.card-3d-footer {
+  padding: var(--ex-space-md) var(--ex-space-lg);
+  background: var(--ex-gray-50);
+  border-top: 1px solid var(--ex-gray-200);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ex-space-md);
+}
+
+/* Difficulty Badge with Gradient Background */
+.card-3d-difficulty {
+  position: absolute;
+  top: var(--ex-space-md);
+  right: var(--ex-space-md);
+  padding: var(--ex-space-xs) var(--ex-space-md);
+  border-radius: var(--ex-radius-full);
+  font-size: var(--ex-font-size-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+  color: white;
+  backdrop-filter: blur(8px);
+  z-index: 10;
+}
+
+.card-3d-difficulty.beginner {
+  background: linear-gradient(135deg, var(--ex-difficulty-beginner), rgba(16, 185, 129, 0.8));
+}
+
+.card-3d-difficulty.elementary {
+  background: linear-gradient(135deg, var(--ex-difficulty-elementary), rgba(6, 182, 212, 0.8));
+}
+
+.card-3d-difficulty.intermediate {
+  background: linear-gradient(135deg, var(--ex-difficulty-intermediate), rgba(245, 158, 11, 0.8));
+}
+
+.card-3d-difficulty.upper-intermediate {
+  background: linear-gradient(135deg, var(--ex-difficulty-upper-intermediate), rgba(249, 115, 22, 0.8));
+}
+
+.card-3d-difficulty.advanced {
+  background: linear-gradient(135deg, var(--ex-difficulty-advanced), rgba(239, 68, 68, 0.8));
+}
+
+.card-3d-difficulty.super-advanced {
+  background: linear-gradient(135deg, var(--ex-difficulty-super-advanced), rgba(220, 38, 38, 0.8));
+}
+
+/* Category Icon */
+.card-3d-category {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--ex-radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--ex-font-size-xl);
+  margin-bottom: var(--ex-space-md);
+  position: relative;
+  overflow: hidden;
+}
+
+.card-3d-category::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--ex-gradient-primary);
+  opacity: 0.1;
+}
+
+/* Progress Ring */
+.card-3d-progress {
+  position: relative;
+  width: 60px;
+  height: 60px;
+}
+
+.card-3d-progress-ring {
+  transform: rotate(-90deg);
+  width: 60px;
+  height: 60px;
+}
+
+.card-3d-progress-circle {
+  fill: none;
+  stroke-width: 4;
+}
+
+.card-3d-progress-circle-bg {
+  stroke: var(--ex-gray-200);
+}
+
+.card-3d-progress-circle-fill {
+  stroke: var(--ex-primary-500);
+  stroke-linecap: round;
+  transition: stroke-dashoffset var(--ex-transition-slow);
+}
+
+.card-3d-progress-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: var(--ex-font-size-sm);
+  font-weight: 600;
+  color: var(--ex-gray-700);
+}
+
+/* Hover Effects */
+.card-3d-hover-content {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.9);
+  color: white;
+  padding: var(--ex-space-lg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transform: translateZ(10px) scale(0.95);
+  transition: all var(--ex-transition-normal);
+  border-radius: var(--ex-radius-lg);
+}
+
+.card-3d:hover .card-3d-hover-content {
+  opacity: 1;
+  transform: translateZ(10px) scale(1);
+}
+
+/* Flip Card Variant */
+.card-3d-flip {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform var(--ex-transition-slow);
+}
+
+.card-3d-flip.flipped {
+  transform: rotateY(180deg);
+}
+
+.card-3d-flip-front,
+.card-3d-flip-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  border-radius: var(--ex-radius-lg);
+}
+
+.card-3d-flip-back {
+  transform: rotateY(180deg);
+  background: var(--ex-gradient-primary);
+  color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--ex-space-lg);
+}
+
+/* Floating Animation */
+.card-3d-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.card-3d-float:nth-child(2n) {
+  animation-delay: 1s;
+}
+
+.card-3d-float:nth-child(3n) {
+  animation-delay: 2s;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .card-3d {
+    min-height: 240px;
+  }
+  
+  .card-3d:hover {
+    transform: translateY(-4px);
+  }
+  
+  .card-3d-bg-1,
+  .card-3d-bg-2 {
+    display: none;
+  }
+}
