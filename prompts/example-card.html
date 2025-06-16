@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Notebook Card Updated</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #f2f2f2;
+      display: flex;
+      justify-content: center;
+      padding: 40px;
+      font-family: sans-serif;
+    }
+
+    .card-container {
+      position: relative;
+      width: 230px;
+      height: 380px;
+    }
+
+    .card-background {
+      position: absolute;
+      top: -10px;
+      left: -10px;
+      width: 100%;
+      height: 100%;
+      background: #b7db7b;
+      border: 2px solid #000;
+      border-radius: 16px;
+      z-index: 0;
+    }
+
+    .card {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: white;
+      border: 2px solid black;
+      border-radius: 16px;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      opacity: 0.4;
+      left: 28px;
+      width: 2px;
+      height: 100%;
+      background: rgba(255, 0, 0, 0.4);
+      z-index: 0;
+    }
+
+    .card-top {
+      height: 40px;
+      background: pink;
+      border-top-left-radius: 14px;
+      border-top-right-radius: 14px;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      padding: 4px 8px;
+      z-index: 10;
+    }
+
+    .notes-icon {
+      background: white;
+      border-radius: 8px;
+      padding: 4px;
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .notes-icon img {
+      width: 24px;
+      height: 24px;
+    }
+
+    .title {
+      font-weight: bold;
+      font-size: 20px;
+      text-align: center;
+    }
+
+    .exercises {
+      display: flex;
+      justify-content: space-between;
+      padding: 0 12px;
+      font-weight: bold;
+    }
+
+    .progress-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+    }
+
+    .progress-section img {
+      height: 60px;
+      margin-top: 5px;
+      border-radius: 50%;
+      cursor: pointer;
+    }
+
+    .tooltip {
+      position: absolute;
+      top: 70px;
+      background: white;
+      border: 1px solid black;
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 12px;
+      max-width: 180px;
+      box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.1);
+      display: none;
+    }
+
+    .progress-label {
+      background: #b7db7b;
+      border: 2px solid black;
+      border-radius: 12px;
+      padding: 4px 10px;
+      font-weight: bold;
+      margin-top: 5px;
+    }
+
+    .progress-bar {
+      margin-top: 10px;
+      width: 80%;
+      height: 8px;
+      background: linear-gradient(90deg, #d3f8b8, #c7e5a1);
+      border-radius: 4px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      width: 0%;
+      height: 100%;
+      background: black;
+      border-radius: 4px;
+      animation: fillProgress 2s ease forwards;
+    }
+
+    @keyframes fillProgress {
+      from {
+        width: 0%;
+      }
+      to {
+        width: 60%;
+      }
+    }
+
+    .play-button {
+      align-self: center;
+      margin: 16px 0;
+      width: 50px;
+      height: 50px;
+      border-radius: 25px;
+      background: #b7db7b;
+      border: 2px solid black;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+
+    .play-button:hover {
+      transform: scale(1.05);
+    }
+
+    .play-icon {
+      width: 0;
+      height: 0;
+      border-left: 14px solid blue;
+      border-top: 10px solid transparent;
+      border-bottom: 10px solid transparent;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card-container">
+    <div class="card-background"></div>
+
+    <div class="card">
+      <div class="card-top">
+        <div class="notes-icon">
+          <span>📝</span>
+        </div>
+      </div>
+
+      <div class="title">Epic Title</div>
+
+      <div class="exercises">
+        <div>Exercises</div>
+        <div>30</div>
+      </div>
+
+      <div class="progress-section">
+        <img id="avatar" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSEtGjSp8St6hnuF1JdePhDCklyptvGis1I1Q&s" alt="Avatar">
+        <div class="tooltip" id="tooltip">You’re doing great! 🎉</div>
+        <div class="progress-label">Progress</div>
+        <div class="progress-bar">
+          <div class="progress-fill"></div>
+        </div>
+      </div>
+
+      <div class="play-button">
+        <div class="play-icon"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const messages = [
+      "Keep it up! 💪",
+      "You’re doing great! 🎉",
+      "Almost there! 🚀",
+      "Time to review a bit more 📚",
+      "You're on fire! 🔥",
+    ];
+
+    const avatar = document.getElementById("avatar");
+    const tooltip = document.getElementById("tooltip");
+
+    avatar.addEventListener("click", () => {
+      tooltip.textContent = messages[Math.floor(Math.random() * messages.length)];
+      tooltip.style.display = tooltip.style.display === "block" ? "none" : "block";
+    });
+
+    document.addEventListener("click", (e) => {
+      if (e.target !== avatar && !tooltip.contains(e.target)) {
+        tooltip.style.display = "none";
+      }
+    });
+  </script>
+</body>
+</html>
