@@ -1,6 +1,7 @@
 'use client';
-import React, { useState } from 'react';
-import { BookOpen, Edit } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
+import { BookOpen, Edit, X } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ExercisePackage } from '@repo/api-bridge';
@@ -21,6 +22,7 @@ export function ExercisePackageCard({
   completionRate = 0
 }: ExercisePackageCardProps) {
   const [showTooltip, setShowTooltip] = useState(false);
+  const [showNotesModal, setShowNotesModal] = useState(false);
   
   // Get category CSS class for the card background
   const getCategoryClass = (category: string) => {
@@ -37,17 +39,34 @@ export function ExercisePackageCard({
     return classes[category] || 'notebook-card--general';
   };
 
+  // Get the package color based on its position (matching nth-child colors)
+  const getPackageColor = () => {
+    const colors = [
+      '#FFE5E5', // Pastel Pink
+      '#E5F3FF', // Pastel Blue
+      '#E5FFE5', // Pastel Green
+      '#FFF5E5', // Pastel Orange
+      '#F5E5FF', // Pastel Purple
+      '#FFFFE5', // Pastel Yellow
+      '#E5FFF5', // Pastel Teal
+      '#FFE5F5', // Pastel Rose
+    ];
+    // Use a simple hash of the package ID to get a consistent color
+    const hash = pkg.id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    return colors[hash % colors.length];
+  };
+
   const handleImageClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    console.log('Character image clicked, showTooltip:', !showTooltip);
     setShowTooltip(!showTooltip);
   };
 
   const handleNotesClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    // Open notes modal - TODO: implement notes modal
-    console.log('Opening notes modal for package:', pkg.id);
+    setShowNotesModal(true);
   };
 
   React.useEffect(() => {
@@ -77,7 +96,12 @@ export function ExercisePackageCard({
         <div className="notebook-line" />
         
         {/* Top Header Section with Package Image */}
-        <div className="notebook-card__header">
+        <div 
+          className="notebook-card__header"
+          style={{
+            backgroundImage: pkg.image ? `url(${pkg.image})` : undefined
+          }}
+        >
           {canEdit && (
             <button
               className="edit-btn"
@@ -193,6 +217,100 @@ export function ExercisePackageCard({
           <div className="play-icon" />
         </Link>
       </div>
+
+      {/* Modal Portal */}
+      <NotesModal 
+        isOpen={showNotesModal}
+        onClose={() => setShowNotesModal(false)}
+        package={pkg}
+        locale={locale}
+        accentColor={getPackageColor()}
+      />
     </div>
   );
+}
+
+// Notes Modal Component with Portal
+interface NotesModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  package: ExercisePackage;
+  locale: string;
+  accentColor: string;
+}
+
+function NotesModal({ isOpen, onClose, package: pkg, locale, accentColor }: NotesModalProps) {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen]);
+
+  if (!mounted || !isOpen) return null;
+
+  const modal = (
+    <div className="package-notes-modal">
+      <div className="package-notes-modal__backdrop" onClick={onClose} />
+      <div 
+        className="package-notes-modal__content"
+        style={{
+          '--modal-accent-color': accentColor
+        } as React.CSSProperties}
+      >
+        <div className="package-notes-modal__header">
+          <h3 className="package-notes-modal__title">
+            <BookOpen className="icon" />
+            {locale === 'es' ? 'Notas del Paquete' : 'Package Notes'}
+          </h3>
+          <button
+            className="package-notes-modal__close"
+            onClick={onClose}
+            aria-label={locale === 'es' ? 'Cerrar' : 'Close'}
+          >
+            <X />
+          </button>
+        </div>
+        
+        <div className="package-notes-modal__body">
+          <h4 className="package-title">{pkg.title}</h4>
+          
+          {/* Placeholder for notes content */}
+          <div className="package-notes-placeholder">
+            <div className="placeholder-icon">📝</div>
+            <p className="placeholder-text">
+              {locale === 'es' 
+                ? 'Este paquete aún no tiene notas.' 
+                : 'This package has no notes yet.'}
+            </p>
+            <p className="placeholder-subtext">
+              {locale === 'es' 
+                ? 'Las notas del profesor aparecerán aquí para ayudarte con los ejercicios.' 
+                : 'Teacher notes will appear here to help you with the exercises.'}
+            </p>
+          </div>
+          
+          {/* Future: Tiptap rendered content will go here */}
+        </div>
+      </div>
+    </div>
+  );
+
+  // Render to body using portal
+  if (typeof document !== 'undefined') {
+    return createPortal(modal, document.body);
+  }
+
+  return null;
 }

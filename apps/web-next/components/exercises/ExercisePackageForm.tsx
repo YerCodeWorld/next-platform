@@ -122,49 +122,7 @@ export function ExercisePackageForm({
     return labels[category] || category;
   };
 
-  if (isModal) {
-    return (
-      <div className="exercise-package-form-modal">
-        <div className="exercise-package-form-modal__overlay" onClick={onClose} />
-        <div className="exercise-package-form-modal__content">
-          <div className="exercise-package-form-modal__header">
-            <h2 className="title">
-              {packageToEdit 
-                ? (locale === 'es' ? 'Editar Paquete de Ejercicios' : 'Edit Exercise Package')
-                : (locale === 'es' ? 'Crear Paquete de Ejercicios' : 'Create Exercise Package')
-              }
-            </h2>
-            <button
-              onClick={onClose}
-              className="close-btn"
-              aria-label={locale === 'es' ? 'Cerrar' : 'Close'}
-            >
-              <X className="icon" />
-            </button>
-          </div>
-
-          <FormContent />
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="exercise-package-form-page">
-      <div className="exercise-package-form-page__header">
-        <h1 className="title">
-          {packageToEdit 
-            ? (locale === 'es' ? 'Editar Paquete de Ejercicios' : 'Edit Exercise Package')
-            : (locale === 'es' ? 'Crear Paquete de Ejercicios' : 'Create Exercise Package')
-          }
-        </h1>
-      </div>
-      <FormContent />
-    </div>
-  );
-
-  function FormContent() {
-    return (
+  const formContent = (
 
         <form onSubmit={handleSubmit} className="exercise-package-form">
           {error && (
@@ -390,6 +348,46 @@ export function ExercisePackageForm({
             </button>
           </div>
         </form>
+  );
+
+  if (isModal) {
+    return (
+      <div className="exercise-package-form-modal">
+        <div className="exercise-package-form-modal__overlay" />
+        <div className="exercise-package-form-modal__content">
+          <div className="exercise-package-form-modal__header">
+            <h2 className="title">
+              {packageToEdit 
+                ? (locale === 'es' ? 'Editar Paquete de Ejercicios' : 'Edit Exercise Package')
+                : (locale === 'es' ? 'Crear Paquete de Ejercicios' : 'Create Exercise Package')
+              }
+            </h2>
+            <button
+              onClick={onClose}
+              className="close-btn"
+              aria-label={locale === 'es' ? 'Cerrar' : 'Close'}
+            >
+              <X className="icon" />
+            </button>
+          </div>
+
+          {formContent}
+        </div>
+      </div>
     );
   }
+
+  return (
+    <div className="exercise-package-form-page">
+      <div className="exercise-package-form-page__header">
+        <h1 className="title">
+          {packageToEdit 
+            ? (locale === 'es' ? 'Editar Paquete de Ejercicios' : 'Edit Exercise Package')
+            : (locale === 'es' ? 'Crear Paquete de Ejercicios' : 'Create Exercise Package')
+          }
+        </h1>
+      </div>
+      {formContent}
+    </div>
+  );
 }

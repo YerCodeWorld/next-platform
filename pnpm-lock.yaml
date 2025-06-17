@@ -70,6 +70,9 @@ importers:
       react-helmet-async:
         specifier: ^2.0.5
         version: 2.0.5(react@19.1.0)
+      react-slick:
+        specifier: ^0.30.3
+        version: 0.30.3(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       sass:
         specifier: ^1.80.6
         version: 1.89.2

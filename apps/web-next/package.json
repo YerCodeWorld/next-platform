@@ -26,6 +26,7 @@
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-helmet-async": "^2.0.5",
+    "react-slick": "^0.30.3",
     "sass": "^1.80.6",
     "sonner": "^2.0.5",
     "swiper": "^11.0.5",

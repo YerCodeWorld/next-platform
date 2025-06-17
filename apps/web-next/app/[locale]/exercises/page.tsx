@@ -1,6 +1,6 @@
 import { getCurrentUser } from '@/lib/auth';
 import { getAllExercisePackages } from '@/lib/api-server';
-import { Breadcrumb } from '@repo/components';
+import { ExercisePackageBreadcrumb } from '@/components/exercises/ExercisePackageBreadcrumb';
 import ExercisePackagesGridWrapper from '@/components/exercises/ExercisePackagesGridWrapper';
 import ExerciseStatsWrapper from '@/components/exercises/ExerciseStatsWrapper';
 
@@ -22,14 +22,15 @@ export default async function ExercisesPage({ params }: { params: Promise<{ loca
 
   return (
     <div className="exercise-packages__container">
-      {/* Breadcrumb */}
-      <Breadcrumb 
+      {/* Custom Game-Oriented Breadcrumb */}
+      <ExercisePackageBreadcrumb 
         title="EduExercises / EduPráctica"
         subtitle="Practice English with Interactive Exercise Packages"
         items={[
           { label: locale === 'es' ? 'Inicio' : 'Home', href: `/${locale}` },
           { label: locale === 'es' ? 'Ejercicios' : 'Exercises' }
         ]}
+        locale={locale}
       />
       
       {/* Filters & Search */}

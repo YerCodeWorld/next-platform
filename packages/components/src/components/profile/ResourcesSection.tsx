@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState } from 'react';
-import Link from 'next-link';  // Replace with NextJS alternative
+import Link from 'next/link';
 import { Post, Dynamic, Exercise } from '@repo/api-bridge';
 
 interface ResourcesSectionProps {
@@ -126,7 +126,8 @@ const ResourcesSection: React.FC<ResourcesSectionProps> = ({
                     </h2>
                     <div className="tp-resource-grid">
                         {filtered.posts.map((post) => (
-                            <Link key={post.id} to={`/blog/${post.slug}`} className="tp-resource-card">
+                            <Link key={post.id} href={`/blog/${post.slug}`}>
+                                <div className="tp-resource-card">
                                 {post.coverImage && (
                                     <div
                                         className="tp-resource-image"
@@ -151,6 +152,7 @@ const ResourcesSection: React.FC<ResourcesSectionProps> = ({
                                         )}
                                     </div>
                                 </div>
+                                </div>
                             </Link>
                         ))}
                     </div>
@@ -165,7 +167,8 @@ const ResourcesSection: React.FC<ResourcesSectionProps> = ({
                     </h2>
                     <div className="tp-resource-grid">
                         {filtered.dynamics.map((dynamic) => (
-                            <Link key={dynamic.id} to={`/dynamics/${dynamic.slug}`} className="tp-resource-card tp-dynamic-card">
+                            <Link key={dynamic.id} href={`/dynamics/${dynamic.slug}`}>
+                                <div className="tp-resource-card tp-dynamic-card">
                                 <div className="tp-resource-content">
                                     <div className="tp-dynamic-header">
                                         <span className="tp-dynamic-type">{dynamic.dynamicType}</span>
@@ -190,6 +193,7 @@ const ResourcesSection: React.FC<ResourcesSectionProps> = ({
                                             </span>
                                         )}
                                     </div>
+                                </div>
                                 </div>
                             </Link>
                         ))}

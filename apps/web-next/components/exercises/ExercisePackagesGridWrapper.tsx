@@ -1,10 +1,17 @@
 'use client';
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { Search, Plus, ChevronLeft, ChevronRight } from 'lucide-react';
 import { ExercisePackageCard } from './ExercisePackageCard';
 import { ExercisePackageForm } from './ExercisePackageForm';
 import { ExercisePackage } from '@repo/api-bridge';
 import { User } from '@/types';
+import Slider from 'react-slick';
+
+interface SliderRef {
+  slickNext: () => void;
+  slickPrev: () => void;
+  slickGoTo: (slide: number) => void;
+}
 
 interface ExercisePackagesGridWrapperProps {
   packages: ExercisePackage[];
@@ -200,41 +207,58 @@ function CategoryCarousel({
   userData,
   getCategoryLabel
 }: CategoryCarouselProps) {
-  const [scrollPosition, setScrollPosition] = useState(0);
-  const carouselRef = React.useRef<HTMLDivElement>(null);
+  const sliderRef = useRef<SliderRef>(null);
 
-  const handleScroll = (direction: 'left' | 'right') => {
-    if (!carouselRef.current) return;
-    
-    const scrollAmount = 320; // Width of one card + gap
-    const newPosition = direction === 'left' 
-      ? Math.max(0, scrollPosition - scrollAmount)
-      : scrollPosition + scrollAmount;
-    
-    carouselRef.current.scrollTo({
-      left: newPosition,
-      behavior: 'smooth'
-    });
-    
-    setScrollPosition(newPosition);
+  const settings = {
+    slidesToShow: 3,
+    slidesToScroll: 1,
+    autoplay: false,
+    speed: 600,
+    dots: false,
+    pauseOnHover: true,
+    arrows: false,
+    draggable: true,
+    infinite: packages.length > 3,
+    centerMode: false,
+    variableWidth: false,
+
+    responsive: [
+      {
+        breakpoint: 1199,
+        settings: {
+          slidesToShow: 2,
+          slidesToScroll: 1,
+          infinite: packages.length > 2,
+        },
+      },
+      {
+        breakpoint: 767,
+        settings: {
+          slidesToShow: 1,
+          slidesToScroll: 1,
+          infinite: packages.length > 1,
+          centerMode: false,
+          centerPadding: '0px',
+        },
+      },
+    ],
   };
 
   return (
     <div className="category-carousel">
       <div className="category-carousel__header">
         <h2 className="title">{getCategoryLabel(category)}</h2>
-        {packages.length > 0 && (
+        {packages.length > 1 && (
           <div className="navigation">
             <button 
               className="nav-btn"
-              onClick={() => handleScroll('left')}
-              disabled={scrollPosition === 0}
+              onClick={() => sliderRef.current?.slickPrev()}
             >
               <ChevronLeft className="icon" />
             </button>
             <button 
               className="nav-btn"
-              onClick={() => handleScroll('right')}
+              onClick={() => sliderRef.current?.slickNext()}
             >
               <ChevronRight className="icon" />
             </button>
@@ -242,29 +266,26 @@ function CategoryCarousel({
         )}
       </div>
       
-      <div 
-        ref={carouselRef}
-        className="category-carousel__content"
-        onScroll={(e) => setScrollPosition(e.currentTarget.scrollLeft)}
-      >
-        {packages.length > 0 ? (
-          packages.map((pkg) => (
-            <ExercisePackageCard
-              key={pkg.id}
-              package={pkg}
-              locale={locale}
-              isLoggedIn={!!userData}
-              canEdit={!!(userData && (userData.role === 'ADMIN' || userData.role === 'TEACHER'))}
-            />
-          ))
-        ) : (
-          <div className="category-carousel__empty">
-            {locale === 'es' 
-              ? 'Esta sección aún no tiene paquetes disponibles.'
-              : 'This section does not have any packages yet.'}
-          </div>
-        )}
-      </div>
+      {packages.length > 0 ? (
+        <Slider ref={sliderRef} {...settings} className="category-carousel__slider">
+          {packages.map((pkg) => (
+            <div key={pkg.id} className="category-carousel__slide">
+              <ExercisePackageCard
+                package={pkg}
+                locale={locale}
+                isLoggedIn={!!userData}
+                canEdit={!!(userData && (userData.role === 'ADMIN' || userData.role === 'TEACHER'))}
+              />
+            </div>
+          ))}
+        </Slider>
+      ) : (
+        <div className="category-carousel__empty">
+          {locale === 'es' 
+            ? 'Esta sección aún no tiene paquetes disponibles.'
+            : 'This section does not have any packages yet.'}
+        </div>
+      )}
     </div>
   );
 }

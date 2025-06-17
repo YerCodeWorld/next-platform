@@ -136,7 +136,7 @@ const TeacherProfilePage: React.FC = () => {
         ? profileThemes[profile.themeColor as keyof typeof profileThemes] || profileThemes['#A47BB9']
         : profileThemes['#A47BB9'];
 
-    const fetchTeacherContent = useCallback(async (email: string) => {
+    const fetchTeacherContent = useCallback(async (email: string, yearsExperience: number = 0) => {
         try {
             const [dynamicsResponse, postsResponse, exercisesResponse] = await Promise.all([
                 dynamicsApi.getDynamicsByEmail(email, { published: true }),
@@ -154,19 +154,18 @@ const TeacherProfilePage: React.FC = () => {
 
             // Calculate stats
             const totalResources = fetchedDynamics.length + fetchedPosts.length + fetchedExercises.length;
-            const yearsTeaching = profile?.yearsExperience || 0;
 
             setTeacherStats({
                 totalExercises: fetchedExercises.length,
                 totalDynamics: fetchedDynamics.length,
                 totalPosts: fetchedPosts.length,
                 totalResources,
-                yearsTeaching
+                yearsTeaching: yearsExperience
             });
         } catch (error) {
             console.error('Error fetching teacher content:', error);
         }
-    }, [dynamicsApi, postApi, exerciseApi, profile?.yearsExperience]);
+    }, [dynamicsApi, postApi, exerciseApi]);
 
     const fetchProfile = useCallback(async () => {
         if (!userId) {
@@ -181,7 +180,7 @@ const TeacherProfilePage: React.FC = () => {
                 setProfile(response.data);
                 await teacherProfileApi.recordProfileView(userId);
                 if (response.data.user?.email) {
-                    await fetchTeacherContent(response.data.user.email);
+                    await fetchTeacherContent(response.data.user.email, response.data.yearsExperience || 0);
                 }
             }
         } catch (error) {
@@ -196,7 +195,7 @@ const TeacherProfilePage: React.FC = () => {
         if (userId) {
             fetchProfile();
         }
-    }, [userId, fetchProfile]);
+    }, [userId]); // eslint-disable-line react-hooks/exhaustive-deps
 
     const calculateProfileCompleteness = (): number => {
         if (!profile) return 0;
