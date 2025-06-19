@@ -1,0 +1,222 @@
+// Exercise Progress Bar Styles
+.exercise-progress-bar {
+  width: 100%;
+  padding: 0;
+  margin: 0;
+}
+
+.progress-track {
+  display: flex;
+  width: 100%;
+  height: 52px;
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 8px;
+  padding: 0;
+  gap: 0;
+  overflow: hidden;
+  border: 2px solid rgba(0, 0, 0, 0.1);
+  
+  @media (max-width: 768px) {
+    height: 44px;
+    border-radius: 6px;
+  }
+  
+  @media (max-width: 480px) {
+    height: 40px;
+    border-radius: 6px;
+  }
+}
+
+.progress-segment {
+  flex: 1;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  min-width: 24px;
+  border-right: 1px solid rgba(255, 255, 255, 0.3);
+  cursor: pointer;
+  
+  &:last-child {
+    border-right: none;
+  }
+  
+  &:first-child {
+    border-top-left-radius: 6px;
+    border-bottom-left-radius: 6px;
+  }
+  
+  &:last-child {
+    border-top-right-radius: 6px;
+    border-bottom-right-radius: 6px;
+  }
+  
+  .segment-inner {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    position: relative;
+  }
+  
+  .segment-number {
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: #4a5568;
+    z-index: 2;
+    position: relative;
+    transition: all 0.2s ease;
+    text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+    
+    @media (max-width: 768px) {
+      font-size: 0.8rem;
+    }
+    
+    @media (max-width: 480px) {
+      font-size: 0.75rem;
+    }
+    
+    // Adjust for many questions
+    @media (max-width: 400px) {
+      font-size: 0.7rem;
+    }
+  }
+  
+  // States
+  &.unanswered {
+    background: #f7fafc;
+    
+    .segment-number {
+      color: #a0aec0;
+    }
+    
+    &:hover {
+      background: #edf2f7;
+      
+      .segment-number {
+        color: #718096;
+      }
+    }
+  }
+  
+  &.answered {
+    background: #e6f3ff;
+    
+    .segment-number {
+      color: #3182ce;
+      font-weight: 800;
+    }
+    
+    &:hover {
+      background: #bee3f8;
+    }
+  }
+  
+  &.current {
+    background: #fed7d7;
+    animation: currentPulse 2s ease-in-out infinite;
+    
+    .segment-number {
+      color: #e53e3e;
+      font-weight: 900;
+    }
+  }
+  
+  &.correct {
+    background: #c6f6d5;
+    animation: successPulse 0.6s ease-out;
+    
+    .segment-number {
+      color: #2f855a;
+      font-weight: 900;
+    }
+    
+    &:hover {
+      background: #9ae6b4;
+    }
+  }
+  
+  &.incorrect {
+    background: #fed7d7;
+    animation: errorShake 0.6s ease-out;
+    
+    .segment-number {
+      color: #c53030;
+      font-weight: 900;
+    }
+    
+    &:hover {
+      background: #feb2b2;
+    }
+  }
+  
+  // Clickable states after exercise completion
+  &.clickable {
+    cursor: pointer;
+    
+    &:hover {
+      transform: translateY(-1px);
+    }
+    
+    &:active {
+      transform: translateY(0);
+    }
+  }
+}
+
+// Animations
+@keyframes currentPulse {
+  0%, 100% {
+    background: #fed7d7;
+  }
+  50% {
+    background: #fc8181;
+  }
+}
+
+@keyframes successPulse {
+  0% {
+    background: #c6f6d5;
+  }
+  50% {
+    background: #9ae6b4;
+  }
+  100% {
+    background: #c6f6d5;
+  }
+}
+
+// Many questions adaptation (more than 10)
+.progress-track:has(.progress-segment:nth-child(11)) {
+  .progress-segment {
+    .segment-number {
+      font-size: 0.75rem;
+      
+      @media (max-width: 480px) {
+        font-size: 0.65rem;
+      }
+    }
+  }
+}
+
+// Very many questions adaptation (more than 15)
+.progress-track:has(.progress-segment:nth-child(16)) {
+  .progress-segment {
+    .segment-number {
+      font-size: 0.65rem;
+      
+      @media (max-width: 640px) {
+        font-size: 0.55rem;
+      }
+      
+      @media (max-width: 480px) {
+        font-size: 0.5rem;
+      }
+    }
+  }
+}

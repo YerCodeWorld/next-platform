@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Multiple Choice Exercise (Enhanced)</title>
   <style>
-    /* === CSS Variables === */
+    /* === CSS Variables | Basic Palette === */
     :root {
       /* Palette - matching your design config */
       --color-green-dark: #00bf63;
@@ -57,11 +57,24 @@
       width: 100%;
       min-height: 100vh;
       font-family: var(--font-family);
-      background: var(--color-green-light);
+      background: white;
       display: flex;
       justify-content: center;
       align-items: flex-start;
       padding: var(--spacing);
+    }
+
+    .main-container {
+      display: block;
+
+    }
+
+    .metadata {
+      display: flex;
+      margin: 2%;
+      border: 4px solid #1a1a1a;
+      padding: 10px;
+      background: rgba(0, 0, 0, 0.1);
     }
 
     /* Container */
@@ -108,16 +121,14 @@
     }
 
     .icon-group {
-      display: flex;
+      display: block;
       align-items: center;
-      gap: var(--spacing);
       flex-wrap: wrap;
     }
 
     .timer-group {
       display: flex;
       align-items: center;
-      gap: 0.25rem;
     }
 
     .icon-btn {
@@ -428,75 +439,98 @@
   </style>
 </head>
 <body>
-  <div class="container">
-    <!-- Header -->
-    <div class="header-row">
+  <div class="main-container">
+
+    <!--"metadata" header, with title, current questions, timer and hint icon-->
+    <!--Can be enhanced in the future for more icons and things.
+    It also needs refinement to make it look beautiful and playful--->
+    <div class="metadata">
       <div class="header-text">
+        <!--Fetching actual exercise title-->
         <div class="title">WHY IS IT THAT...</div>
+        <!--This would be created based on the exercise data and updated accordingly-->
         <div class="subtitle">SENTENCE 7/10</div>
       </div>
-      <div class="icon-group">
-        <!-- Timer icon + text -->
-        <div class="timer-group">
-          <div class="icon-btn" title="Timer">
-            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="12" cy="12" r="9" />
-              <path d="M12 7v5l3 3" />
-            </svg>
-          </div>
+
+      <div class="header-row">
+
+
+        <div class="icon-group">
+
+          <!-- Timer icon + text -->
+          <!--For the moment, just start counting so the user might be able to see the take they took.-->
+          <div class="timer-group">
+            <div class="icon-btn" title="Timer">
+              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="12" cy="12" r="9" />
+                <path d="M12 7v5l3 3" />
+              </svg>
+            </div>
           <div class="timer-text" id="timer">01:18</div>
         </div>
-        <!-- Hint icon -->
-        <div class="icon-btn hint-btn" title="Hint" onclick="showHint()">
+
+          <!-- Hint icon -->
+          <!--You may simplify this by just using an icon for lucidreact or phosphor as fallback-->
+          <div class="icon-btn hint-btn" title="Hint" onclick="showHint()">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M9 18h6m-3-14a5 5 0 0 0-5 5c0 2.21 1.46 4.09 3.5 4.7V16h3v-2.3A5 5 0 0 0 17 9a5 5 0 0 0-5-5z" />
+            </svg>
+          </div>
+          </div>
+      </div>
+    </div>
+
+
+    <div class="container">
+
+      <!-- Question area with nav arrows -->
+      <div class="question-area">
+        <!--I don't like at all the place where this arrows are, you could move them into the sides or something,
+        to make it more intuitive and better looking in general-->
+        <div class="nav-arrow nav-up" title="Previous" onclick="previousQuestion()">
           <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path d="M9 18h6m-3-14a5 5 0 0 0-5 5c0 2.21 1.46 4.09 3.5 4.7V16h3v-2.3A5 5 0 0 0 17 9a5 5 0 0 0-5-5z" />
+            <polygon points="12,6 6,16 18,16" />
+          </svg>
+        </div>
+        <div class="question-text" id="questionText">
+          WHY WOULD SO MANY PEOPLE TAKE LIFE-THREATENING RISKS WHEN LIVING SOME EXTREME EXPERIENCES?
+        </div>
+        <div class="nav-arrow nav-down" title="Next" onclick="nextQuestion()">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <polygon points="6,8 18,8 12,18" />
           </svg>
         </div>
       </div>
-    </div>
 
-    <!-- Question area with nav arrows -->
-    <div class="question-area">
-      <div class="nav-arrow nav-up" title="Previous" onclick="previousQuestion()">
-        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <polygon points="12,6 6,16 18,16" />
-        </svg>
-      </div>
-      <div class="question-text" id="questionText">
-        WHY WOULD SO MANY PEOPLE TAKE LIFE-THREATENING RISKS WHEN LIVING SOME EXTREME EXPERIENCES?
-      </div>
-      <div class="nav-arrow nav-down" title="Next" onclick="nextQuestion()">
-        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <polygon points="6,8 18,8 12,18" />
-        </svg>
-      </div>
-    </div>
-
-    <!-- Options -->
-    <div class="options">
-      <div class="option A" tabindex="0" onclick="selectAnswer('A')" data-answer="A">
-        <div class="option-label">A</div>
-        <div class="option-text">
-          BASICALLY, LIFE IS JUST A LIABILITY FOR THEM AND THEY DON'T CARE MUCH
+      <!-- Options -->
+      <!--One of this is already selected, with adjacent option-lable being green, this is just an example
+      for selected state, it should not be like this in the design but only after selecting. Which state you needs
+      to improve for better UX as well (like changing coloring of the whole thing, etc)-->
+      <div class="options">
+        <div class="option A" tabindex="0" onclick="selectAnswer('A')" data-answer="A">
+          <div class="option-label">A</div>
+          <div class="option-text">
+            BASICALLY, LIFE IS JUST A LIABILITY FOR THEM AND THEY DON'T CARE MUCH
+          </div>
         </div>
-      </div>
-      <div class="option B" tabindex="0" onclick="selectAnswer('B')" data-answer="B">
-        <div class="option-label">B</div>
-        <div class="option-text">
-          FOR THE SAME REASON WE GET ADDICTED TO THINGS. ADRENALINE AND FEELING.
+        <div class="option B" tabindex="0" onclick="selectAnswer('B')" data-answer="B">
+          <div class="option-label">B</div>
+          <div class="option-text">
+            FOR THE SAME REASON WE GET ADDICTED TO THINGS. ADRENALINE AND FEELING.
+          </div>
         </div>
-      </div>
-      <div class="option C" tabindex="0" onclick="selectAnswer('C')" data-answer="C">
-        <div class="option-text">
-          EXTREME? THEY DON'T ACTUALLY THINK THOSE ARE SO DANGEROUS AND SO JUST GO FOR IT
+        <div class="option C" tabindex="0" onclick="selectAnswer('C')" data-answer="C">
+          <div class="option-text">
+            EXTREME? THEY DON'T ACTUALLY THINK THOSE ARE SO DANGEROUS AND SO JUST GO FOR IT
+          </div>
+          <div class="option-label">C</div>
         </div>
-        <div class="option-label">C</div>
-      </div>
-      <div class="option D" tabindex="0" onclick="selectAnswer('D')" data-answer="D">
-        <div class="option-text">
-          THEY DO KNOW THE RISKS, BUT THEY DON'T CONSIDER THEM TO BE THAT GREAT.
+        <div class="option D" tabindex="0" onclick="selectAnswer('D')" data-answer="D">
+          <div class="option-text">
+            THEY DO KNOW THE RISKS, BUT THEY DON'T CONSIDER THEM TO BE THAT GREAT.
+          </div>
+          <div class="option-label">D</div>
         </div>
-        <div class="option-label">D</div>
       </div>
     </div>
   </div>
