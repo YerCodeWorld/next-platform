@@ -1,4 +1,7 @@
-/* =========================== Accordion Css start ============================= */ 
+@import "../abstracts/mixins";
+@import "../abstracts/functions";
+
+/* =========================== Accordion Css start ============================= */
 .common-accordion {
     .accordion-item {
         border: 1px solid var(--neutral-30);
@@ -52,7 +55,7 @@
         padding-inline-end: 64px; 
         font-weight: 600;
         font-size: clampCal(16, 20);
-        font-family: var(--heading-font);
+        font-family: var(--heading-font) sans-serif;
         @include msm-screen {
             padding: 16px;
             padding-inline-end: 64px; 
@@ -74,11 +77,9 @@
         }
         &[aria-expanded="true"], &[aria-expanded="false"] {
             &::after {
-                font-family: 'Phosphor';
+                font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
                 font-weight: 900;
                 content: "\E3D4";
-                color: hsl(var(--main));
-                display: inline-block;
                 position: absolute;
                 inset-block-start: 50%;
                 transform: translateY(-50%);
@@ -100,7 +101,6 @@
         &[aria-expanded="true"] {
             &::after {
                 content: "\E32A";
-                color: var(--neutral-700);
                 background-color: #fff;
                 color: var(--main-600);
             }

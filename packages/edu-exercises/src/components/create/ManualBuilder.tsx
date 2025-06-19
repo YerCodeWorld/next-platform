@@ -11,7 +11,7 @@ import {
     MatchingContent,
     MultipleChoiceContent,
     OrderingContent
-} from '../../types';
+} from '@repo/api-bridge';
 
 interface ManualBuilderProps {
     authorEmail: string;
@@ -44,6 +44,7 @@ export const ManualBuilder: React.FC<ManualBuilderProps> = ({
     const [hints, setHints] = useState<string[]>(currentExercise?.hints || []);
     const [explanation, setExplanation] = useState(currentExercise?.explanation || '');
     const [tags, setTags] = useState<string[]>(currentExercise?.tags || defaultMetadata.tags);
+    const [isPublished, setIsPublished] = useState(currentExercise?.isPublished || false);
     const [newHint, setNewHint] = useState('');
     const [newTag, setNewTag] = useState('');
 
@@ -119,7 +120,8 @@ export const ManualBuilder: React.FC<ManualBuilderProps> = ({
                         });
                         sentenceBuilder.done();
                     });
-                    return fillBuilder.finish().build();
+                    const exercise = fillBuilder.finish().build();
+                    return { ...exercise, isPublished };
                 }
 
                 case 'MATCHING': {
@@ -128,7 +130,8 @@ export const ManualBuilder: React.FC<ManualBuilderProps> = ({
                     matchingContent.pairs.forEach(pair => {
                         matchBuilder.addPair(pair.left, pair.right, pair.hint);
                     });
-                    return matchBuilder.finish().build();
+                    const exercise = matchBuilder.finish().build();
+                    return { ...exercise, isPublished };
                 }
 
                 case 'MULTIPLE_CHOICE': {
@@ -136,7 +139,8 @@ export const ManualBuilder: React.FC<ManualBuilderProps> = ({
                     multipleChoiceContent.questions.forEach(q => {
                         mcBuilder.addQuestion(q.question || '', q.options, q.correctIndices, q.hint, q.explanation);
                     });
-                    return mcBuilder.finish().build();
+                    const exercise = mcBuilder.finish().build();
+                    return { ...exercise, isPublished };
                 }
 
                 case 'ORDERING': {
@@ -144,7 +148,8 @@ export const ManualBuilder: React.FC<ManualBuilderProps> = ({
                     orderingContent.sentences.forEach(sentence => {
                         orderBuilder.addSentence(sentence.segments, sentence.hint);
                     });
-                    return orderBuilder.finish().build();
+                    const exercise = orderBuilder.finish().build();
+                    return { ...exercise, isPublished };
                 }
 
             }
@@ -323,6 +328,17 @@ export const ManualBuilder: React.FC<ManualBuilderProps> = ({
                             ))}
                         </div>
                     </div>
+
+                    <div className="exs-form-group">
+                        <label>
+                            <input
+                                type="checkbox"
+                                checked={isPublished}
+                                onChange={(e) => setIsPublished(e.target.checked)}
+                            />
+                            Publish immediately
+                        </label>
+                    </div>
                 </div>
             </div>
 
@@ -345,7 +361,6 @@ export const ManualBuilder: React.FC<ManualBuilderProps> = ({
 };
 
 // Enhanced content builders with per-item hints/explanations
-
 const FillBlankBuilder: React.FC<{
     content: FillBlankContent;
     onChange: (content: FillBlankContent) => void;

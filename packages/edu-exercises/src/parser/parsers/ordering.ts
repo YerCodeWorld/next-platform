@@ -1,4 +1,4 @@
-import { OrderingContent, CreateExercisePayload } from '../../types';
+import { OrderingContent, CreateExercisePayload } from '@repo/api-bridge';
 
 export function parseOrdering(lines: string[]): Partial<CreateExercisePayload>[] {
     const exercises: Partial<CreateExercisePayload>[] = [];

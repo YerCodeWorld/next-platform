@@ -424,7 +424,7 @@
 }
 
 // High contrast mode support
-@media (prefers-contrast: high) {
+@media (prefers-contrast: more) {
   .login-container {
     border: 2px solid var(--gray-900);
   }

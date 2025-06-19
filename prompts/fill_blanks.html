@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fill In Context</title>
+  <style>
+    :root {
+      --background: #fdfdff;
+      --carousel-color: #7bc96f;
+      --triangle-color: #0066cc;
+      --gap-color: #f77;
+      --light-purple: #f3e6ff;
+      --font: 'Comic Neue', 'Comic Sans MS', sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--background);
+      font-family: var(--font);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 2rem 1rem;
+      text-align: center;
+    }
+
+    .header {
+      width: 100%;
+      max-width: 700px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: bold;
+      font-size: 1.2rem;
+      margin-bottom: 2rem;
+    }
+
+    .sentence {
+      font-size: 1.6rem;
+      font-weight: bold;
+      line-height: 2.4rem;
+      max-width: 700px;
+    }
+
+    input.blank {
+      display: inline-block;
+      font: inherit;
+      padding: 0.2rem 0.5rem;
+      margin: 0 0.2rem;
+      border: none;
+      border-bottom: 3px dashed var(--gap-color);
+      min-width: 80px;
+      text-align: center;
+      background-color: var(--light-purple);
+      border-radius: 4px;
+      transition: all 0.2s ease;
+    }
+
+    input.blank:focus {
+      outline: none;
+      border-color: var(--triangle-color);
+      background-color: #fff;
+    }
+
+    .carousel-button {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: var(--carousel-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 2rem 0 1.5rem;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+
+    .carousel-button:hover {
+      transform: scale(1.1);
+    }
+
+    .triangle {
+      width: 0;
+      height: 0;
+      border-left: 12px solid transparent;
+      border-right: 12px solid transparent;
+    }
+
+    .triangle.up {
+      border-bottom: 18px solid var(--triangle-color);
+    }
+
+    .triangle.down {
+      border-top: 18px solid var(--triangle-color);
+    }
+
+    @media (max-width: 500px) {
+      .sentence {
+        font-size: 1.2rem;
+      }
+      input.blank {
+        min-width: 60px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div>FILL IN CONTEXT – SENTENCE <span id="count">1</span>/10</div>
+    <div>⏰ <span id="timer">01:18</span></div>
+  </div>
+
+  <div class="carousel-button" onclick="prevSentence()">
+    <div class="triangle up"></div>
+  </div>
+
+  <div class="sentence" id="sentence"></div>
+
+  <div class="carousel-button" onclick="nextSentence()">
+    <div class="triangle down"></div>
+  </div>
+
+  <script>
+    const sentences = [
+      "HOW COME YOU TALKED TO HIM ABOUT IT AGAIN? I THOUGHT WE <input class='blank' placeholder='_____'/> TALKED ABOUT THIS NEVER <input class='blank' placeholder='_____'/> AGAIN!",
+      "I CAN'T BELIEVE SHE <input class='blank' placeholder='_____'/> THAT! IT WAS SO UNEXPECTED.",
+      "THEY HAVE BEEN <input class='blank' placeholder='_____'/> FOR HOURS WITHOUT A BREAK."
+    ];
+
+    let index = 0;
+    const sentenceDiv = document.getElementById("sentence");
+    const countSpan = document.getElementById("count");
+
+    function renderSentence() {
+      sentenceDiv.innerHTML = sentences[index];
+      countSpan.textContent = index + 1;
+    }
+
+    function nextSentence() {
+      index = (index + 1) % sentences.length;
+      renderSentence();
+    }
+
+    function prevSentence() {
+      index = (index - 1 + sentences.length) % sentences.length;
+      renderSentence();
+    }
+
+    renderSentence();
+  </script>
+</body>
+</html>

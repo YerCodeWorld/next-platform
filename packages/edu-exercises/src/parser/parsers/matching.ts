@@ -1,4 +1,4 @@
-import { MatchingContent, CreateExercisePayload } from '../../types';
+import { MatchingContent, CreateExercisePayload } from '@repo/api-bridge';
 
 export function parseMatching(lines: string[]): Partial<CreateExercisePayload>[] {
     const exercises: Partial<CreateExercisePayload>[] = [];

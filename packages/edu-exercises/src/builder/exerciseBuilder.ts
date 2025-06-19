@@ -6,7 +6,7 @@ import {
     MatchingContent,
     MultipleChoiceContent,
     OrderingContent
-} from '../types';
+} from '@repo/api-bridge';
 import { validateExercise } from '../parser';
 
 export class ExerciseBuilder {

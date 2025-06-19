@@ -300,7 +300,12 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
                                         value={newLanguage}
                                         onChange={(e) => setNewLanguage(e.target.value)}
                                         placeholder="Add a language"
-                                        onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addLanguage())}
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter') {
+                                                e.preventDefault();
+                                                addLanguage();
+                                            }
+                                        }}
                                     />
                                     <button type="button" onClick={addLanguage}>Add</button>
                                 </div>
@@ -322,7 +327,12 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
                                         value={newSpecialization}
                                         onChange={(e) => setNewSpecialization(e.target.value)}
                                         placeholder="Add a specialization"
-                                        onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addSpecialization())}
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter') {
+                                                e.preventDefault();
+                                                addSpecialization();
+                                            }
+                                        }}
                                     />
                                     <button type="button" onClick={addSpecialization}>Add</button>
                                 </div>

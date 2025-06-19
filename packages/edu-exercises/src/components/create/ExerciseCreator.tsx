@@ -12,7 +12,8 @@ import {
     ExerciseType,
     ExerciseDifficulty,
     ExerciseCategory
-} from '../../types';
+} from '@repo/api-bridge';
+import { exerciseToLanScript } from '../../parser';
 
 interface ExerciseCreatorProps {
     mode?: 'script' | 'manual';
@@ -203,70 +204,6 @@ export const ExerciseCreator: React.FC<ExerciseCreatorProps> = ({
         }
     };
 
-    // Convert Exercise to LanScript format for editing
-    const exerciseToLanScript = (ex: Exercise): string => {
-        let script = '{\n';
-        script += `  type: "${ex.type.toLowerCase()}"\n`;
-        script += `  title: "${ex.title}"\n`;
-        script += `  difficulty: "${ex.difficulty}"\n`;
-        script += `  category: "${ex.category}"\n`;
-        script += `  isPublished: "${ex.isPublished}"\n`;
-        if (ex.instructions) script += `  instructions: "${ex.instructions}"\n`;
-        if (ex.explanation) script += `  explanation: "${ex.explanation}"\n`;
-        script += '\n';
-
-        switch (ex.type) {
-            case 'FILL_BLANK': {
-                const content = ex.content as any;
-                content.sentences?.forEach((sentence: any) => {
-                    let text = sentence.text;
-                    // Convert blanks back to *word* format
-                    sentence.blanks?.forEach((blank: any) => {
-                        const answers = blank.answers.join('|');
-                        text = text.replace('___', `*${answers}*`);
-                    });
-                    script += `  ${text}`;
-                    if (sentence.blanks?.[0]?.hint) {
-                        script += ` @hint(${sentence.blanks[0].hint})`;
-                    }
-                    script += '\n';
-                });
-                break;
-            }
-            case 'MATCHING': {
-                const content = ex.content as any;
-                content.pairs?.forEach((pair: any) => {
-                    script += `  ${pair.left} = ${pair.right}`;
-                    if (pair.hint) script += ` @hint(${pair.hint})`;
-                    script += '\n';
-                });
-                break;
-            }
-            case 'MULTIPLE_CHOICE': {
-                const content = ex.content as any;
-                content.questions?.forEach((q: any) => {
-                    const correctAnswers = q.correctIndices.map((i: number) => q.options[i]).join(',');
-                    script += `  ${q.question} = ${q.options.join(' | ')} [${correctAnswers}]`;
-                    if (q.hint) script += ` @hint(${q.hint})`;
-                    if (q.explanation) script += ` @explanation(${q.explanation})`;
-                    script += '\n';
-                });
-                break;
-            }
-            case 'ORDERING': {
-                const content = ex.content as any;
-                content.sentences?.forEach((sentence: any) => {
-                    script += `  ${sentence.segments.join(' | ')}`;
-                    if (sentence.hint) script += ` @hint(${sentence.hint})`;
-                    script += '\n';
-                });
-                break;
-            }
-        }
-
-        script += '}';
-        return script;
-    };
 
     if (!authorEmail) {
         return (

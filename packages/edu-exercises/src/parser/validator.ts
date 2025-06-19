@@ -1,4 +1,4 @@
-import { CreateExercisePayload } from '../types';
+import { CreateExercisePayload } from '@repo/api-bridge';
 
 export interface ValidationResult {
     isValid: boolean;

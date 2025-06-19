@@ -1,5 +1,5 @@
 import React from 'react';
-import { CreateExercisePayload, FillBlankContent, MatchingContent, MultipleChoiceContent, OrderingContent } from '../../types';
+import { CreateExercisePayload, FillBlankContent, MatchingContent, MultipleChoiceContent, OrderingContent } from '@repo/api-bridge';
 
 interface ExercisePreviewProps {
     exercise: CreateExercisePayload;

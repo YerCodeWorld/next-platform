@@ -11,7 +11,7 @@ import {
     MatchingContent,
     MultipleChoiceContent,
     OrderingContent
-} from '../../types';
+} from '@repo/api-bridge';
 import { ExercisePreview } from './ExercisePreview';
 
 import { toast } from 'sonner';
@@ -584,6 +584,13 @@ export const LanScriptEditor: React.FC<LanScriptEditorProps> = ({
             editor.dispose();
         };
     }, []);
+
+    // Update editor content when initialScript changes
+    useEffect(() => {
+        if (monacoRef.current && initialScript !== undefined) {
+            monacoRef.current.setValue(initialScript);
+        }
+    }, [initialScript]);
 
     const validateExercises = (exercises: CreateExercisePayload[]): string[] => {
         const errors: string[] = [];

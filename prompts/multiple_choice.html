@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Multiple Choice Exercise (Enhanced)</title>
+  <style>
+    /* === CSS Variables === */
+    :root {
+      /* Palette - matching your design config */
+      --color-green-dark: #00bf63;
+      --color-green-mid: #7ed957;
+      --color-green-light: #caf3b9;
+      --color-blue-light: #abd7fe;
+      --color-pink: #f8a8c5;
+      --color-violet: #e0c3f3;
+      --color-text: #000;
+      --color-border: #000;
+
+      /* Font - keeping design-accurate font */
+      --font-family: 'Comic Sans MS', cursive, sans-serif;
+
+      /* Spacing scale */
+      --spacing-sm: 0.5rem;
+      --spacing: 1rem;
+      --spacing-lg: 1.5rem;
+      --spacing-xl: 2rem;
+
+      /* Border radius and width */
+      --radius: 16px;
+      --border-w: 4px;
+
+      /* Font sizes (responsive) */
+      --fs-title: clamp(1rem, 4vw, 1.5rem);
+      --fs-subtitle: clamp(0.9rem, 3vw, 1.1rem);
+      --fs-question: clamp(0.95rem, 3.5vw, 1.2rem);
+      --fs-option: clamp(0.85rem, 3vw, 1rem);
+      --fs-timer: clamp(0.8rem, 2.5vw, 1rem);
+
+      /* Label (letter) size */
+      --label-size: clamp(2rem, 6vw, 3rem);
+      /* Nav arrow size */
+      --nav-size: clamp(2.5rem, 7vw, 4rem);
+
+      /* Transitions */
+      --transition: all 0.3s ease;
+    }
+
+    /* Mobile-first base reset */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      width: 100%;
+      min-height: 100vh;
+      font-family: var(--font-family);
+      background: var(--color-green-light);
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: var(--spacing);
+    }
+
+    /* Container */
+    .container {
+      position: relative;
+      width: 100%;
+      max-width: 800px;
+      background: var(--color-green-light);
+      border: var(--border-w) solid var(--color-border);
+      border-radius: calc(var(--radius) * 1.5);
+      padding: var(--spacing-lg) var(--spacing);
+      min-height: 600px;
+    }
+
+    /* Header row: title/subtitle on left, icons on right */
+    .header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      gap: var(--spacing);
+    }
+
+    .header-text {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .title {
+      font-size: var(--fs-title);
+      font-weight: bold;
+      color: var(--color-text);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .subtitle {
+      font-size: var(--fs-subtitle);
+      margin-top: 0.25rem;
+      text-transform: uppercase;
+      letter-spacing: 0.025em;
+    }
+
+    .icon-group {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing);
+      flex-wrap: wrap;
+    }
+
+    .timer-group {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    .icon-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 2.5rem;
+      height: 2.5rem;
+      cursor: pointer;
+      border-radius: 50%;
+      background: rgba(255, 215, 0, 0.1);
+      border: 2px solid transparent;
+      transition: var(--transition);
+    }
+
+    .icon-btn:hover {
+      background: rgba(255, 215, 0, 0.2);
+      border-color: #ffd700;
+      transform: scale(1.05);
+    }
+
+    .icon-btn svg {
+      width: 70%;
+      height: 70%;
+      stroke: var(--color-text);
+      fill: none;
+      stroke-width: 2;
+    }
+
+    .hint-btn svg {
+      fill: #ffd700;
+      stroke: none;
+    }
+
+    .timer-text {
+      font-size: var(--fs-timer);
+      font-weight: bold;
+      color: var(--color-text);
+    }
+
+    /* Question area */
+    .question-area {
+      position: relative;
+      margin: var(--spacing-xl) 0;
+      padding: var(--spacing-lg);
+      border: var(--border-w) solid var(--color-border);
+      border-radius: var(--radius);
+      background: #fff;
+      text-align: center;
+      min-height: 120px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .question-text {
+      font-size: var(--fs-question);
+      line-height: 1.4;
+      color: var(--color-text);
+      margin: 0 auto;
+      max-width: 100%;
+      word-wrap: break-word;
+      text-transform: uppercase;
+      letter-spacing: 0.025em;
+      font-weight: 600;
+    }
+
+    /* Nav arrows: absolute positioned, centered horizontally, overlapping question-area */
+    .nav-arrow {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      width: var(--nav-size);
+      height: var(--nav-size);
+      background: var(--color-green-light);
+      border: var(--border-w) solid var(--color-border);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: var(--transition);
+      z-index: 10;
+    }
+
+    .nav-arrow:hover {
+      background: var(--color-green-mid);
+      transform: translateX(-50%) scale(1.05);
+      box-shadow: 0 4px 12px rgba(0, 191, 99, 0.3);
+    }
+
+    .nav-arrow:active {
+      transform: translateX(-50%) scale(0.95);
+    }
+
+    .nav-arrow svg {
+      width: 60%;
+      height: 60%;
+      fill: var(--color-green-dark);
+      stroke: none;
+    }
+
+    .nav-up {
+      top: calc(-1 * (var(--nav-size) / 2));
+    }
+
+    .nav-down {
+      bottom: calc(-1 * (var(--nav-size) / 2));
+    }
+
+    /* Options list */
+    .options {
+      margin-top: var(--spacing-xl);
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing);
+    }
+
+    .option {
+      position: relative;
+      display: flex;
+      align-items: center;
+      padding: var(--spacing) var(--spacing-lg);
+      border: var(--border-w) solid var(--color-border);
+      border-radius: var(--radius);
+      font-size: var(--fs-option);
+      color: var(--color-text);
+      background: #fff;
+      cursor: pointer;
+      transition: var(--transition);
+      min-height: 80px;
+    }
+
+    .option:hover {
+      filter: brightness(0.95);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .option.selected {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+      border-width: 6px;
+    }
+
+    .option-text {
+      flex: 1;
+      line-height: 1.3;
+      padding: 0 calc(var(--label-size) * 0.7);
+      text-transform: uppercase;
+      letter-spacing: 0.025em;
+      font-weight: 500;
+    }
+
+    /* Letter label inside but attached */
+    .option-label {
+      position: absolute;
+      width: var(--label-size);
+      height: var(--label-size);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: var(--border-w) solid var(--color-border);
+      border-radius: 50%;
+      font-weight: bold;
+      background: #fff;
+      color: var(--color-text);
+      font-size: calc(var(--label-size) * 0.4);
+      transition: var(--transition);
+    }
+
+    /* Specific backgrounds and label positions */
+    .option.A {
+      background: var(--color-blue-light);
+    }
+    .option.A .option-label {
+      left: calc(-1 * (var(--label-size) / 2));
+      top: 50%;
+      transform: translateY(-50%);
+      background: #fff;
+    }
+
+    .option.B {
+      background: var(--color-green-light);
+    }
+    .option.B .option-label {
+      left: calc(-1 * (var(--label-size) / 2));
+      top: 50%;
+      transform: translateY(-50%);
+      background: var(--color-green-dark);
+      color: #fff;
+    }
+
+    .option.C {
+      background: var(--color-pink);
+    }
+    .option.C .option-label {
+      right: calc(-1 * (var(--label-size) / 2));
+      top: 50%;
+      transform: translateY(-50%);
+      background: #fff;
+    }
+
+    .option.D {
+      background: var(--color-violet);
+    }
+    .option.D .option-label {
+      right: calc(-1 * (var(--label-size) / 2));
+      top: 50%;
+      transform: translateY(-50%);
+      background: #fff;
+    }
+
+    /* Mobile adaptations */
+    @media (max-width: 480px) {
+      .container {
+        padding: var(--spacing) calc(var(--spacing) * 0.75);
+        border-radius: var(--radius);
+      }
+
+      .header-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--spacing-sm);
+      }
+
+      .icon-group {
+        align-self: stretch;
+        justify-content: space-between;
+      }
+
+      .question-area {
+        margin: var(--spacing-lg) 0;
+        padding: var(--spacing);
+        min-height: 100px;
+      }
+
+      .option {
+        padding: var(--spacing-sm) var(--spacing);
+        min-height: 70px;
+      }
+
+      .option-text {
+        padding: 0 calc(var(--label-size) * 0.6);
+      }
+
+      .options {
+        gap: var(--spacing-sm);
+      }
+    }
+
+    /* Desktop layout enhancement */
+    @media (min-width: 768px) {
+      .container {
+        padding: var(--spacing-xl);
+        max-width: 900px;
+      }
+
+      .options {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: var(--spacing-lg);
+        grid-template-areas:
+          "A C"
+          "B D";
+      }
+
+      .option.A { grid-area: A; }
+      .option.B { grid-area: B; }
+      .option.C { grid-area: C; }
+      .option.D { grid-area: D; }
+    }
+
+    /* Accessibility: focus outline */
+    .option:focus-visible {
+      outline: 3px solid var(--color-green-dark);
+      outline-offset: 2px;
+    }
+
+    .nav-arrow:focus-visible {
+      outline: 3px solid var(--color-green-dark);
+      outline-offset: 2px;
+    }
+
+    /* Animation for selection */
+    @keyframes selectPulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.02); }
+      100% { transform: scale(1); }
+    }
+
+    .option.selected .option-label {
+      animation: selectPulse 0.6s ease-out;
+    }
+
+    /* Reduce motion for accessibility */
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        animation: none !important;
+        transition: none !important;
+      }
+
+      .option:hover,
+      .nav-arrow:hover {
+        transform: none !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <div class="header-row">
+      <div class="header-text">
+        <div class="title">WHY IS IT THAT...</div>
+        <div class="subtitle">SENTENCE 7/10</div>
+      </div>
+      <div class="icon-group">
+        <!-- Timer icon + text -->
+        <div class="timer-group">
+          <div class="icon-btn" title="Timer">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="12" cy="12" r="9" />
+              <path d="M12 7v5l3 3" />
+            </svg>
+          </div>
+          <div class="timer-text" id="timer">01:18</div>
+        </div>
+        <!-- Hint icon -->
+        <div class="icon-btn hint-btn" title="Hint" onclick="showHint()">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M9 18h6m-3-14a5 5 0 0 0-5 5c0 2.21 1.46 4.09 3.5 4.7V16h3v-2.3A5 5 0 0 0 17 9a5 5 0 0 0-5-5z" />
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- Question area with nav arrows -->
+    <div class="question-area">
+      <div class="nav-arrow nav-up" title="Previous" onclick="previousQuestion()">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <polygon points="12,6 6,16 18,16" />
+        </svg>
+      </div>
+      <div class="question-text" id="questionText">
+        WHY WOULD SO MANY PEOPLE TAKE LIFE-THREATENING RISKS WHEN LIVING SOME EXTREME EXPERIENCES?
+      </div>
+      <div class="nav-arrow nav-down" title="Next" onclick="nextQuestion()">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <polygon points="6,8 18,8 12,18" />
+        </svg>
+      </div>
+    </div>
+
+    <!-- Options -->
+    <div class="options">
+      <div class="option A" tabindex="0" onclick="selectAnswer('A')" data-answer="A">
+        <div class="option-label">A</div>
+        <div class="option-text">
+          BASICALLY, LIFE IS JUST A LIABILITY FOR THEM AND THEY DON'T CARE MUCH
+        </div>
+      </div>
+      <div class="option B" tabindex="0" onclick="selectAnswer('B')" data-answer="B">
+        <div class="option-label">B</div>
+        <div class="option-text">
+          FOR THE SAME REASON WE GET ADDICTED TO THINGS. ADRENALINE AND FEELING.
+        </div>
+      </div>
+      <div class="option C" tabindex="0" onclick="selectAnswer('C')" data-answer="C">
+        <div class="option-text">
+          EXTREME? THEY DON'T ACTUALLY THINK THOSE ARE SO DANGEROUS AND SO JUST GO FOR IT
+        </div>
+        <div class="option-label">C</div>
+      </div>
+      <div class="option D" tabindex="0" onclick="selectAnswer('D')" data-answer="D">
+        <div class="option-text">
+          THEY DO KNOW THE RISKS, BUT THEY DON'T CONSIDER THEM TO BE THAT GREAT.
+        </div>
+        <div class="option-label">D</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Mock data for questions
+    const questions = [
+      {
+        id: 1,
+        text: "WHY WOULD SO MANY PEOPLE TAKE LIFE-THREATENING RISKS WHEN LIVING SOME EXTREME EXPERIENCES?",
+        answers: [
+          { letter: "A", text: "BASICALLY, LIFE IS JUST A LIABILITY FOR THEM AND THEY DON'T CARE MUCH" },
+          { letter: "B", text: "FOR THE SAME REASON WE GET ADDICTED TO THINGS. ADRENALINE AND FEELING." },
+          { letter: "C", text: "EXTREME? THEY DON'T ACTUALLY THINK THOSE ARE SO DANGEROUS AND SO JUST GO FOR IT" },
+          { letter: "D", text: "THEY DO KNOW THE RISKS, BUT THEY DON'T CONSIDER THEM TO BE THAT GREAT." }
+        ],
+        correctAnswer: "B"
+      },
+      {
+        id: 2,
+        text: "WHAT IS THE MAIN REASON PEOPLE SEEK ADVENTURE?",
+        answers: [
+          { letter: "A", text: "TO ESCAPE FROM THEIR BORING DAILY ROUTINE" },
+          { letter: "B", text: "TO PROVE SOMETHING TO THEMSELVES OR OTHERS" },
+          { letter: "C", text: "FOR THE THRILL AND EXCITEMENT IT PROVIDES" },
+          { letter: "D", text: "BECAUSE THEY HAVE NOTHING BETTER TO DO" }
+        ],
+        correctAnswer: "C"
+      }
+    ];
+
+    let currentQuestionIndex = 0;
+    let selectedAnswer = null;
+    let timeRemaining = 78; // 01:18 in seconds
+
+    // Timer functionality
+    function updateTimer() {
+      const minutes = Math.floor(timeRemaining / 60);
+      const seconds = timeRemaining % 60;
+      const timerElement = document.getElementById('timer');
+      timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+      if (timeRemaining > 0) {
+        timeRemaining--;
+        setTimeout(updateTimer, 1000);
+      } else {
+        console.log("Time's up!");
+        // Handle time up logic
+      }
+    }
+
+    // Start timer
+    updateTimer();
+
+    // Answer selection with enhanced feedback
+    function selectAnswer(letter) {
+      // Remove previous selection
+      document.querySelectorAll('.option').forEach(option => {
+        option.classList.remove('selected');
+      });
+
+      // Add selection
+      const selectedOption = document.querySelector(`[data-answer="${letter}"]`);
+      selectedOption.classList.add('selected');
+
+      selectedAnswer = letter;
+      console.log(`Selected answer: ${letter}`);
+
+      // Visual feedback
+      selectedOption.style.animationPlayState = 'running';
+
+      // Auto-advance after selection (optional)
+      setTimeout(() => {
+        if (selectedAnswer) {
+          nextQuestion();
+        }
+      }, 2000);
+    }
+
+    // Navigation functions with carousel functionality
+    function nextQuestion() {
+      if (currentQuestionIndex < questions.length - 1) {
+        currentQuestionIndex++;
+        loadQuestion();
+        console.log(`Moved to question ${currentQuestionIndex + 1}`);
+      } else {
+        console.log("End of quiz reached");
+        // Handle quiz completion
+        alert("Quiz completed! Great job!");
+      }
+    }
+
+    function previousQuestion() {
+      if (currentQuestionIndex > 0) {
+        currentQuestionIndex--;
+        loadQuestion();
+        console.log(`Moved to question ${currentQuestionIndex + 1}`);
+      } else {
+        console.log("Already at first question");
+      }
+    }
+
+    function loadQuestion() {
+      const question = questions[currentQuestionIndex];
+      selectedAnswer = null;
+
+      // Update question text
+      document.getElementById('questionText').textContent = question.text;
+
+      // Update answer texts
+      question.answers.forEach(answer => {
+        const optionElement = document.querySelector(`[data-answer="${answer.letter}"] .option-text`);
+        if (optionElement) {
+          optionElement.textContent = answer.text;
+        }
+      });
+
+      // Clear selections
+      document.querySelectorAll('.option').forEach(option => {
+        option.classList.remove('selected');
+      });
+
+      // Update progress
+      document.querySelector('.subtitle').textContent = `SENTENCE ${currentQuestionIndex + 1}/${questions.length}`;
+
+      console.log(`Loaded question ${currentQuestionIndex + 1}`);
+    }
+
+    // Hint functionality
+    function showHint() {
+      const currentQuestion = questions[currentQuestionIndex];
+      const hintText = `💡 Hint: Look for the answer that mentions psychological motivation (Answer ${currentQuestion.correctAnswer})`;
+
+      // Create a temporary hint display
+      const hintDiv = document.createElement('div');
+      hintDiv.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #ffd700;
+        color: #000;
+        padding: 1rem;
+        border-radius: 8px;
+        border: 2px solid #000;
+        font-weight: bold;
+        z-index: 1000;
+        animation: fadeInOut 3s ease-in-out;
+      `;
+      hintDiv.textContent = hintText;
+
+      // Add fadeInOut animation
+      const style = document.createElement('style');
+      style.textContent = `
+        @keyframes fadeInOut {
+          0%, 100% { opacity: 0; transform: translateY(-10px); }
+          10%, 90% { opacity: 1; transform: translateY(0); }
+        }
+      `;
+      document.head.appendChild(style);
+
+      document.body.appendChild(hintDiv);
+      setTimeout(() => hintDiv.remove(), 3000);
+    }
+
+    // Keyboard navigation
+    document.addEventListener('keydown', function(event) {
+      switch(event.key) {
+        case 'ArrowLeft':
+        case 'ArrowUp':
+          event.preventDefault();
+          previousQuestion();
+          break;
+        case 'ArrowRight':
+        case 'ArrowDown':
+          event.preventDefault();
+          nextQuestion();
+          break;
+        case '1':
+        case 'a':
+        case 'A':
+          event.preventDefault();
+          selectAnswer('A');
+          break;
+        case '2':
+        case 'b':
+        case 'B':
+          event.preventDefault();
+          selectAnswer('B');
+          break;
+        case '3':
+        case 'c':
+        case 'C':
+          event.preventDefault();
+          selectAnswer('C');
+          break;
+        case '4':
+        case 'd':
+        case 'D':
+          event.preventDefault();
+          selectAnswer('D');
+          break;
+        case 'h':
+        case 'H':
+          event.preventDefault();
+          showHint();
+          break;
+      }
+    });
+
+    // Focus management for accessibility
+    document.querySelectorAll('.option').forEach(option => {
+      option.addEventListener('keydown', function(event) {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          this.click();
+        }
+      });
+    });
+
+    console.log('Enhanced Multiple Choice Exercise initialized');
+    console.log(`${questions.length} questions loaded`);
+  </script>
+</body>
+</html>

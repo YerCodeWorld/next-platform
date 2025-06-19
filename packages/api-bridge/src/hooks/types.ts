@@ -170,6 +170,7 @@ export interface CreateExercisePayload {
     hints?: string[];
     explanation?: string;
     tags?: string[];
+    packageId?: string;
     isPublished?: boolean;
     authorEmail: string;
 }

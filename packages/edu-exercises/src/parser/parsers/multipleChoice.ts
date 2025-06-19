@@ -1,4 +1,4 @@
-import { MultipleChoiceContent, CreateExercisePayload } from '../../types';
+import { MultipleChoiceContent, CreateExercisePayload } from '@repo/api-bridge';
 
 export function parseMultipleChoice(lines: string[]): Partial<CreateExercisePayload>[] {
     const exercises: Partial<CreateExercisePayload>[] = [];

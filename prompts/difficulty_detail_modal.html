@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Replica UI</title>
+  <style>
+    /* === CSS Variables for Palette === */
+    :root {
+      /* Greens */
+      --color-green-dark: #00bf63;
+      --color-green-mid: #7ed957;
+      --color-green-light: #caf3b9;
+      /* Accents */
+      --color-pink: #f8a8c5;
+      --color-blue: #abd7fe;
+      --color-violet: #e0c3f3;
+      /* Other accents */
+      --color-accent1: #aafff2;
+      --color-accent2: #8fffc9;
+      /* Background for scroll panel */
+      --color-panel-bg: #f0fcff;
+      /* Text / border colors */
+      --color-border: #000;
+      --color-text: #000;
+      /* Font */
+      --font-family: 'Comic Sans MS', 'Comic Neue', cursive, sans-serif;
+      /* Spacing unit */
+      --spacing: 1rem;
+      --radius: 16px;
+      --border-width: 4px;
+    }
+
+    /* === Global resets and base === */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body, html {
+      width: 100%;
+      height: 100%;
+      font-family: var(--font-family);
+      background: var(--color-green-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* === Outer container === */
+    .outer-container {
+      position: relative;
+      background: var(--color-green-light);
+      border: var(--border-width) solid var(--color-border);
+      border-radius: 24px;
+      padding: calc(var(--spacing) * 2);
+      /* constrain max width for demo */
+      max-width: 600px;
+      width: 100%;
+    }
+
+    /* === Top header “SIMPLE PRESENT PACKAGE” with layered effect === */
+    .header-wrapper {
+      position: relative;
+      width: fit-content;
+      margin: 0 auto;
+    }
+    .header-bg {
+      position: absolute;
+      top: 8px;
+      left: 0;
+      width: 100%;
+      height: 48px;
+      background: var(--color-green-dark);
+      border-radius: var(--radius);
+      z-index: 1;
+    }
+    .header {
+      position: relative;
+      z-index: 2;
+      background: #fff;
+      border: var(--border-width) solid var(--color-border);
+      border-radius: var(--radius);
+      padding: 0.75rem 1.5rem;
+      font-size: 1rem;
+      text-align: center;
+      white-space: nowrap;
+      display: inline-block;
+    }
+
+    /* === “BEGINNER” button/pill === */
+    .level-btn {
+      display: block;
+      background: var(--color-green-dark);
+      color: #000;
+      border: var(--border-width) solid var(--color-border);
+      border-radius: var(--radius);
+      padding: 0.5rem 1.5rem;
+      font-size: 1rem;
+      margin: var(--spacing) auto;
+      width: fit-content;
+    }
+
+    /* === Scrollable panel with list items === */
+    .panel {
+      background: var(--color-panel-bg);
+      border: var(--border-width) solid var(--color-border);
+      border-radius: var(--radius);
+      padding: var(--spacing);
+      max-height: 300px;
+      overflow-y: auto;
+      margin-top: var(--spacing);
+      /* add a little inner padding-bottom so last item isn't hidden under scrollbar */
+      padding-bottom: calc(var(--spacing) + 8px);
+    }
+    /* Custom scrollbar styling (WebKit) */
+    .panel::-webkit-scrollbar {
+      width: 8px;
+    }
+    .panel::-webkit-scrollbar-track {
+      background: rgba(0,0,0,0.1);
+      border-radius: 4px;
+    }
+    .panel::-webkit-scrollbar-thumb {
+      background: rgba(0,0,0,0.3);
+      border-radius: 4px;
+    }
+
+    .item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border: var(--border-width) solid var(--color-border);
+      border-radius: var(--radius);
+      padding: 0.75rem 1rem;
+      margin-bottom: var(--spacing);
+      font-size: 1rem;
+      /* Default background for “inactive” */
+      background: #fff;
+    }
+    .item:last-child {
+      margin-bottom: 0;
+    }
+    /* Active/completed items */
+    .item.active {
+      background: var(--color-green-mid);
+    }
+
+    .item-label {
+      flex: 1;
+    }
+    .item-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    /* Icon button wrapper */
+    .icon-btn {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: var(--border-width) solid var(--color-border);
+      border-radius: var(--radius);
+      background: #fff;
+      cursor: pointer;
+    }
+    .icon-btn svg {
+      width: 16px;
+      height: 16px;
+      fill: none;
+      stroke: var(--color-border);
+      stroke-width: 2;
+    }
+    /* For active/completed: green background circle behind check */
+    .check-btn {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--color-green-mid);
+      border: var(--border-width) solid var(--color-border);
+      border-radius: 50%;
+      cursor: default;
+    }
+    .play-btn {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--color-green-mid);
+      border: var(--border-width) solid var(--color-border);
+      border-radius: 50%;
+      cursor: pointer;
+    }
+    .play-btn svg {
+      width: 16px;
+      height: 16px;
+      fill: var(--color-green-light);
+      stroke: none;
+    }
+
+    /* === Bottom Continue button === */
+    .continue-btn {
+      display: block;
+      background: var(--color-accent1);
+      border: var(--border-width) solid var(--color-border);
+      border-radius: var(--radius);
+      padding: 0.75rem 2rem;
+      font-size: 1rem;
+      margin: var(--spacing) auto 0;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="outer-container">
+
+    <!-- Header with layered background -->
+    <div class="header-wrapper">
+      <div class="header-bg"></div>
+      <div class="header">SIMPLE PRESENT PACKAGE</div>
+    </div>
+
+    <!-- Level pill -->
+    <div class="level-btn">BEGINNER</div>
+
+    <!-- Scrollable panel -->
+    <div class="panel">
+      <!-- Item 1: Affirmative Form (active/completed) -->
+      <div class="item active">
+        <div class="item-label">AFFIRMATIVE FORM</div>
+        <div class="item-actions">
+          <!-- Edit icon -->
+          <div class="icon-btn" title="Edit">
+            <!-- Pencil SVG -->
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M3 21h3.75L17.81 9.94l-3.75-3.75L3 17.25V21z"/>
+              <path d="M20.71 7.04a1.003 1.003 0 0 0 0-1.42l-2.34-2.34a1.003 1.003 0 0 0-1.42 0l-1.83 1.83 3.75 3.75 1.84-1.82z"/>
+            </svg>
+          </div>
+          <!-- Check icon -->
+          <div class="check-btn" title="Completed">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M20 6L9 17l-5-5"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Item 2: Negative Form (active/completed) -->
+      <div class="item active">
+        <div class="item-label">NEGATIVE FORM</div>
+        <div class="item-actions">
+          <div class="icon-btn" title="Edit">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M3 21h3.75L17.81 9.94l-3.75-3.75L3 17.25V21z"/>
+              <path d="M20.71 7.04a1.003 1.003 0 0 0 0-1.42l-2.34-2.34a1.003 1.003 0 0 0-1.42 0l-1.83 1.83 3.75 3.75 1.84-1.82z"/>
+            </svg>
+          </div>
+          <div class="check-btn" title="Completed">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M20 6L9 17l-5-5"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Item 3: Question Form (not completed, with play) -->
+      <div class="item">
+        <div class="item-label">QUESTION FORM</div>
+        <div class="item-actions">
+          <div class="icon-btn" title="Edit">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M3 21h3.75L17.81 9.94l-3.75-3.75L3 17.25V21z"/>
+              <path d="M20.71 7.04a1.003 1.003 0 0 0 0-1.42l-2.34-2.34a1.003 1.003 0 0 0-1.42 0l-1.83 1.83 3.75 3.75 1.84-1.82z"/>
+            </svg>
+          </div>
+          <div class="play-btn" title="Play">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M8 5v14l11-7z"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Item 4: Mixed Forms (not completed, with play) -->
+      <div class="item">
+        <div class="item-label">MIXED FORMS</div>
+        <div class="item-actions">
+          <div class="icon-btn" title="Edit">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M3 21h3.75L17.81 9.94l-3.75-3.75L3 17.25V21z"/>
+              <path d="M20.71 7.04a1.003 1.003 0 0 0 0-1.42l-2.34-2.34a1.003 1.003 0 0 0-1.42 0l-1.83 1.83 3.75 3.75 1.84-1.82z"/>
+            </svg>
+          </div>
+          <div class="play-btn" title="Play">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M8 5v14l11-7z"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Continue button -->
+    <button class="continue-btn">CONTINUE</button>
+  </div>
+</body>
+</html>

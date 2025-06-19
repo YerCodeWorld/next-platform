@@ -1,4 +1,4 @@
-import { FillBlankContent, CreateExercisePayload } from '../../types';
+import { FillBlankContent, CreateExercisePayload } from '@repo/api-bridge';
 
 export function parseFillBlank(lines: string[]): Partial<CreateExercisePayload>[] {
     const exercises: Partial<CreateExercisePayload>[] = [];

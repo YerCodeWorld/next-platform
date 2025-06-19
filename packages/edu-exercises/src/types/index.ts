@@ -1,54 +1,15 @@
 // packages/exercises/src/types/index.ts
 // Base types
 export type ExerciseType = 'FILL_BLANK' | 'MATCHING' | 'MULTIPLE_CHOICE' | 'ORDERING';
-export type ExerciseDifficulty = 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
-export type ExerciseCategory = 'GRAMMAR' | 'VOCABULARY' | 'READING' | 'WRITING' |
-    'LISTENING' | 'SPEAKING' | 'CONVERSATION' | 'GENERAL';
-
-// Exercise content types
-export interface FillBlankContent {
-    sentences: Array<{
-        text: string;
-        blanks: Array<{
-            position: number;  // Position in the sentence
-            answers: string[]; // Acceptable answers
-            hint?: string;
-        }>;
-    }>;
-}
-
-export interface MatchingContent {
-    pairs: Array<{
-        left: string;
-        right: string;
-        hint?: string;
-    }>;
-    randomize?: boolean;
-}
-
-export interface MultipleChoiceContent {
-    questions: Array<{
-        question: string | undefined;
-        options: string[];
-        correctIndices: number[]; // Support multiple correct answers
-        hint?: string;
-        explanation?: string;
-    }>;
-}
-
-export interface OrderingContent {
-    sentences: Array<{
-        segments: string[];  // Correct order
-        hint?: string;
-    }>;
-}
-
-
-export type ExerciseContent =
-    | FillBlankContent
-    | MatchingContent
-    | MultipleChoiceContent
-    | OrderingContent;
+import {
+    ExerciseDifficulty,
+    ExerciseCategory,
+    ExerciseContent,
+    FillBlankContent,
+    MatchingContent,
+    MultipleChoiceContent,
+    OrderingContent
+} from "@repo/api-bridge";
 
 // Main exercise interface
 export interface Exercise {
@@ -90,3 +51,14 @@ export interface CreateExercisePayload {
 }
 
 export interface UpdateExercisePayload extends Partial<Omit<CreateExercisePayload, 'authorEmail'>> {}
+
+// Re-export content types from api-bridge
+export type {
+    FillBlankContent,
+    MatchingContent,
+    MultipleChoiceContent,
+    OrderingContent,
+    ExerciseDifficulty,
+    ExerciseCategory,
+    ExerciseContent
+};

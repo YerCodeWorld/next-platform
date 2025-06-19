@@ -8,7 +8,7 @@ import {
     MatchingContent,
     MultipleChoiceContent,
     OrderingContent
-} from '../../types';
+} from '@repo/api-bridge';
 
 export interface LanScriptBlock {
     metadata: {

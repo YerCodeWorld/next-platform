@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Simple Present Package – Enhanced</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap">
+
+  <!-- Important, these are the styles (we possibly need to ignore the body and html ones). We also need to prefix them to avoid overriding. -->
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    html, body {
+      height: 100%;
+    }
+    body {
+      font-family: 'Patrick Hand', sans-serif;
+      background: repeating-linear-gradient(to bottom, #fafafa 0px, #fafafa 24px, #e0e0e0 25px);
+      display: flex;
+      justify-content: center;
+      padding: 40px;
+    }
+
+    .container {
+      width: 100%;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* === Header === */
+    .header-wrapper {
+      position: relative;
+      display: inline-block;
+      margin: 0 auto 40px auto;
+    }
+    .header-bg {
+      position: absolute;
+      top: 6px;
+      left: 6px;
+      width: 100%;
+      height: 100%;
+      background: #c0e7ff;
+      border-radius: 12px;
+    }
+    .header {
+      position: relative;
+      padding: 12px 24px;
+      background: #fff;
+      border: 3px solid #000;
+      border-radius: 12px;
+      font-size: 1.2rem;
+      text-align: center;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    /* === Cards === */
+    .cards {
+      display: grid;
+      gap: 32px;
+      grid-template-columns: repeat(3, 1fr);
+    }
+    @media (max-width: 600px) {
+      .cards {
+        display: flex;
+        flex-direction: column;
+      }
+      .card-wrapper.beginner { order: 1; }
+      .card-wrapper.upper-beginner { order: 2; }
+      .card-wrapper.intermediate { order: 3; }
+      .card-wrapper.upper-intermediate { order: 4; }
+      .card-wrapper.advanced { order: 5; }
+      .card-wrapper.super-advanced { order: 6; }
+    }
+
+    .card-wrapper {
+      position: relative;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+    .card-wrapper:hover .card {
+      transform: scale(1.04);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      z-index: 5;
+    }
+    .card-wrapper.focused .card {
+      transform: scale(1.05);
+      z-index: 10;
+    }
+
+    .card-bg {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      width: 100%;
+      height: 100%;
+      border-radius: 12px;
+      transition: all 0.2s ease;
+    }
+
+    @keyframes spin-once {
+      to { transform: rotate(600deg); }
+    }
+    .spin {
+      animation: spin-once 0.8s linear;
+    }
+
+    .card {
+      position: relative;
+      background: #fff;
+      border: 3px solid #000;
+      border-radius: 12px;
+      padding: 24px 16px 16px;
+      min-height: 180px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .card-title {
+      position: absolute;
+      top: -18px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 4px 12px;
+      background: #fff;
+      border: 3px solid #000;
+      border-radius: 8px;
+      font-size: 1rem;
+      text-transform: uppercase;
+      white-space: nowrap;
+      z-index: 3;
+    }
+
+    .info-btn {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 20px;
+      height: 20px;
+      background: #fff;
+      border: 2px solid #000;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      user-select: none;
+    }
+    .info-btn:hover {
+      background: #f0f0f0;
+    }
+
+    .pill-level, .pill-action {
+      padding: 6px 12px;
+      border: 3px solid #000;
+      border-radius: 999px;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      background: var(--color);
+      margin-top: 12px;
+    }
+    .pill-action:hover {
+      transform: scale(1.05);
+      background: #fff;
+      color: var(--color);
+      border-color: var(--color);
+    }
+
+    .decor-line {
+      width: 60%;
+      border-top: 1px dashed #888;
+      margin: 12px 0;
+      opacity: 0.5;
+    }
+
+    .progress-text {
+      font-size: 0.9rem;
+      font-weight: bold;
+    }
+
+    /* === Character Bubble === */
+    .character-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 24px;
+      position: relative;
+    }
+
+    .char-img {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      border: 3px solid #000;
+      object-fit: cover;
+      background: #fff;
+    }
+
+    .speech-bubble {
+      position: relative;
+      margin-top: 12px;
+      padding: 8px 12px;
+      background: #fff;
+      border: 3px solid #000;
+      border-radius: 12px;
+      max-width: 200px;
+      text-align: center;
+      font-size: 0.9rem;
+      opacity: 1;
+      transition: opacity 0.3s;
+    }
+
+    .speech-bubble::after {
+      content: "";
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      border: 8px solid transparent;
+      border-bottom-color: #fff;
+    }
+  </style>
+</head>
+
+<!--HTML, Super simple but does its work-->
+<body>
+  <div class="container">
+    <div class="character-container">
+      <img src="https://via.placeholder.com/100" alt="Character" class="char-img">
+      <div class="speech-bubble" id="speech-bubble">Welcome!</div>
+    </div>
+
+    <div class="header-wrapper">
+      <div class="header-bg"></div>
+ 	
+      <!--Hard-corded, you need to change this with the proper fetching of the package title-->
+      <div class="header">SIMPLE PRESENT PACKAGE</div>
+    </div>
+    
+    
+    <div class="cards" id="cards-container"></div>
+  </div>
+
+  <!--We are creating the cards dynamically, as well as some other functions for the animations and the char message display-->
+  <!--You need to adapt these well without breaking integrity of the design of the component. Each card needs to fetch its number of exercises -->
+  <!--When we fetch all the exercises that have a package ID of the current package, we can check their difficulty to achieve this-->
+  <script>
+    const messages = [
+      "Keep practicing daily!",
+      "Try one more exercise.",
+      "Consistency is key.",
+      "Small steps lead to big gains.",
+      "Practice makes perfect!",
+      "Challenge yourself today.",
+      "Review yesterday’s mistakes.",
+      "Stay focused and keep going.",
+      "You’re improving every day!",
+      "Don’t give up—try again!"
+    ];
+
+    function cycleMessages() {
+      const bubble = document.getElementById('speech-bubble');
+      if (!bubble) return;
+      const idx = Math.floor(Math.random() * messages.length);
+      bubble.style.opacity = '0';
+      setTimeout(() => {
+        bubble.textContent = messages[idx];
+        bubble.style.opacity = '1';
+      }, 300);
+      const delay = 10000 + Math.random() * 10000;
+      setTimeout(cycleMessages, delay);
+    }
+
+    const cardData = [
+      { key: 'beginner', title: 'Beginner', color: '#00bf63', progress: '5/5', action: 'Review', info: 'Beginner level info...' },
+      { key: 'intermediate', title: 'Intermediate', color: '#f8a8c5', progress: '4/5', action: 'Continue', info: 'Intermediate level info...' },
+      { key: 'advanced', title: 'Advanced', color: '#ff914d', progress: '0/5', action: 'Start', info: 'Advanced level info...' },
+      { key: 'upper-beginner', title: 'Upper Beginner', color: '#aed768', progress: '5/5', action: 'Review', info: 'Upper Beginner info...' },
+      { key: 'upper-intermediate', title: 'Upper Intermediate', color: '#ffde59', progress: '3/5', action: 'Continue', info: 'Upper Intermediate info...' },
+      { key: 'super-advanced', title: 'Super Advanced', color: '#ff3131', progress: '0/5', action: 'Start', info: 'Super Advanced info...' },
+    ];
+
+    const container = document.getElementById('cards-container');
+
+    cardData.forEach(data => {
+      const wrapper = document.createElement('div');
+      wrapper.className = `card-wrapper ${data.key}`;
+      wrapper.style.setProperty('--color', data.color);
+
+      const bg = document.createElement('div');
+      bg.className = 'card-bg';
+      bg.style.background = data.color;
+      wrapper.appendChild(bg);
+
+      const card = document.createElement('div');
+      card.className = 'card';
+
+      const title = document.createElement('div');
+      title.className = 'card-title';
+      title.textContent = data.title;
+      card.appendChild(title);
+
+      const infoBtn = document.createElement('div');
+      infoBtn.className = 'info-btn';
+      infoBtn.textContent = 'i';
+      infoBtn.title = 'Click for info';
+      infoBtn.addEventListener('click', e => {
+        e.stopPropagation();
+        alert(data.info);
+      });
+      card.appendChild(infoBtn);
+
+      const pillLevel = document.createElement('div');
+      pillLevel.className = 'pill-level';
+      pillLevel.textContent = 'Level';
+      card.appendChild(pillLevel);
+
+      const line = document.createElement('hr');
+      line.className = 'decor-line';
+      card.appendChild(line);
+
+      const prog = document.createElement('div');
+      prog.className = 'progress-text';
+      prog.textContent = data.progress;
+      card.appendChild(prog);
+
+      const pillAction = document.createElement('div');
+      pillAction.className = 'pill-action';
+      pillAction.textContent = data.action;
+      card.appendChild(pillAction);
+
+      wrapper.appendChild(card);
+      container.appendChild(wrapper);
+
+      wrapper.addEventListener('click', () => {
+        document.querySelectorAll('.card-wrapper').forEach(w => w.classList.remove('focused'));
+        wrapper.classList.add('focused');
+      });
+
+      function scheduleSpin() {
+        const delay = 5000 + Math.random() * 10000;
+        setTimeout(() => {
+          const cardRect = card.getBoundingClientRect();
+          const diameter = Math.min(cardRect.width, cardRect.height);
+          const offset = 10;
+          const newTop = offset + (cardRect.height - diameter) / 2;
+          const newLeft = offset + (cardRect.width - diameter) / 2;
+
+          bg.style.width = `${diameter}px`;
+          bg.style.height = `${diameter}px`;
+          bg.style.top = `${newTop}px`;
+          bg.style.left = `${newLeft}px`;
+          bg.style.borderRadius = '50%';
+          bg.classList.add('spin');
+
+          bg.addEventListener('animationend', function handler() {
+            bg.classList.remove('spin');
+            bg.style.width = '';
+            bg.style.height = '';
+            bg.style.top = `${offset}px`;
+            bg.style.left = `${offset}px`;
+            bg.style.borderRadius = '12px';
+            bg.removeEventListener('animationend', handler);
+            scheduleSpin();
+          });
+        }, delay);
+      }
+      setTimeout(scheduleSpin, 1000 + Math.random() * 2000);
+    });
+
+    window.addEventListener('load', cycleMessages);
+  </script>
+</body>
+</html>

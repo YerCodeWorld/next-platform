@@ -1,8 +1,8 @@
 /* ================================= Button Css Start =========================== */
 .btn-check:checked+.btn, .btn.active, .btn.show, .btn:first-child:active, :not(.btn-check)+.btn:active {
-    color: none;
-    background-color: none;
-    border-color: none;
+    color: unset;
+    background-color: unset;
+    border-color: unset;
 }
 
 .btn {

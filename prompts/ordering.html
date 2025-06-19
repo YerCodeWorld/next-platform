@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Opinions Ordering</title>
+  <style>
+    body {
+      font-family: 'Comic Sans MS', cursive, sans-serif;
+      background: #ffffff;
+      margin: 30px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    h1 {
+      font-weight: bold;
+      font-size: 26px;
+      margin-bottom: 5px;
+    }
+
+    .meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 90%;
+      max-width: 600px;
+      font-size: 18px;
+      margin-bottom: 15px;
+    }
+
+    .meta-left {
+      font-weight: bold;
+    }
+
+    .meta-right {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .meta-right span {
+      font-size: 18px;
+    }
+
+    .word-pool {
+      background: #d9b8f6;
+      border-radius: 20px;
+      padding: 20px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      width: 90%;
+      max-width: 600px;
+      margin-bottom: 20px;
+    }
+
+    .word {
+      padding: 10px 16px;
+      border-radius: 10px;
+      font-weight: bold;
+      cursor: pointer;
+      user-select: none;
+      border: 2px solid black;
+      transition: all 0.2s ease;
+    }
+
+    .pink { background-color: #f9b5c1; }
+    .blue { background-color: #a7d3f6; }
+    .aqua { background-color: #a6f6e0; }
+    .white { background-color: white !important; }
+
+    .controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 90%;
+      max-width: 600px;
+    }
+
+    .arrow {
+      background: #a7f796;
+      padding: 10px 15px;
+      border-radius: 50%;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 22px;
+      transition: 0.2s;
+    }
+
+    .arrow:hover {
+      background: #91e884;
+      transform: scale(1.1);
+    }
+
+    .separator {
+      flex: 1;
+      height: 1px;
+      border-bottom: 2px dotted black;
+      margin: 0 10px;
+    }
+
+    .sentence-box {
+      border: 3px solid black;
+      border-radius: 10px;
+      padding: 15px;
+      min-height: 60px;
+      width: 90%;
+      max-width: 600px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      background: #f4f4f4;
+      margin-top: 15px;
+    }
+
+    .selected-word {
+      cursor: grab;
+    }
+
+    .selected-word:active {
+      cursor: grabbing;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>OPINIONS ORDERING</h1>
+  <div class="meta">
+    <div class="meta-left">SENTENCE 4/10</div>
+    <div class="meta-right">
+      <span>🕒 01:18</span>
+      <span>💡</span>
+    </div>
+  </div>
+
+  <div class="word-pool" id="wordPool">
+    <!-- Words will appear here -->
+  </div>
+
+  <div class="controls">
+    <div class="arrow" title="Previous">&#9664;</div>
+    <div class="separator"></div>
+    <div class="arrow" title="Next">&#9654;</div>
+  </div>
+
+  <div class="sentence-box" id="sentenceBox">
+    <!-- Selected words appear here -->
+  </div>
+
+  <script>
+    const words = [
+      { text: "COMES", color: "pink" },
+      { text: "WHEN", color: "pink" },
+      { text: "SPEAKING", color: "aqua" },
+      { text: "TALENTED", color: "aqua" },
+      { text: "IS", color: "pink" },
+      { text: "IT", color: "blue" },
+      { text: "SHE", color: "blue" },
+      { text: "TO", color: "aqua" },
+      { text: "INCREDIBLY", color: "aqua" },
+    ];
+
+    const wordPool = document.getElementById("wordPool");
+    const sentenceBox = document.getElementById("sentenceBox");
+
+    const wordStates = {}; // tracks if a word has been used
+
+    function createWordElement(wordObj, isClone = false) {
+      const el = document.createElement("div");
+      el.className = `word ${isClone ? wordObj.color : wordStates[wordObj.text] ? 'white' : wordObj.color}`;
+      el.textContent = wordObj.text;
+
+      if (!isClone) {
+        el.addEventListener("click", () => {
+          if (wordStates[wordObj.text]) return; // prevent duplicates
+          wordStates[wordObj.text] = true;
+
+          // recolor original to white
+          el.classList.add("white");
+
+          const clone = createWordElement(wordObj, true);
+          clone.classList.add("selected-word");
+          clone.draggable = true;
+
+          // Allow click to remove from sentence
+          clone.addEventListener("click", () => {
+            clone.remove();
+            wordStates[wordObj.text] = false;
+            updatePoolColors();
+          });
+
+          sentenceBox.appendChild(clone);
+        });
+      }
+
+      return el;
+    }
+
+    function updatePoolColors() {
+      Array.from(wordPool.children).forEach(el => {
+        const wordText = el.textContent;
+        const wordObj = words.find(w => w.text === wordText);
+        el.className = `word ${wordStates[wordText] ? 'white' : wordObj.color}`;
+      });
+    }
+
+    // Initialize
+    words.forEach(word => {
+      wordStates[word.text] = false;
+      wordPool.appendChild(createWordElement(word));
+    });
+
+    // Optional: Drag-and-drop reordering in the sentence box
+    let draggedEl = null;
+
+    sentenceBox.addEventListener("dragstart", e => {
+      if (e.target.classList.contains("selected-word")) {
+        draggedEl = e.target;
+      }
+    });
+
+    sentenceBox.addEventListener("dragover", e => {
+      e.preventDefault();
+      const afterElement = getDragAfterElement(sentenceBox, e.clientX);
+      if (afterElement == null) {
+        sentenceBox.appendChild(draggedEl);
+      } else {
+        sentenceBox.insertBefore(draggedEl, afterElement);
+      }
+    });
+
+    function getDragAfterElement(container, x) {
+      const draggableElements = [...container.querySelectorAll(".selected-word:not(.dragging)")];
+
+      return draggableElements.reduce((closest, child) => {
+        const box = child.getBoundingClientRect();
+        const offset = x - box.left - box.width / 2;
+        if (offset < 0 && offset > closest.offset) {
+          return { offset, element: child };
+        } else {
+          return closest;
+        }
+      }, { offset: Number.NEGATIVE_INFINITY }).element;
+    }
+  </script>
+
+</body>
+</html>
