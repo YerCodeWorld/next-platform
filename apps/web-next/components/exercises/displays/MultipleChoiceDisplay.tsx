@@ -36,6 +36,7 @@ export function MultipleChoiceDisplay({
   const [showHint, setShowHint] = useState(false);
   const [timeElapsed, setTimeElapsed] = useState(0);
   const [isCompleted, setIsCompleted] = useState(false);
+  const [autoAdvance, setAutoAdvance] = useState(true);
   
   // Sound effects
   const { initializeSounds, playClick, playSuccess, playError, playNavigation } = useSounds();
@@ -98,20 +99,22 @@ export function MultipleChoiceDisplay({
       // Single choice - replace selection and auto-advance
       currentQuestionState.selectedOptions = [optionIndex];
       
-      // Auto-advance to next question after a delay for single choice
-      setTimeout(() => {
-        if (currentQuestionIndex < content.questions.length - 1) {
-          playNavigation();
-          setCurrentQuestionIndex(prev => prev + 1);
-          setShowHint(false);
-        }
-      }, 800);
+      // Auto-advance to next question after a delay for single choice (if enabled)
+      if (autoAdvance) {
+        setTimeout(() => {
+          if (currentQuestionIndex < content.questions.length - 1) {
+            playNavigation();
+            setCurrentQuestionIndex(prev => prev + 1);
+            setShowHint(false);
+          }
+        }, 800);
+      }
     }
 
     currentQuestionState.isAnswered = currentQuestionState.selectedOptions.length > 0;
     setQuestionStates(newStates);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [questionStates, currentQuestionIndex, isMultipleChoice, showResults, currentState, content.questions.length]);
+  }, [questionStates, currentQuestionIndex, isMultipleChoice, showResults, currentState, content.questions.length, autoAdvance]);
 
   const checkAnswers = useCallback(() => {
     const newStates = [...questionStates];
@@ -304,6 +307,21 @@ export function MultipleChoiceDisplay({
                 <Clock />
               </div>
               <div className="mc-timer-text">{formatTime(timeElapsed)}</div>
+            </div>
+
+            {/* Auto-advance toggle */}
+            <div className="mc-auto-advance-toggle">
+              <label className="mc-checkbox-label">
+                <input
+                  type="checkbox"
+                  checked={autoAdvance}
+                  onChange={(e) => setAutoAdvance(e.target.checked)}
+                  className="mc-checkbox"
+                />
+                <span className="mc-checkbox-text">
+                  {locale === 'es' ? 'Auto' : 'Auto'}
+                </span>
+              </label>
             </div>
 
             {/* Hint button */}

@@ -1,10 +1,11 @@
 'use client';
 import React, { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
-import { Plus } from 'lucide-react';
+import { Plus, ArrowLeft } from 'lucide-react';
 import { ExercisePackage, PackageExercise, User, ExerciseDifficulty, useExercisePackagesApi } from '@repo/api-bridge';
 import { ExerciseBuilderModal } from './ExerciseBuilderModal';
 import { ExerciseDifficultyModal } from './ExerciseDifficultyModal';
+import { useRouter } from 'next/navigation';
 
 interface ExerciseLevelsDisplayProps {
   package: ExercisePackage;
@@ -73,6 +74,7 @@ export default function ExerciseLevelsDisplay({
   const animationTimeouts = useRef<NodeJS.Timeout[]>([]);
   
   const exercisePackagesApi = useExercisePackagesApi();
+  const router = useRouter();
 
   // Group exercises by difficulty
   const exercisesByDifficulty = exerciseData.reduce((acc, exercise) => {
@@ -170,6 +172,10 @@ export default function ExerciseLevelsDisplay({
     await refreshExercises();
   };
 
+  const handleBackToPackages = () => {
+    router.push(`/${locale}/exercises`);
+  };
+
   return (
     <div className="exercise-levels">
       <div className="exercise-levels__container">
@@ -192,6 +198,16 @@ export default function ExerciseLevelsDisplay({
           <div className="header-bg"></div>
           <div className="header">{pkg.title.toUpperCase()}</div>
         </div>
+
+        {/* Back to Packages Button */}
+        <button 
+          className="back-to-packages-btn"
+          onClick={handleBackToPackages}
+          title={locale === 'es' ? 'Volver a paquetes' : 'Back to packages'}
+        >
+          <ArrowLeft />
+          <span>{locale === 'es' ? 'VOLVER A PAQUETES' : 'BACK TO PACKAGES'}</span>
+        </button>
 
         {/* Level Cards Grid */}
         <div className="cards">

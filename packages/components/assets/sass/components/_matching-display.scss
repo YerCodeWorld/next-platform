@@ -30,11 +30,11 @@
   --md-border-w: 4px;
 
   // Font sizes (responsive)
-  --md-fs-title: clamp(1rem, 4vw, 1.5rem);
-  --md-fs-subtitle: clamp(0.9rem, 3vw, 1.1rem);
-  --md-fs-question: clamp(0.95rem, 3.5vw, 1.2rem);
-  --md-fs-item: clamp(0.85rem, 3vw, 1rem);
-  --md-fs-timer: clamp(0.8rem, 2.5vw, 1rem);
+  --md-fs-title: clamp(1.1rem, 4.5vw, 1.7rem);
+  --md-fs-subtitle: clamp(1rem, 3.5vw, 1.3rem);
+  --md-fs-question: clamp(1.1rem, 4vw, 1.4rem);
+  --md-fs-item: clamp(0.95rem, 3.5vw, 1.2rem);
+  --md-fs-timer: clamp(0.9rem, 3vw, 1.1rem);
 
   // Nav arrow size
   --md-nav-size: clamp(2.5rem, 7vw, 4rem);

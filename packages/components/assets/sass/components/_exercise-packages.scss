@@ -1599,11 +1599,11 @@
   }
 }
 
-// Responsive adjustments for breadcrumb
+// Responsive adjustments for breadcrumb  
 @media (max-width: 768px) {
   .exercise-breadcrumb {
     min-height: 50vh;
-    margin: 1rem;
+    margin: 0.5rem;
     border-radius: 2rem;
     padding-top: 1.5rem;
 
@@ -1765,7 +1765,57 @@
 @media (max-width: 480px) {
   .exercise-packages {
     &__container {
-      padding: 0.5rem;
+      padding: 0.25rem;
+    }
+  }
+
+  .exercise-breadcrumb {
+    margin: 0.25rem;
+    min-height: 40vh;
+    border-radius: 1.5rem;
+    padding-top: 1rem;
+
+    &::before {
+      border-radius: 2rem;
+    }
+
+    &__content {
+      padding: 1.5rem 0.75rem;
+    }
+
+    &__hero {
+      .hero-title {
+        font-size: clamp(1.5rem, 6vw, 2.5rem);
+      }
+
+      .hero-subtitle {
+        font-size: clamp(0.875rem, 3vw, 1rem);
+        padding: 0 0.5rem;
+      }
+    }
+  }
+
+  .package-notes-modal {
+    padding: 0.5rem;
+
+    &__content {
+      max-height: 95vh;
+    }
+  }
+
+  .exercise-package-form-modal {
+    padding: 0.5rem;
+
+    &__content {
+      max-height: 95vh;
+    }
+
+    &__header {
+      padding: 1rem;
+
+      .title {
+        font-size: 1.25rem;
+      }
     }
   }
 

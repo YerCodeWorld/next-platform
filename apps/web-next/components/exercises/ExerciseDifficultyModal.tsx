@@ -102,6 +102,11 @@ export function ExerciseDifficultyModal({
     }
   };
 
+  const handleBackToPackages = () => {
+    // Navigate back to the exercises packages page
+    router.push(`/${locale}/exercises`);
+  };
+
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const isExerciseCompleted = (_exercise: PackageExercise): boolean => {
     // TODO: Implement actual completion check based on user progress
@@ -237,10 +242,15 @@ export function ExerciseDifficultyModal({
           )}
         </div>
 
-        {/* Continue button */}
-        <button className="continue-btn" onClick={handleContinue}>
-          {locale === 'es' ? 'CONTINUAR' : 'CONTINUE'}
-        </button>
+        {/* Action buttons */}
+        <div className="modal-actions">
+          <button className="back-to-packages-btn" onClick={handleBackToPackages}>
+            {locale === 'es' ? 'VOLVER A PAQUETES' : 'BACK TO PACKAGES'}
+          </button>
+          <button className="continue-btn" onClick={handleContinue}>
+            {locale === 'es' ? 'CONTINUAR' : 'CONTINUE'}
+          </button>
+        </div>
       </div>
 
       {/* Exercise Edit Modal */}

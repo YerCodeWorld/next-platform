@@ -55,6 +55,9 @@ export function OrderingDisplay({
   const [timeElapsed, setTimeElapsed] = useState(0);
   const [isCompleted, setIsCompleted] = useState(false);
   const [draggedItem, setDraggedItem] = useState<{ segment: WordSegment; fromArea: 'available' | 'ordered' } | null>(null);
+  const [touchStartTime, setTouchStartTime] = useState<number>(0);
+  const [touchStartPos, setTouchStartPos] = useState<{ x: number; y: number } | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
   
   // Sound effects
   const { initializeSounds, playClick, playSuccess, playError, playNavigation } = useSounds();
@@ -189,8 +192,10 @@ export function OrderingDisplay({
     e.dataTransfer.dropEffect = 'move';
   };
 
-  const handleDrop = (e: React.DragEvent, toArea: 'available' | 'ordered', dropIndex?: number) => {
-    e.preventDefault();
+  const handleDrop = useCallback((e: React.DragEvent | React.TouchEvent, toArea: 'available' | 'ordered', dropIndex?: number) => {
+    if ('preventDefault' in e) {
+      e.preventDefault();
+    }
     
     if (!draggedItem || showResults || !currentState) return;
     
@@ -231,7 +236,8 @@ export function OrderingDisplay({
     setQuestionStates(newStates);
     setAvailableSegments(newAvailable);
     setDraggedItem(null);
-  };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [draggedItem, showResults, currentState, currentQuestionIndex, questionStates, availableSegments, currentSentence.segments.length]);
 
   // Helper function to get drop position based on mouse coordinates
   const getDragAfterElement = (container: Element, x: number) => {
@@ -316,6 +322,70 @@ export function OrderingDisplay({
     onComplete?.(allCorrect);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [questionStates, content.sentences, onComplete]);
+
+  // Touch event handlers for mobile drag and drop
+  const handleTouchStart = useCallback((e: React.TouchEvent, segment: WordSegment, fromArea: 'available' | 'ordered') => {
+    if (showResults) return;
+    
+    const touch = e.touches[0];
+    setTouchStartTime(Date.now());
+    setTouchStartPos({ x: touch.clientX, y: touch.clientY });
+    setDraggedItem({ segment, fromArea });
+    
+    // Prevent scrolling when starting to drag
+    e.preventDefault();
+  }, [showResults]);
+
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
+    if (!draggedItem || !touchStartPos) return;
+    
+    const touch = e.touches[0];
+    const deltaX = Math.abs(touch.clientX - touchStartPos.x);
+    const deltaY = Math.abs(touch.clientY - touchStartPos.y);
+    const timeDiff = Date.now() - touchStartTime;
+    
+    // Start dragging if moved enough distance or held long enough
+    if (!isDragging && (deltaX > 10 || deltaY > 10 || timeDiff > 500)) {
+      setIsDragging(true);
+    }
+    
+    // Prevent scrolling while dragging
+    if (isDragging) {
+      e.preventDefault();
+    }
+  }, [draggedItem, touchStartPos, touchStartTime, isDragging]);
+
+  const handleTouchEnd = useCallback((e: React.TouchEvent) => {
+    if (!draggedItem || !isDragging) {
+      setDraggedItem(null);
+      setIsDragging(false);
+      setTouchStartPos(null);
+      return;
+    }
+    
+    const touch = e.changedTouches[0];
+    const elementBelow = document.elementFromPoint(touch.clientX, touch.clientY);
+    
+    if (elementBelow) {
+      // Check if dropped on sentence box
+      const sentenceBox = elementBelow.closest('.od-sentence-box');
+      if (sentenceBox) {
+        // Handle drop to sentence box
+        handleDrop(e, 'ordered');
+      }
+      
+      // Check if dropped on word pool
+      const wordPool = elementBelow.closest('.od-word-pool');
+      if (wordPool && draggedItem.fromArea === 'ordered') {
+        // Handle drop back to word pool
+        handleDrop(e, 'available');
+      }
+    }
+    
+    setDraggedItem(null);
+    setIsDragging(false);
+    setTouchStartPos(null);
+  }, [draggedItem, isDragging, handleDrop]);
 
   const handleNext = useCallback(() => {
     if (currentQuestionIndex < content.sentences.length - 1) {
@@ -489,6 +559,9 @@ export function OrderingDisplay({
                 draggable={!showResults}
                 onDragStart={(e) => handleDragStart(e, segment, 'available')}
                 onDragEnd={handleDragEnd}
+                onTouchStart={(e) => handleTouchStart(e, segment, 'available')}
+                onTouchMove={handleTouchMove}
+                onTouchEnd={handleTouchEnd}
               >
                 {segment.text}
               </div>
@@ -542,6 +615,9 @@ export function OrderingDisplay({
                 draggable={!showResults}
                 onDragStart={(e) => handleDragStart(e, segment, 'ordered')}
                 onDragEnd={handleDragEnd}
+                onTouchStart={(e) => handleTouchStart(e, segment, 'ordered')}
+                onTouchMove={handleTouchMove}
+                onTouchEnd={handleTouchEnd}
               >
                 {segment.text}
               </div>

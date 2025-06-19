@@ -30,15 +30,15 @@
   --fb-border-w: 4px;
 
   // Font sizes (responsive)
-  --fb-fs-title: clamp(1rem, 4vw, 1.5rem);
-  --fb-fs-subtitle: clamp(0.9rem, 3vw, 1.1rem);
-  --fb-fs-sentence: clamp(1.2rem, 4.5vw, 1.8rem); // Larger than multiple choice
-  --fb-fs-option: clamp(0.85rem, 3vw, 1rem);
-  --fb-fs-timer: clamp(0.8rem, 2.5vw, 1rem);
+  --fb-fs-title: clamp(1.1rem, 4.5vw, 1.7rem);
+  --fb-fs-subtitle: clamp(1rem, 3.5vw, 1.3rem);
+  --fb-fs-sentence: clamp(1.4rem, 5vw, 2rem); // Even larger for better readability
+  --fb-fs-option: clamp(0.95rem, 3.5vw, 1.2rem);
+  --fb-fs-timer: clamp(0.9rem, 3vw, 1.1rem);
 
   // Input size
-  --fb-input-width: clamp(80px, 15vw, 120px);
-  --fb-input-height: clamp(40px, 8vw, 50px);
+  --fb-input-width: clamp(120px, 20vw, 180px);
+  --fb-input-height: clamp(45px, 9vw, 60px);
   
   // Nav arrow size
   --fb-nav-size: clamp(2.5rem, 7vw, 4rem);

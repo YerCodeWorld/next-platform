@@ -38,10 +38,10 @@
   --od-border-w: 4px;
 
   // Font sizes (responsive)
-  --od-fs-title: clamp(1rem, 4vw, 1.5rem);
-  --od-fs-subtitle: clamp(0.9rem, 3vw, 1.1rem);
-  --od-fs-word: clamp(0.9rem, 3.5vw, 1.1rem);
-  --od-fs-option: clamp(0.85rem, 3vw, 1rem);
+  --od-fs-title: clamp(1.1rem, 4.5vw, 1.7rem);
+  --od-fs-subtitle: clamp(1rem, 3.5vw, 1.3rem);
+  --od-fs-word: clamp(1rem, 4vw, 1.3rem);
+  --od-fs-option: clamp(0.95rem, 3.5vw, 1.2rem);
   --od-fs-timer: clamp(0.8rem, 2.5vw, 1rem);
 
   // Nav arrow size
@@ -736,18 +736,43 @@
 
   .od-word-pool {
     padding: var(--od-spacing);
+    margin-bottom: var(--od-spacing);
     
     .od-word-pool-inner {
       gap: var(--od-spacing-sm);
+      min-height: 50px;
     }
   }
 
   .od-controls {
-    margin: var(--od-spacing) 0;
+    margin: var(--od-spacing-sm) 0;
+  }
+
+  .od-sentence-area {
+    margin-top: var(--od-spacing-sm);
   }
 
   .od-sentence-box {
     gap: var(--od-spacing-sm);
+    min-height: 50px;
+    padding: var(--od-spacing);
+  }
+
+  .od-word {
+    padding: calc(var(--od-spacing) * 0.75) var(--od-spacing);
+    font-size: calc(var(--od-fs-word) * 0.9);
+    
+    // Add visual feedback for touch interaction
+    &:active {
+      transform: scale(0.95);
+      opacity: 0.8;
+    }
+  }
+
+  .od-word-ordered {
+    // Better touch target for reordering
+    min-width: 60px;
+    text-align: center;
   }
 
   .od-hint-display {
@@ -756,6 +781,18 @@
     left: 10px;
     right: 10px;
     max-width: none;
+  }
+
+  // Improve touch interaction
+  .od-word-pool-inner,
+  .od-sentence-box {
+    touch-action: manipulation;
+  }
+
+  // Visual feedback for dragging state
+  .od-word.dragging {
+    opacity: 0.5;
+    transform: scale(1.05);
   }
 }
 

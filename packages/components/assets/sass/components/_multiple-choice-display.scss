@@ -30,11 +30,11 @@
   --mc-border-w: 4px;
 
   // Font sizes (responsive)
-  --mc-fs-title: clamp(1rem, 4vw, 1.5rem);
-  --mc-fs-subtitle: clamp(0.9rem, 3vw, 1.1rem);
-  --mc-fs-question: clamp(0.95rem, 3.5vw, 1.2rem);
-  --mc-fs-option: clamp(0.85rem, 3vw, 1rem);
-  --mc-fs-timer: clamp(0.8rem, 2.5vw, 1rem);
+  --mc-fs-title: clamp(1.1rem, 4.5vw, 1.7rem);
+  --mc-fs-subtitle: clamp(1rem, 3.5vw, 1.3rem);
+  --mc-fs-question: clamp(1.1rem, 4vw, 1.4rem);
+  --mc-fs-option: clamp(0.95rem, 3.5vw, 1.2rem);
+  --mc-fs-timer: clamp(0.9rem, 3vw, 1.1rem);
 
   // Label (letter) size
   --mc-label-size: clamp(2rem, 6vw, 3rem);
@@ -270,6 +270,58 @@
     font-size: var(--mc-fs-timer);
     font-weight: bold;
     color: var(--mc-color-text);
+  }
+
+  .mc-auto-advance-toggle {
+    display: flex;
+    align-items: center;
+
+    .mc-checkbox-label {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
+      font-size: var(--mc-fs-timer);
+      font-weight: 600;
+      color: var(--mc-color-text);
+    }
+
+    .mc-checkbox {
+      width: 1.25rem;
+      height: 1.25rem;
+      border: 2px solid var(--mc-color-border);
+      border-radius: 4px;
+      background: white;
+      cursor: pointer;
+      position: relative;
+      appearance: none;
+      transition: var(--mc-transition);
+
+      &:checked {
+        background: var(--mc-color-green-dark);
+        border-color: var(--mc-color-green-dark);
+
+        &::after {
+          content: '✓';
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          color: white;
+          font-size: 0.875rem;
+          font-weight: bold;
+        }
+      }
+
+      &:hover {
+        border-color: var(--mc-color-green-mid);
+        transform: scale(1.05);
+      }
+    }
+
+    .mc-checkbox-text {
+      user-select: none;
+    }
   }
 }
 
