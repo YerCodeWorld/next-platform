@@ -121,7 +121,7 @@ const Menu: React.FC<MenuProps> = ({
         {
             icon: Trophy,
             label: translations.navigation.competitions || "Competitions",
-            href: `/${locale}/construction/match`
+            href: `/${locale}/edugames`
         }
     ];
 

@@ -1,9 +1,11 @@
 'use client';
 import React, { useState, useEffect, useCallback } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Exercise, ExercisePackage, User, MultipleChoiceContent } from '@repo/api-bridge';
 import { Clock, Lightbulb, ChevronUp, ChevronDown, X, CheckCircle, XCircle } from 'lucide-react';
 import { ExerciseProgressBar } from '../ExerciseProgressBar';
 import { useSounds } from '../../../utils/sounds';
+import { buttonVariants, staggerContainer, staggerItem } from '../../motion/PageTransition';
 
 interface MultipleChoiceDisplayProps {
   exercise: Exercise;
@@ -38,8 +40,15 @@ export function MultipleChoiceDisplay({
   const [isCompleted, setIsCompleted] = useState(false);
   const [autoAdvance, setAutoAdvance] = useState(true);
   
-  // Sound effects
-  const { initializeSounds, playClick, playSuccess, playError, playNavigation } = useSounds();
+  // Enhanced sound effects
+  const { 
+    initializeSounds, 
+    playClick, 
+    playSuccess, 
+    playError, 
+    playNavigation,
+    playHover 
+  } = useSounds();
 
   // Initialize question states and sounds
   useEffect(() => {
@@ -352,32 +361,68 @@ export function MultipleChoiceDisplay({
       {/* Main container */}
       <div className="mc-container">
         {/* Question area with navigation */}
-        <div className="mc-question-area">
+        <motion.div 
+          className="mc-question-area"
+          key={currentQuestionIndex}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, ease: 'easeOut' }}
+        >
           {/* Navigation arrows */}
-          {currentQuestionIndex > 0 && (
-            <button 
-              className="mc-nav-arrow mc-nav-up" 
-              onClick={handlePrevious}
-              title={locale === 'es' ? 'Anterior' : 'Previous'}
-            >
-              <ChevronUp />
-            </button>
-          )}
+          <AnimatePresence>
+            {currentQuestionIndex > 0 && (
+              <motion.button 
+                className="mc-nav-arrow mc-nav-up" 
+                onClick={() => {
+                  handlePrevious();
+                  playNavigation();
+                }}
+                onMouseEnter={() => playHover()}
+                title={locale === 'es' ? 'Anterior' : 'Previous'}
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                whileHover={{ scale: 1.1, y: -2 }}
+                whileTap={{ scale: 0.9 }}
+                transition={{ duration: 0.2 }}
+              >
+                <ChevronUp />
+              </motion.button>
+            )}
+          </AnimatePresence>
           
-          <div className="mc-question-text">
+          <motion.div 
+            className="mc-question-text"
+            key={`question-${currentQuestionIndex}`}
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.4, delay: 0.1 }}
+          >
             {currentQuestion.question}
-          </div>
+          </motion.div>
           
-          {currentQuestionIndex < content.questions.length - 1 && (
-            <button 
-              className="mc-nav-arrow mc-nav-down" 
-              onClick={handleNext}
-              title={locale === 'es' ? 'Siguiente' : 'Next'}
-            >
-              <ChevronDown />
-            </button>
-          )}
-        </div>
+          <AnimatePresence>
+            {currentQuestionIndex < content.questions.length - 1 && (
+              <motion.button 
+                className="mc-nav-arrow mc-nav-down" 
+                onClick={() => {
+                  handleNext();
+                  playNavigation();
+                }}
+                onMouseEnter={() => playHover()}
+                title={locale === 'es' ? 'Siguiente' : 'Next'}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 10 }}
+                whileHover={{ scale: 1.1, y: 2 }}
+                whileTap={{ scale: 0.9 }}
+                transition={{ duration: 0.2 }}
+              >
+                <ChevronDown />
+              </motion.button>
+            )}
+          </AnimatePresence>
+        </motion.div>
 
         {/* Multiple choice instruction */}
         {isMultipleChoice && !showResults && (
@@ -387,41 +432,79 @@ export function MultipleChoiceDisplay({
         )}
 
         {/* Options */}
-        <div className="mc-options">
-          {currentQuestion.options.map((option, index) => {
-            const letter = getOptionLetter(index);
-            const optionClass = getOptionClass(index);
-            
-            return (
-              <div
-                key={index}
-                className={`mc-option mc-option-${letter} ${optionClass}`}
-                onClick={() => handleOptionSelect(index)}
-                tabIndex={0}
-                role="button"
-                aria-pressed={currentState.selectedOptions.includes(index)}
-              >
-                <div className="mc-option-text">{letter}. {option}</div>
-              </div>
-            );
-          })}
-        </div>
+        <motion.div 
+          className="mc-options"
+          variants={staggerContainer}
+          initial="hidden"
+          animate="visible"
+          key={currentQuestionIndex} // Re-animate when question changes
+        >
+          <AnimatePresence mode="popLayout">
+            {currentQuestion.options.map((option, index) => {
+              const letter = getOptionLetter(index);
+              const optionClass = getOptionClass(index);
+              
+              return (
+                <motion.div
+                  key={`${currentQuestionIndex}-${index}`}
+                  className={`mc-option mc-option-${letter} ${optionClass}`}
+                  variants={staggerItem}
+                  whileHover={{ 
+                    scale: 1.02, 
+                    y: -2,
+                    transition: { duration: 0.2 }
+                  }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => {
+                    handleOptionSelect(index);
+                    playClick(1 + index * 0.1); // Slightly different pitch for each option
+                  }}
+                  onMouseEnter={() => playHover()}
+                  tabIndex={0}
+                  role="button"
+                  aria-pressed={currentState.selectedOptions.includes(index)}
+                  layout
+                >
+                  <div className="mc-option-text">{letter}. {option}</div>
+                </motion.div>
+              );
+            })}
+          </AnimatePresence>
+        </motion.div>
 
         {/* Hint display */}
-        {showHint && currentQuestion.hint && (
-          <div className="mc-hint-display">
-            <div className="mc-hint-header">
-              <Lightbulb className="mc-hint-icon" />
-              <span>{locale === 'es' ? 'Pista' : 'Hint'}</span>
-              <button className="mc-hint-close" onClick={() => setShowHint(false)}>
-                <X />
-              </button>
-            </div>
-            <div className="mc-hint-content">
-              {currentQuestion.hint}
-            </div>
-          </div>
-        )}
+        <AnimatePresence>
+          {showHint && currentQuestion.hint && (
+            <motion.div 
+              className="mc-hint-display"
+              initial={{ opacity: 0, scale: 0.8, y: -20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: -10 }}
+              transition={{ duration: 0.3, ease: 'easeOut' }}
+            >
+              <div className="mc-hint-header">
+                <Lightbulb className="mc-hint-icon" />
+                <span>{locale === 'es' ? 'Pista' : 'Hint'}</span>
+                <motion.button 
+                  className="mc-hint-close" 
+                  onClick={() => setShowHint(false)}
+                  whileHover={{ scale: 1.1, rotate: 90 }}
+                  whileTap={{ scale: 0.9 }}
+                >
+                  <X />
+                </motion.button>
+              </div>
+              <motion.div 
+                className="mc-hint-content"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.2 }}
+              >
+                {currentQuestion.hint}
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Results display */}
         {showResults && (
@@ -450,31 +533,65 @@ export function MultipleChoiceDisplay({
         )}
 
         {/* Submit button */}
-        {!showResults && (
-          <button
-            className="mc-submit-btn"
-            onClick={checkAnswers}
-            disabled={!allQuestionsAnswered}
-          >
-            {locale === 'es' ? 'VERIFICAR RESPUESTAS' : 'CHECK ANSWERS'}
-          </button>
-        )}
+        <AnimatePresence>
+          {!showResults && (
+            <motion.button
+              className="mc-submit-btn"
+              onClick={() => {
+                checkAnswers();
+                playClick(1.2);
+              }}
+              disabled={!allQuestionsAnswered}
+              variants={buttonVariants}
+              initial="rest"
+              animate={allQuestionsAnswered ? "rest" : "rest"}
+              whileHover={allQuestionsAnswered ? "hover" : undefined}
+              whileTap={allQuestionsAnswered ? "tap" : undefined}
+              onMouseEnter={() => allQuestionsAnswered && playHover()}
+              layout
+            >
+              {locale === 'es' ? 'VERIFICAR RESPUESTAS' : 'CHECK ANSWERS'}
+            </motion.button>
+          )}
+        </AnimatePresence>
 
         {/* Final results summary */}
-        {showResults && (
-          <div className="mc-final-results">
-            <div className="mc-score">
-              {locale === 'es' ? 'Puntuación' : 'Score'}: {questionStates.filter(s => s.isCorrect).length}/{content.questions.length}
-            </div>
-            <button
-              className="mc-redo-btn"
-              onClick={handleRedo}
-              title={locale === 'es' ? 'Intentar de nuevo' : 'Try again'}
+        <AnimatePresence>
+          {showResults && (
+            <motion.div 
+              className="mc-final-results"
+              initial={{ opacity: 0, y: 30, scale: 0.9 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -20, scale: 0.95 }}
+              transition={{ duration: 0.5, ease: 'easeOut' }}
             >
-              {locale === 'es' ? 'INTENTAR DE NUEVO' : 'TRY AGAIN'}
-            </button>
-          </div>
-        )}
+              <motion.div 
+                className="mc-score"
+                initial={{ scale: 0.8 }}
+                animate={{ scale: 1 }}
+                transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
+              >
+                {locale === 'es' ? 'Puntuación' : 'Score'}: {questionStates.filter(s => s.isCorrect).length}/{content.questions.length}
+              </motion.div>
+              <motion.button
+                className="mc-redo-btn"
+                onClick={() => {
+                  handleRedo();
+                  playNavigation();
+                }}
+                onMouseEnter={() => playHover()}
+                title={locale === 'es' ? 'Intentar de nuevo' : 'Try again'}
+                variants={buttonVariants}
+                initial="rest"
+                whileHover="hover"
+                whileTap="tap"
+                transition={{ delay: 0.3 }}
+              >
+                {locale === 'es' ? 'INTENTAR DE NUEVO' : 'TRY AGAIN'}
+              </motion.button>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );

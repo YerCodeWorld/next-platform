@@ -1,6 +1,6 @@
 'use client';
 import React, { useState } from 'react';
-import { Exercise, ExercisePackage, User } from '@repo/api-bridge';
+import { Exercise, ExercisePackage, User, useExercisePackagesApi } from '@repo/api-bridge';
 import { MultipleChoiceDisplay } from './displays/MultipleChoiceDisplay';
 import { FillBlanksDisplay } from './displays/FillBlanksDisplay';
 import { OrderingDisplay } from './displays/OrderingDisplay';
@@ -24,12 +24,25 @@ export default function ExercisePracticeDisplay({
 }: ExercisePracticeDisplayProps) {
   const router = useRouter();
   const [isCompleted, setIsCompleted] = useState(false);
+  const exercisePackagesApi = useExercisePackagesApi();
 
-  const handleComplete = (correct: boolean) => {
+  const handleComplete = async (correct: boolean) => {
     setIsCompleted(true);
     
     if (correct) {
       toast.success(locale === 'es' ? '¡Correcto! ¡Bien hecho! 🎉' : 'Correct! Well done! 🎉');
+      
+      // Mark exercise as complete in the database
+      if (userData && userData.email && pkg.id && exercise.id) {
+        try {
+          await exercisePackagesApi.markExerciseComplete(pkg.id, exercise.id, userData.email);
+          console.log('Exercise marked as complete successfully');
+        } catch (error) {
+          console.error('Error marking exercise as complete:', error);
+          // Don't show error to user as the exercise was still completed successfully
+          // The UI will still show completion, API call is just for persistence
+        }
+      }
     } else {
       toast.error(locale === 'es' ? 'No del todo correcto. ¡Inténtalo de nuevo!' : 'Not quite right. Try again!');
     }

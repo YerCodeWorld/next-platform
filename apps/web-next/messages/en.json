@@ -12,7 +12,7 @@
       "journal": "EduBlog",
       "games": "EduGames",
       "courses": "EduActivities",
-      "competitions": "EduMatch",
+      "competitions": "EduGames",
       "discussion": "EduChat"
     }
   },
@@ -311,5 +311,9 @@
       "title": "No packages available",
       "subtitle": "Check back soon for new exercise packages"
     }
+  },
+  "games": {
+    "title": "EduGames",
+    "subtitle": "Discover amazing educational games designed to make learning fun and engaging!"
   }
 }

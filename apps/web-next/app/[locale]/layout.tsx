@@ -13,6 +13,8 @@ import FooterWrapper from '@/components/layout/FooterWrapper';
 import HelpAssistant from '../../components/global/HelpAssitant';
 import { AuthProvider } from '@/components/providers/AuthProvider';
 import { getCurrentUser } from '@/lib/auth';
+import { MotionProvider } from '../../components/motion/MotionProvider';
+import { PageTransition } from '../../components/motion/PageTransition';
 
 // Import compiled SCSS styles
 import '@repo/components/globals.scss';
@@ -54,20 +56,24 @@ export default async function LocaleLayout({
         <NextIntlClientProvider messages={messages} locale={locale}>
             <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || ''}>
                 <AuthProvider user={user}>
-                    <div className="site-wrapper-container">
-                        <div className="site-wrapper">
-                            <HeaderWrapper locale={locale} />
-                            <main className="main-content">
-                                {children}
-                            </main>
-                            <FooterWrapper locale={locale} />
+                    <MotionProvider>
+                        <div className="site-wrapper-container">
+                            <div className="site-wrapper">
+                                <HeaderWrapper locale={locale} />
+                                <main className="main-content">
+                                    <PageTransition>
+                                        {children}
+                                    </PageTransition>
+                                </main>
+                                <FooterWrapper locale={locale} />
+                            </div>
                         </div>
-                    </div>
 
-                    {/* Global Help Assistant */}
-                    <HelpAssistant user={user}/>
+                        {/* Global Help Assistant */}
+                        <HelpAssistant user={user}/>
 
-                    <Toaster position="bottom-center" richColors />
+                        <Toaster position="bottom-center" richColors />
+                    </MotionProvider>
                 </AuthProvider>
             </GoogleOAuthProvider>
         </NextIntlClientProvider>

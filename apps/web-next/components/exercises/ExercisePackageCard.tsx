@@ -5,6 +5,7 @@ import { BookOpen, Edit, X } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ExercisePackage } from '@repo/api-bridge';
+import { useSounds } from '../../utils/sounds';
 
 interface ExercisePackageCardProps {
   package: ExercisePackage;
@@ -23,6 +24,7 @@ export function ExercisePackageCard({
 }: ExercisePackageCardProps) {
   const [showTooltip, setShowTooltip] = useState(false);
   const [showNotesModal, setShowNotesModal] = useState(false);
+  const { playClick, playHover } = useSounds();
   
   // Get category CSS class for the card background
   const getCategoryClass = (category: string) => {
@@ -86,7 +88,10 @@ export function ExercisePackageCard({
   }, [showTooltip]);
 
   return (
-    <div className="notebook-card-container">
+    <div 
+      className="notebook-card-container"
+      onMouseEnter={() => playHover()}
+    >
       {/* 3D Background Shadow */}
       <div className={`notebook-card-background ${getCategoryClass(pkg.category)}`} />
       
@@ -109,6 +114,7 @@ export function ExercisePackageCard({
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
+                playClick();
                 window.dispatchEvent(new CustomEvent('openEditPackageModal', { detail: pkg }));
               }}
             >
@@ -129,7 +135,14 @@ export function ExercisePackageCard({
             </div>
           )}
           
-          <button className="notes-icon" onClick={handleNotesClick} aria-label={locale === 'es' ? 'Ver notas' : 'View notes'}>
+          <button 
+            className="notes-icon" 
+            onClick={(e) => {
+              handleNotesClick(e);
+              playClick();
+            }}
+            aria-label={locale === 'es' ? 'Ver notas' : 'View notes'}
+          >
             <BookOpen className="notebook-icon" />
           </button>
         </div>
@@ -164,7 +177,12 @@ export function ExercisePackageCard({
 
         {/* Progress Section with Character */}
         <div className="notebook-card__progress-section">
-          <div className="character-image" onClick={handleImageClick}>
+          <div 
+            className="character-image" 
+            onClick={handleImageClick}
+            onMouseEnter={() => setShowTooltip(true)}
+            onMouseLeave={() => setShowTooltip(false)}
+          >
             <Image
               src="/images/chars/char-isabel-talking.png"
               alt="Isabel character"
@@ -213,6 +231,7 @@ export function ExercisePackageCard({
         <Link
           href={`/${locale}/exercises/${pkg.slug}`}
           className="notebook-card__play-button"
+          onClick={() => playClick()}
         >
           <div className="play-icon" />
         </Link>
@@ -241,6 +260,7 @@ interface NotesModalProps {
 
 function NotesModal({ isOpen, onClose, package: pkg, locale, accentColor }: NotesModalProps) {
   const [mounted, setMounted] = useState(false);
+  const { playClick } = useSounds();
 
   useEffect(() => {
     setMounted(true);
@@ -276,7 +296,10 @@ function NotesModal({ isOpen, onClose, package: pkg, locale, accentColor }: Note
           </h3>
           <button
             className="package-notes-modal__close"
-            onClick={onClose}
+            onClick={() => {
+              playClick();
+              onClose();
+            }}
             aria-label={locale === 'es' ? 'Cerrar' : 'Close'}
           >
             <X />

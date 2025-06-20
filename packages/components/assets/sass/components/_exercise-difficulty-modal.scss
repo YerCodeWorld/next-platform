@@ -327,7 +327,7 @@
     }
   }
 
-  // Check button (for completed)
+  // Check button (for completed) - now clickable for replay
   .check-btn {
     width: 32px;
     height: 32px;
@@ -337,7 +337,13 @@
     background: #7ed957;
     border: 4px solid #000;
     border-radius: 50%;
-    cursor: default;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      transform: scale(1.1);
+      background: #5cb043;
+    }
 
     svg {
       width: 16px;

@@ -12,7 +12,7 @@
       "journal": "EduBlog",
       "games": "EduJuegos",
       "courses": "EduDinámicas",
-      "competitions": "EduPartida",
+      "competitions": "EduJuegos",
       "discussion": "EduDebate"
     }
   },
@@ -311,5 +311,9 @@
       "title": "No hay paquetes disponibles",
       "subtitle": "Vuelve pronto para nuevos paquetes de ejercicios"
     }
+  },
+  "games": {
+    "title": "EduJuegos",
+    "subtitle": "¡Descubre increíbles juegos educativos diseñados para hacer que el aprendizaje sea divertido y atractivo!"
   }
 }

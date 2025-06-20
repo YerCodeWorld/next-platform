@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { X, Play, Check, Edit2 } from 'lucide-react';
-import { ExercisePackage, PackageExercise, User, ExerciseDifficulty, useExerciseApi, Exercise } from '@repo/api-bridge';
+import { ExercisePackage, PackageExercise, User, ExerciseDifficulty, useExerciseApi, Exercise, useExercisePackagesApi, UserProgress } from '@repo/api-bridge';
 import { ExerciseBuilderModal } from './ExerciseBuilderModal';
 import { useRouter } from 'next/navigation';
 
@@ -32,8 +32,10 @@ export function ExerciseDifficultyModal({
   const [loading] = useState(false);
   const [selectedExercise, setSelectedExercise] = useState<Exercise | PackageExercise | null>(null);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [userProgress, setUserProgress] = useState<UserProgress | null>(null);
   
   const exerciseApi = useExerciseApi();
+  const exercisePackagesApi = useExercisePackagesApi();
   const router = useRouter();
 
   useEffect(() => {
@@ -63,9 +65,46 @@ export function ExerciseDifficultyModal({
     }
   }, [isOpen, initialExercises]);
 
+  // Fetch user progress when modal opens
+  useEffect(() => {
+    let isMounted = true;
+    
+    const fetchUserProgress = async () => {
+      if (isOpen && userData && userData.email && pkg.id) {
+        try {
+          const progress = await exercisePackagesApi.getUserProgress(pkg.id, userData.email);
+          if (isMounted) {
+            setUserProgress(progress);
+          }
+        } catch (error) {
+          console.error('Error fetching user progress:', error);
+          if (isMounted) {
+            setUserProgress(null);
+          }
+          // Don't block the UI if API is unavailable
+        }
+      } else if ((!isOpen || !userData) && isMounted) {
+        setUserProgress(null);
+      }
+    };
+
+    fetchUserProgress();
+    
+    return () => {
+      isMounted = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen, pkg.id, userData?.email]); // Only depend on stable primitive values, exercisePackagesApi would cause infinite loops
+
   const handlePlayExercise = (exercise: PackageExercise) => {
-    // Navigate to exercise practice page
-    router.push(`/${locale}/exercises/${pkg.slug}/practice/${exercise.id}`);
+    try {
+      // Navigate to exercise practice page
+      const url = `/${locale}/exercises/${pkg.slug}/practice/${exercise.id}`;
+      console.log('Navigating to:', url);
+      router.push(url);
+    } catch (error) {
+      console.error('Navigation error:', error);
+    }
   };
 
   const handleEditExercise = async (exercise: PackageExercise) => {
@@ -107,11 +146,11 @@ export function ExerciseDifficultyModal({
     router.push(`/${locale}/exercises`);
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const isExerciseCompleted = (_exercise: PackageExercise): boolean => {
-    // TODO: Implement actual completion check based on user progress
-    // For now, return false for all
-    return false;
+  const isExerciseCompleted = (exercise: PackageExercise): boolean => {
+    if (!userProgress || !userProgress.completedExercises || !Array.isArray(userProgress.completedExercises)) {
+      return false;
+    }
+    return userProgress.completedExercises.includes(exercise.id);
   };
 
   const canEditExercise = userData && (userData.role === 'ADMIN' || userData.role === 'TEACHER');
@@ -220,11 +259,16 @@ export function ExerciseDifficultyModal({
                       </button>
                     )}
                     
-                    {/* Play or Check button */}
+                    {/* Play or Check button - both clickable for replay */}
                     {isCompleted ? (
-                      <div className="check-btn" title={locale === 'es' ? 'Completado' : 'Completed'} style={{ backgroundColor: getDifficultyColor() }}>
+                      <button
+                        className="check-btn"
+                        onClick={() => handlePlayExercise(exercise)}
+                        title={locale === 'es' ? 'Completado - Haz clic para repetir' : 'Completed - Click to replay'}
+                        style={{ backgroundColor: getDifficultyColor() }}
+                      >
                         <Check />
-                      </div>
+                      </button>
                     ) : (
                       <button
                         className="play-btn"

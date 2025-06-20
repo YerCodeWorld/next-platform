@@ -3,7 +3,7 @@ import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { Search, Plus, ChevronLeft, ChevronRight } from 'lucide-react';
 import { ExercisePackageCard } from './ExercisePackageCard';
 import { ExercisePackageForm } from './ExercisePackageForm';
-import { ExercisePackage } from '@repo/api-bridge';
+import { ExercisePackage, useExercisePackagesApi, UserProgress } from '@repo/api-bridge';
 import { User } from '@/types';
 import Slider from 'react-slick';
 
@@ -29,6 +29,9 @@ export default function ExercisePackagesGridWrapper({
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [packageToEdit, setPackageToEdit] = useState<ExercisePackage | null>(null);
+  const [packageProgress, setPackageProgress] = useState<Record<string, UserProgress>>({});
+  
+  const exercisePackagesApi = useExercisePackagesApi();
 
   // Group packages by category
   const packagesByCategory = useMemo(() => {
@@ -59,6 +62,36 @@ export default function ExercisePackagesGridWrapper({
 
   const canCreatePackages = userData && (userData.role === 'ADMIN' || userData.role === 'TEACHER');
 
+  // Fetch progress for all packages
+  useEffect(() => {
+    const fetchAllProgress = async () => {
+      if (userData && userData.email && packages.length > 0) {
+        const progressPromises = packages.map(async (pkg) => {
+          try {
+            const progress = await exercisePackagesApi.getUserProgress(pkg.id, userData.email!);
+            return [pkg.id, progress] as [string, UserProgress];
+          } catch (error) {
+            console.error(`Error fetching progress for package ${pkg.id}:`, error);
+            return [pkg.id, null] as [string, UserProgress | null];
+          }
+        });
+
+        const progressResults = await Promise.all(progressPromises);
+        const progressMap = progressResults.reduce((acc, [packageId, progress]) => {
+          if (progress) {
+            acc[packageId] = progress;
+          }
+          return acc;
+        }, {} as Record<string, UserProgress>);
+
+        setPackageProgress(progressMap);
+      }
+    };
+
+    fetchAllProgress();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [packages, userData?.email]); // Only depend on stable values
+
   // Listen for edit modal events
   useEffect(() => {
     const handleEditPackage = (event: CustomEvent) => {
@@ -83,6 +116,13 @@ export default function ExercisePackagesGridWrapper({
       CONVERSATION: locale === 'es' ? 'Conversación' : 'Conversation',
     };
     return labels[category] || category;
+  };
+
+  // Get completion rate for a package
+  const getCompletionRate = (packageId: string): number => {
+    const progress = packageProgress[packageId];
+    if (!progress) return 0;
+    return progress.completionRate || 0;
   };
 
   return (
@@ -134,13 +174,15 @@ export default function ExercisePackagesGridWrapper({
             packages={filteredPackages} 
             locale={locale} 
             userData={userData}
+            getCompletionRate={getCompletionRate}
           />
         ) : (
           <CategoryCarousels 
             packagesByCategory={packagesByCategory} 
             locale={locale} 
             userData={userData}
-            getCategoryLabel={getCategoryLabel} 
+            getCategoryLabel={getCategoryLabel}
+            getCompletionRate={getCompletionRate}
           />
         )}
 
@@ -167,13 +209,15 @@ interface CategoryCarouselsProps {
   locale: string;
   userData?: User | null;
   getCategoryLabel: (category: string) => string;
+  getCompletionRate: (packageId: string) => number;
 }
 
 function CategoryCarousels({ 
   packagesByCategory, 
   locale, 
   userData,
-  getCategoryLabel 
+  getCategoryLabel,
+  getCompletionRate
 }: CategoryCarouselsProps) {
   return (
     <div>
@@ -185,6 +229,7 @@ function CategoryCarousels({
           locale={locale}
           userData={userData}
           getCategoryLabel={getCategoryLabel}
+          getCompletionRate={getCompletionRate}
         />
       ))}
     </div>
@@ -198,6 +243,7 @@ interface CategoryCarouselProps {
   locale: string;
   userData?: User | null;
   getCategoryLabel: (category: string) => string;
+  getCompletionRate: (packageId: string) => number;
 }
 
 function CategoryCarousel({
@@ -205,7 +251,8 @@ function CategoryCarousel({
   packages,
   locale,
   userData,
-  getCategoryLabel
+  getCategoryLabel,
+  getCompletionRate
 }: CategoryCarouselProps) {
   const sliderRef = useRef<SliderRef>(null);
 
@@ -275,6 +322,7 @@ function CategoryCarousel({
                 locale={locale}
                 isLoggedIn={!!userData}
                 canEdit={!!(userData && (userData.role === 'ADMIN' || userData.role === 'TEACHER'))}
+                completionRate={getCompletionRate(pkg.id)}
               />
             </div>
           ))}
@@ -295,12 +343,14 @@ interface FilteredPackagesGridProps {
   packages: ExercisePackage[];
   locale: string;
   userData?: User | null;
+  getCompletionRate: (packageId: string) => number;
 }
 
 function FilteredPackagesGrid({ 
   packages, 
   locale, 
-  userData
+  userData,
+  getCompletionRate
 }: FilteredPackagesGridProps) {
   return (
     <div className="filtered-packages-grid">
@@ -312,6 +362,7 @@ function FilteredPackagesGrid({
             locale={locale}
             isLoggedIn={!!userData}
             canEdit={!!(userData && (userData.role === 'ADMIN' || userData.role === 'TEACHER'))}
+            completionRate={getCompletionRate(pkg.id)}
           />
         ))
       ) : (

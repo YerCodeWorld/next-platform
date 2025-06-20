@@ -5,13 +5,17 @@ import { useApi } from './useApi';
 // Types for exercise packages
 export interface ExercisePackage {
     id: string;
+
     title: string;
     description: string;
     slug: string;
-    category: string;
+
     image?: string | null;
+    category: string;
+
     metaTitle?: string;
     metaDescription?: string;
+
     maxExercises: number;
     isPublished: boolean;
     featured: boolean;
@@ -296,14 +300,17 @@ export function useExercisePackagesApi() {
     };
 
     // Mark an exercise as complete
-    const markExerciseComplete = async (packageId: string, exerciseId: string): Promise<void> => {
+    const markExerciseComplete = async (packageId: string, exerciseId: string, userEmail: string): Promise<void> => {
         setLoading(true);
         setError(null);
         
         try {
             await api.post<void>(
                 `/exercise-packages/${packageId}/complete`,
-                { exerciseId }
+                { 
+                    exerciseId,
+                    userEmail 
+                }
             );
         } catch (err) {
             const errorMessage = err instanceof Error ? err.message : 'Failed to mark exercise as complete';

@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { Plus, ArrowLeft } from 'lucide-react';
-import { ExercisePackage, PackageExercise, User, ExerciseDifficulty, useExercisePackagesApi } from '@repo/api-bridge';
+import { ExercisePackage, PackageExercise, User, ExerciseDifficulty, useExercisePackagesApi, UserProgress } from '@repo/api-bridge';
 import { ExerciseBuilderModal } from './ExerciseBuilderModal';
 import { ExerciseDifficultyModal } from './ExerciseDifficultyModal';
 import { useRouter } from 'next/navigation';
@@ -71,6 +71,7 @@ export default function ExerciseLevelsDisplay({
   const [exerciseData, setExerciseData] = useState(exercises);
   const [showDifficultyModal, setShowDifficultyModal] = useState(false);
   const [selectedDifficultyForModal, setSelectedDifficultyForModal] = useState<ExerciseDifficulty | null>(null);
+  const [userProgress, setUserProgress] = useState<UserProgress | null>(null);
   const animationTimeouts = useRef<NodeJS.Timeout[]>([]);
   
   const exercisePackagesApi = useExercisePackagesApi();
@@ -93,6 +94,37 @@ export default function ExerciseLevelsDisplay({
       ? `Información del nivel ${translateLevel(level.title)}...`
       : `${level.title} level info...`
   }));
+
+  // Fetch user progress on component mount and when user changes
+  useEffect(() => {
+    let isMounted = true;
+    
+    const fetchUserProgress = async () => {
+      if (userData && userData.email && pkg.id) {
+        try {
+          const progress = await exercisePackagesApi.getUserProgress(pkg.id, userData.email);
+          if (isMounted) {
+            setUserProgress(progress);
+          }
+        } catch (error) {
+          console.error('Error fetching user progress:', error);
+          if (isMounted) {
+            setUserProgress(null);
+          }
+          // Don't block the UI if API is unavailable
+        }
+      } else if (isMounted) {
+        setUserProgress(null);
+      }
+    };
+
+    fetchUserProgress();
+    
+    return () => {
+      isMounted = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pkg.id, userData?.email]); // Only depend on stable primitive values, exercisePackagesApi would cause infinite loops
 
   // Cycle through messages
   useEffect(() => {
@@ -130,6 +162,17 @@ export default function ExerciseLevelsDisplay({
     };
     return translations[level] || level;
   }
+
+  // Calculate completion count for a difficulty level
+  const getCompletionCount = (exercises: PackageExercise[]): number => {
+    if (!userProgress || !userProgress.completedExercises || !Array.isArray(userProgress.completedExercises)) {
+      return 0;
+    }
+    
+    return exercises.filter(exercise => 
+      userProgress.completedExercises.includes(exercise.id)
+    ).length;
+  };
 
   const handleCardClick = (levelKey: string) => {
     setFocusedLevel(levelKey);
@@ -223,6 +266,7 @@ export default function ExerciseLevelsDisplay({
               onPlusClick={(e) => handleLevelPlusClick(e, level.key as ExerciseDifficulty)}
               onStartClick={() => handleStartClick(level.key)}
               animationDelay={index * 200}
+              getCompletionCount={getCompletionCount}
             />
           ))}
         </div>
@@ -283,6 +327,7 @@ interface LevelCardProps {
   onPlusClick: (e: React.MouseEvent) => void;
   onStartClick: () => void;
   animationDelay: number;
+  getCompletionCount: (exercises: PackageExercise[]) => number;
 }
 
 function LevelCard({ 
@@ -294,7 +339,8 @@ function LevelCard({
   onInfoClick,
   onPlusClick,
   onStartClick,
-  animationDelay 
+  animationDelay,
+  getCompletionCount
 }: LevelCardProps) {
   const cardBgRef = useRef<HTMLDivElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
@@ -345,7 +391,8 @@ function LevelCard({
     };
   }, [animationDelay]);
 
-  const progress = `0/${level.exercises.length}`;
+  const completedCount = getCompletionCount(level.exercises);
+  const progress = `${completedCount}/${level.exercises.length}`;
   const actionText = locale === 'es' ? 'Empezar' : 'Start';
 
   return (
