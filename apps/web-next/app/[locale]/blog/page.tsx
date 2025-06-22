@@ -5,7 +5,6 @@ import { Metadata } from 'next';
 import { Breadcrumb } from "@repo/components";
 import BlogGridWrapper from '@/components/blog/BlogGridWrapper';
 import BlogStatsWrapper from '@/components/blog/BlogStatsWrapper';
-import CreateBlogButton from '@/components/blog/CreateBlogButton';
 // import { getCurrentUser } from '@/lib/auth';
 
 export async function generateMetadata({
@@ -54,9 +53,9 @@ export default async function BlogPage({
 }) {
     const { locale } = await params;
     // const currentUser = await getCurrentUser();
-    // const canCreatePost = currentUser && (currentUser.role === 'ADMIN' || currentUser.role === 'TEACHER');
 
     return (
+        <>
         <div className="blog-page">
 
             <Breadcrumb
@@ -126,9 +125,8 @@ export default async function BlogPage({
                     </div>
                 </section>
             </div>
-
-            {/* Floating Create Blog Button */}
-            <CreateBlogButton locale={locale} />
         </div>
+
+        </>
     );
 }

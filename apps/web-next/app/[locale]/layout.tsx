@@ -11,6 +11,7 @@ import { Toaster } from 'sonner';
 import HeaderWrapper from '@/components/layout/HeaderWrapper';
 import FooterWrapper from '@/components/layout/FooterWrapper';
 import HelpAssistant from '../../components/global/HelpAssitant';
+import PageFloatingButton from '../../components/global/PageFloatingButton';
 import { AuthProvider } from '@/components/providers/AuthProvider';
 import { getCurrentUser } from '@/lib/auth';
 import { MotionProvider } from '../../components/motion/MotionProvider';
@@ -71,6 +72,9 @@ export default async function LocaleLayout({
 
                         {/* Global Help Assistant */}
                         <HelpAssistant user={user}/>
+
+                        {/* Page-specific Floating Button */}
+                        <PageFloatingButton locale={locale} user={user} />
 
                         <Toaster position="bottom-center" richColors />
                     </MotionProvider>

@@ -72,7 +72,6 @@ export default async function ActivitiesPage({
     const { locale } = await params;
     const t = await getTranslations();
     // const currentUser = await getCurrentUser();
-    // const canCreateDynamic = currentUser && (currentUser.role === 'ADMIN' || currentUser.role === 'TEACHER');
 
     const breadcrumbItems = [
         { label: t('common.navigation.home'), href: `/${locale}` },
@@ -80,6 +79,7 @@ export default async function ActivitiesPage({
     ];
 
     return (
+        <>
         <div className="activities-page">
             {/* Enhanced Breadcrumb */}
             <Breadcrumb
@@ -148,5 +148,7 @@ export default async function ActivitiesPage({
                 </section>
             </div>
         </div>
+
+        </>
     );
 }
