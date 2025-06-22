@@ -1,7 +1,7 @@
 // apps/web-next/components/home/TilesWrapper.tsx - FIXED
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import "./../../styles/home/tiles.css";
@@ -31,10 +31,9 @@ interface TilesProps {
 }
 
 const Tiles: React.FC<TilesProps> = ({ translations, locale }) => {
-    const [imagesLoaded, setImagesLoaded] = useState(false);
     const t = translations;
 
-    const tilesData: TileItem[] = [
+    const tilesData: TileItem[] = useMemo(() => [
         {
             id: 'teachers',
             title: t.tiles.tile1.title,
@@ -83,7 +82,7 @@ const Tiles: React.FC<TilesProps> = ({ translations, locale }) => {
             link: `/${locale}/construction/discussion`,
             color: '#87c5a4',
         },
-    ];
+    ], [t, locale]);
 
     // Preload images to prevent blank tiles during scroll
     useEffect(() => {
@@ -98,11 +97,10 @@ const Tiles: React.FC<TilesProps> = ({ translations, locale }) => {
             });
 
             await Promise.all(imagePromises);
-            setImagesLoaded(true);
         };
 
         preloadImages();
-    }, []);
+    }, [tilesData]);
 
     return (
         <section id="explore" className="tiles-section">
