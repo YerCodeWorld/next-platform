@@ -1,6 +1,7 @@
 "use client"
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useTeacherProfileApi } from '@repo/api-bridge';
 import { toast } from 'sonner';
 
@@ -18,6 +19,7 @@ const CertificationModal: React.FC<CertificationModalProps> = ({
                                                                       }) => {
     const teacherProfileApi = useTeacherProfileApi();
     const [saving, setSaving] = useState(false);
+    const [mounted, setMounted] = useState(false);
     const [formData, setFormData] = useState({
         name: '',
         issuer: '',
@@ -27,6 +29,19 @@ const CertificationModal: React.FC<CertificationModalProps> = ({
         credentialUrl: '',
         description: ''
     });
+
+    // Handle mounting for SSR safety
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
+    // Handle body scroll lock
+    useEffect(() => {
+        document.body.style.overflow = 'hidden';
+        return () => {
+            document.body.style.overflow = 'unset';
+        };
+    }, []);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -55,7 +70,9 @@ const CertificationModal: React.FC<CertificationModalProps> = ({
         }
     };
 
-    return (
+    if (!mounted) return null;
+
+    const modal = (
         <div className="tp-modal-overlay" onClick={onClose}>
             <div className="tp-modal" onClick={(e) => e.stopPropagation()}>
                 <div className="tp-modal-header">
@@ -153,6 +170,8 @@ const CertificationModal: React.FC<CertificationModalProps> = ({
             </div>
         </div>
     );
+
+    return createPortal(modal, document.body);
 };
 
 export default  CertificationModal;

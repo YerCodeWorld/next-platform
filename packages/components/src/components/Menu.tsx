@@ -8,7 +8,7 @@ import {
     GraduationCap,
     BookOpen,
     GameController,
-    Trophy,
+    PencilSimple,
     ChatDots,
     User,
     Gear,
@@ -36,6 +36,7 @@ interface MenuTranslations {
         home: string;
         teachers: string;
         journal: string;
+        practice: string;
         games: string;
         courses: string;
         competitions: string;
@@ -99,9 +100,14 @@ const Menu: React.FC<MenuProps> = ({
             href: `/${locale}/teachers`
         },
         {
+            icon: PencilSimple,
+            label: translations.navigation.practice || "Practice",
+            href: `/${locale}/exercises`
+        },
+        {
             icon: BookOpen,
             label: translations.navigation.courses || "Courses",
-            href: `/${locale}/construction/courses`
+            href: `/${locale}/activities`
         },
         {
             icon: FileText,
@@ -109,20 +115,11 @@ const Menu: React.FC<MenuProps> = ({
             href: `/${locale}/blog`
         },
         {
-            icon: ChatDots,
-            label: translations.navigation.discussion || "Discussion",
-            href: `/${locale}/construction/discussion`
-        },
-        {
             icon: GameController,
             label: translations.navigation.games || "Games",
-            href: `/${locale}/exercises`
-        },
-        {
-            icon: Trophy,
-            label: translations.navigation.competitions || "Competitions",
             href: `/${locale}/edugames`
         }
+
     ];
 
     const footerItems = [
@@ -254,7 +251,7 @@ const Menu: React.FC<MenuProps> = ({
                             <ul className="menu__nav-list">
                                 <li className="menu__nav-item">
                                     <Link
-                                        href={`/${locale}/profile`}
+                                        href={`/${locale}/teachers/${user.id}`}
                                         onClick={onClose}
                                         className="menu__nav-link"
                                     >

@@ -16,6 +16,7 @@ export interface HeaderTranslations {
         home: string;
         teachers: string;
         journal: string;
+        practice: string;
         games: string;
         courses: string;
         competitions: string;

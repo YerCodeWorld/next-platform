@@ -2,11 +2,12 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, Pagination, EffectFade } from 'swiper/modules';
-import { Watch, PhoneCall, ArrowUpRight, Play, Users, Star } from 'phosphor-react';
+import { Watch, PhoneCall, ArrowUpRight, Play, Users, Star, X } from 'phosphor-react';
 
 // Import Swiper styles
 import 'swiper/css';
@@ -68,28 +69,40 @@ const BannerTwo: React.FC<BannerTwoProps> = ({
     // Platform features carousel images
     const platformImages = [
         {
-            src: '/images/platform/about.png',
-            alt: 'About EduGuiders - Discover our mission and values',
-            title: 'About Us',
-            description: 'Learn about our mission to connect students with amazing teachers'
+            src: '/images/platform/teachers.png',
+            alt: 'Teachers - Discover our amazing teachers',
+            title: 'Teachers',
+            description: 'Discover our guiders to your learning journey'
         },
         {
-            src: '/images/platform/dynamicsSection.png',
+            src: '/images/platform/blog.png',
+            alt: 'Blog - Insights from our guiders',
+            title: 'Blog',
+            description: 'Discover our always fresh discussion topics'
+        },
+        {
+            src: '/images/platform/activities.png',
             alt: 'Teaching Dynamics - Interactive learning activities',
             title: 'Dynamics',
             description: 'Interactive teaching activities and educational games'
         },
         {
-            src: '/images/platform/teacherProfile.png',
-            alt: 'Teacher Profiles - Meet our expert educators',
-            title: 'Teachers',
-            description: 'Connect with experienced and passionate educators'
+            src: '/images/platform/exercises.png',
+            alt: 'Exercises - Practice whatever topic',
+            title: 'Exercises',
+            description: 'Practice any topic with our amazing tools'
         },
         {
-            src: '/images/platform/mascot-test-removebg-preview.png',
-            alt: 'Teacher Profiles - Meet our expert educators',
-            title: 'Teachers',
-            description: 'Connect with experienced and passionate educators'
+            src: '/images/platform/games.png',
+            alt: 'Games - Interactive learning activities',
+            title: 'Games',
+            description: 'Want to have a good and fun time? Come over!'
+        },
+        {
+            src: '/images/platform/mascot.png',
+            alt: 'About EduGuiders - Your EduPlatform',
+            title: 'About Us',
+            description: 'Learn all about us, who we are and our mission'
         }
     ];
 
@@ -123,6 +136,32 @@ const BannerTwo: React.FC<BannerTwoProps> = ({
     const handleVideoPlay = () => {
         setIsVideoPlaying(true);
     };
+
+    const handleVideoClose = () => {
+        setIsVideoPlaying(false);
+    };
+
+    // Handle Escape key to close video and manage body scroll
+    useEffect(() => {
+        const handleEscape = (e: KeyboardEvent) => {
+            if (e.key === 'Escape' && isVideoPlaying) {
+                handleVideoClose();
+            }
+        };
+
+        if (isVideoPlaying) {
+            document.addEventListener('keydown', handleEscape);
+            // Prevent body scroll when modal is open
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = 'unset';
+        }
+
+        return () => {
+            document.removeEventListener('keydown', handleEscape);
+            document.body.style.overflow = 'unset';
+        };
+    }, [isVideoPlaying]);
 
     // Don't render until mounted to prevent hydration issues
     if (!mounted || !currentSlideData) {
@@ -192,191 +231,221 @@ const BannerTwo: React.FC<BannerTwoProps> = ({
         );
     };
 
-    if (!currentSlideData) return;
+    // Video Modal Component
+    const VideoModal = () => {
+        if (!mounted || !isVideoPlaying) return null;
 
-    return (
-        <section className="banner-fixed">
-            <div className="banner-container">
-                <div className="banner-content">
-                    {/* Left Content */}
-                    <div className="banner-text">
-                        <div className="banner-badge">
-                            <Star size={16} weight="fill" />
-                            <span>Your Future, Achieve Success</span>
-                        </div>
-
-                        <h1 className="banner-title">
-                            {currentSlideData.title}
-                        </h1>
-
-                        <p className="banner-subtitle">
-                            {currentSlideData.subtitle}
-                        </p>
-
-                        <div className="banner-actions">
-                            <Link
-                                href={currentSlideData.buttonLink}
-                                className="btn btn--primary"
-                            >
-                                {currentSlideData.buttonText}
-                                <ArrowUpRight size={18} weight="bold" />
-                            </Link>
-
-                            <Link
-                                href={`/${locale}/about`}
-                                className="btn btn--secondary"
-                            >
-                                {translations.aboutUsAlt}
-                                <ArrowUpRight size={18} weight="bold" />
-                            </Link>
-                        </div>
-
-                        {/* Slide Indicators */}
-                        <div className="banner-indicators">
-                            {data.slides.map((_, index) => (
-                                <button
-                                    key={index}
-                                    className={`indicator ${index === currentSlide ? 'indicator--active' : ''}`}
-                                    onClick={() => setCurrentSlide(index)}
-                                    aria-label={`Go to slide ${index + 1}`}
-                                />
-                            ))}
-                        </div>
-                    </div>
-
-                    {/* Right Visual */}
-                    <div className="banner-visual">
-                        {/* Main Platform Showcase */}
-                        <div className="platform-showcase">
-                            <Swiper
-                                modules={[Autoplay, Pagination, EffectFade]}
-                                effect="fade"
-                                fadeEffect={{ crossFade: true }}
-                                autoplay={{
-                                    delay: 4000,
-                                    disableOnInteraction: false,
-                                    pauseOnMouseEnter: true
-                                }}
-                                pagination={{
-                                    clickable: true,
-                                    bulletClass: 'platform-bullet',
-                                    bulletActiveClass: 'platform-bullet--active'
-                                }}
-                                loop={platformImages.length > 1}
-                                speed={1000}
-                                className="platform-swiper"
-                                ref={swiperRef}
-                                key={`swiper-${mounted}`} // Force re-render on mount
-                            >
-                                {platformImages.map((image, index) => (
-                                    <SwiperSlide key={index}>
-                                        <div className="platform-slide">
-                                            <Image
-                                                src={image.src}
-                                                alt={image.alt}
-                                                width={500}
-                                                height={400}
-                                                className="platform-image"
-                                                priority={index === 0}
-                                                quality={90}
-                                                onError={(e) => {
-                                                    console.error('Image failed to load:', image.src);
-                                                    // Fallback to a solid color background
-                                                    e.currentTarget.style.display = 'none';
-                                                }}
-                                            />
-                                            <div className="platform-overlay">
-                                                <div className="platform-info">
-                                                    <h3>{image.title}</h3>
-                                                    <p>{image.description}</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </SwiperSlide>
-                                ))}
-                            </Swiper>
-
-                            {/* Video Play Button Overlay */}
-                            <div className="video-overlay">
-                                <button
-                                    className="play-button"
-                                    onClick={handleVideoPlay}
-                                    aria-label="Play introduction video"
-                                >
-                                    <Play size={isMobile ? 20 : 28} weight="fill" />
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Cards Section - Mobile optimized */}
-                <div className="banner-cards">
-                    <UserBadge />
-
-                    <div className="banner-card banner-card--offer">
-                        <div className="banner-card__header">
-                            <div className="banner-card__icon banner-card__icon--watch">
-                                <Watch size={20} weight="regular" />
-                            </div>
-                            <div className="banner-card__info">
-                                <h4 className="banner-card__title">{translations.offFor}</h4>
-                                <p className="banner-card__subtitle">{translations.forAllCourses}</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="banner-card banner-card--support">
-                        <div className="banner-card__header">
-                            <div className="banner-card__icon banner-card__icon--phone">
-                                <PhoneCall size={20} weight="regular" />
-                            </div>
-                            <div className="banner-card__info">
-                                <h4 className="banner-card__title">{translations.onlineSupports}</h4>
-                                <a
-                                    href="tel:(704)555-0127"
-                                    className="banner-card__link"
-                                >
-                                    (704) 555-0127
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Educational floating elements */}
-                <div className="educational-floaters">
-                    <div className="edu-floater edu-floater--notebook">
-                        <Image
-                            src="/images/shapes/shape6.png"
-                            alt=""
-                            width={50}
-                            height={50}
-                            className="edu-floater-image"
-                        />
-                    </div>
-                    <div className="edu-floater edu-floater--ruler">
-                        <Image
-                            src="/images/shapes/shape3.png"
-                            alt=""
-                            width={45}
-                            height={45}
-                            className="edu-floater-image"
-                        />
-                    </div>
-                    <div className="edu-floater edu-floater--planet">
-                        <Image
-                            src="/images/shapes/shape1.png"
-                            alt=""
-                            width={55}
-                            height={55}
-                            className="edu-floater-image"
-                        />
-                    </div>
+        const modal = (
+            <div className="video-modal" onClick={handleVideoClose}>
+                <div className="video-modal__content" onClick={(e) => e.stopPropagation()}>
+                    <button 
+                        className="video-modal__close" 
+                        onClick={handleVideoClose}
+                        aria-label="Close video"
+                    >
+                        <X size={24} weight="bold" />
+                    </button>
+                    <video
+                        className="video-modal__player"
+                        controls
+                        autoPlay
+                        onEnded={handleVideoClose}
+                    >
+                        <source src="/videos/EduGuiders.mp4" type="video/mp4" />
+                        Your browser does not support the video tag.
+                    </video>
                 </div>
             </div>
+        );
 
-            <style>{`
+        return createPortal(modal, document.body);
+    };
+
+    return (
+        <>
+            <VideoModal />
+            <section className="banner-fixed">
+                <div className="banner-container">
+                    <div className="banner-content">
+                        {/* Left Content */}
+                        <div className="banner-text">
+                            <div className="banner-badge">
+                                <Star size={16} weight="fill" />
+                                <span>Your Future, Achieve Success</span>
+                            </div>
+
+                            <h1 className="banner-title">
+                                {currentSlideData.title}
+                            </h1>
+
+                            <p className="banner-subtitle">
+                                {currentSlideData.subtitle}
+                            </p>
+
+                            <div className="banner-actions">
+                                <Link
+                                    href={currentSlideData.buttonLink}
+                                    className="btn btn--primary"
+                                >
+                                    {currentSlideData.buttonText}
+                                    <ArrowUpRight size={18} weight="bold" />
+                                </Link>
+
+                                <Link
+                                    href={`/${locale}/about`}
+                                    className="btn btn--secondary"
+                                >
+                                    {translations.aboutUsAlt}
+                                    <ArrowUpRight size={18} weight="bold" />
+                                </Link>
+                            </div>
+
+                            {/* Slide Indicators */}
+                            <div className="banner-indicators">
+                                {data.slides.map((_, index) => (
+                                    <button
+                                        key={index}
+                                        className={`indicator ${index === currentSlide ? 'indicator--active' : ''}`}
+                                        onClick={() => setCurrentSlide(index)}
+                                        aria-label={`Go to slide ${index + 1}`}
+                                    />
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Right Visual */}
+                        <div className="banner-visual">
+                            {/* Main Platform Showcase */}
+                            <div className="platform-showcase">
+                                <Swiper
+                                    modules={[Autoplay, Pagination, EffectFade]}
+                                    effect="fade"
+                                    fadeEffect={{ crossFade: true }}
+                                    autoplay={{
+                                        delay: 4000,
+                                        disableOnInteraction: false,
+                                        pauseOnMouseEnter: true
+                                    }}
+                                    pagination={{
+                                        clickable: true,
+                                        bulletClass: 'platform-bullet',
+                                        bulletActiveClass: 'platform-bullet--active'
+                                    }}
+                                    loop={platformImages.length > 1}
+                                    speed={1000}
+                                    className="platform-swiper"
+                                    ref={swiperRef}
+                                    key={`swiper-${mounted}`} // Force re-render on mount
+                                >
+                                    {platformImages.map((image, index) => (
+                                        <SwiperSlide key={index}>
+                                            <div className="platform-slide">
+                                                <Image
+                                                    src={image.src}
+                                                    alt={image.alt}
+                                                    width={500}
+                                                    height={400}
+                                                    className="platform-image"
+                                                    priority={index === 0}
+                                                    quality={90}
+                                                    onError={(e) => {
+                                                        console.error('Image failed to load:', image.src);
+                                                        // Fallback to a solid color background
+                                                        e.currentTarget.style.display = 'none';
+                                                    }}
+                                                />
+                                                <div className="platform-overlay">
+                                                    <div className="platform-info">
+                                                        <h3>{image.title}</h3>
+                                                        <p>{image.description}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </SwiperSlide>
+                                    ))}
+                                </Swiper>
+
+                                {/* Video Play Button Overlay */}
+                                <div className="video-overlay">
+                                    <button
+                                        className="play-button"
+                                        onClick={handleVideoPlay}
+                                        aria-label="Play introduction video"
+                                    >
+                                        <Play size={isMobile ? 20 : 28} weight="fill" />
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Cards Section - Mobile optimized */}
+                    <div className="banner-cards">
+                        <UserBadge />
+
+                        <div className="banner-card banner-card--offer">
+                            <div className="banner-card__header">
+                                <div className="banner-card__icon banner-card__icon--watch">
+                                    <Watch size={20} weight="regular" />
+                                </div>
+                                <div className="banner-card__info">
+                                    <h4 className="banner-card__title">{translations.offFor}</h4>
+                                    <p className="banner-card__subtitle">{translations.forAllCourses}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="banner-card banner-card--support">
+                            <div className="banner-card__header">
+                                <div className="banner-card__icon banner-card__icon--phone">
+                                    <PhoneCall size={20} weight="regular" />
+                                </div>
+                                <div className="banner-card__info">
+                                    <h4 className="banner-card__title">{translations.onlineSupports}</h4>
+                                    <a
+                                        href="tel:(704)555-0127"
+                                        className="banner-card__link"
+                                    >
+                                        (704) 555-0127
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Educational floating elements */}
+                    <div className="educational-floaters">
+                        <div className="edu-floater edu-floater--notebook">
+                            <Image
+                                src="/images/shapes/shape6.png"
+                                alt=""
+                                width={50}
+                                height={50}
+                                className="edu-floater-image"
+                            />
+                        </div>
+                        <div className="edu-floater edu-floater--ruler">
+                            <Image
+                                src="/images/shapes/shape3.png"
+                                alt=""
+                                width={45}
+                                height={45}
+                                className="edu-floater-image"
+                            />
+                        </div>
+                        <div className="edu-floater edu-floater--planet">
+                            <Image
+                                src="/images/shapes/shape1.png"
+                                alt=""
+                                width={55}
+                                height={55}
+                                className="edu-floater-image"
+                            />
+                        </div>
+                    </div>
+                </div>
+
+                <style>{`
                 .banner-fixed {
                     position: relative;
                     padding: clamp(2rem, 8vw, 4rem) 0;
@@ -872,7 +941,6 @@ const BannerTwo: React.FC<BannerTwoProps> = ({
                         display: none;
                     }
                 }
-l
 
                 /* High contrast mode support */
                 @media (prefers-contrast: custom) {
@@ -898,8 +966,124 @@ l
                         transform: none;
                     }
                 }
+
+                /* Video Modal Styles */
+                .video-modal {
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    background: rgba(0, 0, 0, 0.9);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    z-index: 1000;
+                    padding: 1rem;
+                    animation: fadeIn 0.3s ease;
+                }
+
+                .video-modal__content {
+                    position: relative;
+                    width: 100%;
+                    max-width: 900px;
+                    max-height: 90vh;
+                    background: black;
+                    border-radius: 12px;
+                    overflow: hidden;
+                    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+                    animation: scaleIn 0.3s ease;
+                }
+
+                .video-modal__close {
+                    position: absolute;
+                    top: 1rem;
+                    right: 1rem;
+                    width: 40px;
+                    height: 40px;
+                    border-radius: 50%;
+                    background: rgba(255, 255, 255, 0.1);
+                    backdrop-filter: blur(10px);
+                    border: 1px solid rgba(255, 255, 255, 0.2);
+                    color: white;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                    z-index: 10;
+                }
+
+                .video-modal__close:hover {
+                    background: rgba(255, 255, 255, 0.2);
+                    transform: scale(1.1);
+                }
+
+                .video-modal__player {
+                    width: 100%;
+                    height: 100%;
+                    max-height: 90vh;
+                    object-fit: contain;
+                    background: black;
+                }
+
+                @keyframes fadeIn {
+                    from { opacity: 0; }
+                    to { opacity: 1; }
+                }
+
+                @keyframes scaleIn {
+                    from { 
+                        opacity: 0;
+                        transform: scale(0.9);
+                    }
+                    to { 
+                        opacity: 1;
+                        transform: scale(1);
+                    }
+                }
+
+                /* Mobile adjustments for video modal */
+                @media (max-width: 768px) {
+                    .video-modal {
+                        padding: 0;
+                    }
+
+                    .video-modal__content {
+                        max-width: 100%;
+                        max-height: 100%;
+                        height: 100%;
+                        border-radius: 0;
+                    }
+
+                    .video-modal__close {
+                        top: 0.5rem;
+                        right: 0.5rem;
+                        width: 36px;
+                        height: 36px;
+                    }
+
+                    .video-modal__player {
+                        height: 100%;
+                    }
+                }
+
+                /* Accessibility - Focus styles */
+                .video-modal__close:focus {
+                    outline: 2px solid white;
+                    outline-offset: 2px;
+                }
+
+                /* Reduced motion support for modal */
+                @media (prefers-reduced-motion: reduce) {
+                    .video-modal,
+                    .video-modal__content {
+                        animation: none;
+                    }
+                }
             `}</style>
-        </section>
+            </section>
+        </>
     );
 };
 

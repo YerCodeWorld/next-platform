@@ -4,8 +4,7 @@
 import React, { useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
-// @ts-ignore
-import { BookOpen, Eye, ChatDots, ArrowRight, UserCircle, CaretLeft, CaretRight } from 'phosphor-react';
+import { BookOpen, Eye, ChatDots, ArrowRight, UserCircle, CaretLeft, CaretRight, Calendar, Clock } from 'phosphor-react';
 import { Post } from "@repo/api-bridge";
 import Slider from "react-slick";
 
@@ -65,8 +64,10 @@ const BlogShowCase: React.FC<BlogShowCaseProps> = ({
             {
                 breakpoint: 767,
                 settings: {
-                    slidesToShow: 2,
+                    slidesToShow: 1,
                     arrows: false,
+                    centerMode: true,
+                    centerPadding: '20px',
                 },
             },
             {
@@ -74,6 +75,7 @@ const BlogShowCase: React.FC<BlogShowCaseProps> = ({
                 settings: {
                     slidesToShow: 1,
                     arrows: false,
+                    centerMode: false,
                 },
             },
         ],
@@ -90,14 +92,14 @@ const BlogShowCase: React.FC<BlogShowCaseProps> = ({
     // Don't render if no posts
     if (posts.length === 0) {
         return (
-            <section className='blog-two py-120 bg-main-25'>
+            <section className='blog-two py-120 bg-gray-50'>
                 <div className='container'>
                     <div className='section-heading text-center'>
                         <div className='flex-align d-inline-flex gap-8 mb-16'>
-                            <span className='text-main-600 text-2xl d-flex'>
+                            <span className='text-main-400 text-2xl d-flex'>
                                 <i className='ph-bold ph-book-open' />
                             </span>
-                            <h5 className='text-main-600 mb-0'>{translations.title}</h5>
+                            <h5 className='text-main-400 mb-0'>{translations.title}</h5>
                         </div>
                         <h2 className='mb-24'>{translations.subtitle}</h2>
                         <p>No blog posts available at the moment.</p>
@@ -108,14 +110,14 @@ const BlogShowCase: React.FC<BlogShowCaseProps> = ({
     }
 
     return (
-        <section className='blog-two py-120'>
+        <section className='blog-two py-120 bg-gray-50'>
             <div className='container'>
                 <div className='section-heading text-center'>
                     <div className='flex-align d-inline-flex gap-8 mb-16 wow bounceInDown'>
-                        <span className='text-main-600 text-2xl d-flex'>
-                            <BookOpen size={24} weight="bold" />
+                        <span className='text-main-400 text-2xl d-flex'>
+                            <BookOpen size={28} weight="duotone" />
                         </span>
-                        <h5 className='text-main-600 mb-0'>{translations.title}</h5>
+                        <h5 className='text-main-400 mb-0'>{translations.title}</h5>
                     </div>
                     <h2 className='mb-24 wow bounceIn'>{translations.subtitle}</h2>
                     <p className='wow bounceInUp'>
@@ -130,7 +132,7 @@ const BlogShowCase: React.FC<BlogShowCaseProps> = ({
                         return (
                             <div
                                 key={post.id}
-                                className='scale-hover-item bg-primary-300 rounded-16 p-12 h-100'
+                                className='scale-hover-item bg-white rounded-16 p-12 h-100 shadow-sm hover-shadow-lg transition-2'
                                 data-aos='fade-up'
                                 data-aos-duration={200 + (index * 200)}
                             >
@@ -145,20 +147,25 @@ const BlogShowCase: React.FC<BlogShowCaseProps> = ({
                                         />
                                     </Link>
 
-                                    <div className='position-absolute inset-inline-end-0 inset-block-end-0 me-16 mb-16 py-12 px-24 rounded-8 bg-main-three-600 text-white fw-medium'>
-                                        <h3 className='mb-0 text-white fw-medium'>{day}</h3>
-                                        {month}
+                                    <div className='position-absolute inset-inline-end-0 inset-block-end-0 me-16 mb-16 py-8 px-16 rounded-8 bg-white bg-opacity-90 backdrop-blur-sm text-main-600 fw-medium shadow-sm'>
+                                        <div className='flex-align gap-4'>
+                                            <Calendar size={20} weight="duotone" />
+                                            <span>
+                                                <h4 className='mb-0 text-main-600 fw-bold'>{day}</h4>
+                                                <span className='text-xs'>{month}</span>
+                                            </span>
+                                        </div>
                                     </div>
                                 </div>
 
-                                <div className='pt-32 pb-24 px-16 position-relative'>
-                                    <h4 className='mb-28'>
-                                        <Link href={`/${locale}/blog/${post.slug}`} className='link text-line-2'>
+                                <div className='pt-24 pb-20 px-16 position-relative'>
+                                    <h4 className='mb-20 fs-20'>
+                                        <Link href={`/${locale}/blog/${post.slug}`} className='link text-line-2 text-gray-800 hover-text-main-600 transition-2'>
                                             {post.title}
                                         </Link>
                                     </h4>
 
-                                    <div className='flex-align gap-14 flex-wrap my-20'>
+                                    <div className='flex-align gap-12 flex-wrap my-16'>
                                         <div className='flex-align gap-8'>
                                             {post.user?.picture ? (
                                                 <Image
@@ -166,43 +173,37 @@ const BlogShowCase: React.FC<BlogShowCaseProps> = ({
                                                     alt={post.user.name}
                                                     width={24}
                                                     height={24}
-                                                    className='w-24 h-24 rounded-circle object-fit-cover'
+                                                    className='w-28 h-28 rounded-circle object-fit-cover border border-2 border-gray-200'
                                                 />
                                             ) : (
-                                                <span className='text-neutral-500 text-2xl d-flex'>
-                                                    <i className='ph ph-user-circle' />
-                                                </span>
+                                                <UserCircle size={28} weight="duotone" className='text-gray-400' />
                                             )}
-                                            <span className='text-neutral-500 text-lg'>
+                                            <span className='text-gray-600 text-sm fw-medium'>
                                                 {translations.by} {post.user?.name || 'Unknown'}
                                             </span>
                                         </div>
 
-                                        <span className='w-8 h-8 bg-neutral-100 rounded-circle' />
+                                        <span className='w-6 h-6 bg-gray-300 rounded-circle d-none d-sm-block' />
                                         <div className='flex-align gap-8'>
-                                            <span className='text-neutral-500 text-2xl d-flex'>
-                                                <i className='ph-bold ph-eye' />
-                                            </span>
-                                            <span className='text-neutral-500 text-lg'>...</span>
+                                            <Eye size={20} weight="duotone" className='text-gray-400' />
+                                            <span className='text-gray-500 text-sm'>1.2k</span>
                                         </div>
 
-                                        <span className='w-8 h-8 bg-neutral-100 rounded-circle' />
+                                        <span className='w-6 h-6 bg-gray-300 rounded-circle d-none d-sm-block' />
                                         <div className='flex-align gap-8'>
-                                            <span className='text-neutral-500 text-2xl d-flex'>
-                                                <i className='ph ph-chat-dots' />
-                                            </span>
-                                            <span className='text-neutral-500 text-lg'>...</span>
+                                            <ChatDots size={20} weight="duotone" className='text-gray-400' />
+                                            <span className='text-gray-500 text-sm'>24</span>
                                         </div>
                                     </div>
 
-                                    <div className='flex-between gap-8 pt-24 border-top border-neutral-50 mt-28 border-dashed border-0'>
+                                    <div className='flex-between gap-8 pt-20 border-top border-gray-200 mt-20'>
                                         <Link
                                             href={`/${locale}/blog/${post.slug}`}
-                                            className='flex-align gap-8 text-main-600 hover-text-decoration-underline transition-1 fw-semibold'
+                                            className='flex-align gap-8 text-main-400 hover-text-main-600 transition-2 fw-semibold text-sm'
                                             tabIndex={0}
                                         >
                                             {translations.readMore}
-                                            <i className='ph ph-arrow-right' />
+                                            <ArrowRight size={16} weight="bold" />
                                         </Link>
                                     </div>
                                 </div>
@@ -216,18 +217,18 @@ const BlogShowCase: React.FC<BlogShowCaseProps> = ({
                         type='button'
                         id='blog-two-prev'
                         onClick={() => sliderRef.current?.slickPrev()}
-                        className='slick-arrow flex-center rounded-circle border border-gray-100 hover-border-main-600 text-xl hover-bg-main-600 hover-text-white transition-1 w-48 h-48'
+                        className='slick-arrow flex-center rounded-circle border border-gray-200 hover-border-main-400 text-xl hover-bg-main-400 hover-text-white transition-2 w-44 h-44 bg-white shadow-sm hover-shadow-md'
                     >
-                        <CaretLeft size={25} weight={"bold"}/>
+                        <CaretLeft size={20} weight={"bold"} className='text-gray-600'/>
 
                     </button>
                     <button
                         type='button'
                         id='blog-two-next'
                         onClick={() => sliderRef.current?.slickNext()}
-                        className='slick-arrow flex-center rounded-circle border border-gray-100 hover-border-main-600 text-xl hover-bg-main-600 hover-text-white transition-1 w-48 h-48'
+                        className='slick-arrow flex-center rounded-circle border border-gray-200 hover-border-main-400 text-xl hover-bg-main-400 hover-text-white transition-2 w-44 h-44 bg-white shadow-sm hover-shadow-md'
                     >
-                        <CaretRight size={25} weight={"bold"}/>
+                        <CaretRight size={20} weight={"bold"} className='text-gray-600'/>
 
                     </button>
                 </div>

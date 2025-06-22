@@ -1,6 +1,7 @@
 "use client"
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { TeacherProfile, useTeacherProfileApi } from '@repo/api-bridge';
 import { toast } from 'sonner';
 
@@ -21,6 +22,7 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
     const teacherProfileApi = useTeacherProfileApi();
     const [activeTab, setActiveTab] = useState('basic');
     const [saving, setSaving] = useState(false);
+    const [mounted, setMounted] = useState(false);
     const [newLanguage, setNewLanguage] = useState('');
     const [newSpecialization, setNewSpecialization] = useState('');
 
@@ -143,7 +145,20 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
         }
     };
 
-    return (
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
+    useEffect(() => {
+        document.body.style.overflow = 'hidden';
+        return () => {
+            document.body.style.overflow = 'unset';
+        };
+    }, []);
+
+    if (!mounted) return null;
+
+    const modal = (
         <div className="tp-modal-overlay" onClick={onClose}>
             <div className="tp-modal" onClick={(e) => e.stopPropagation()}>
                 <div className="tp-modal-header">
@@ -526,6 +541,8 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
             </div>
         </div>
     );
+
+    return createPortal(modal, document.body);
 };
 
 export default EditProfileModal;

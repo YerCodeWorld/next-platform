@@ -24,6 +24,7 @@ interface HeaderTranslations {
         home: string;
         teachers: string;
         journal: string;
+        practice: string;
         games: string;
         courses: string;
         competitions: string;
@@ -258,7 +259,7 @@ const Header: React.FC<HeaderProps> = ({
                                     href={`/${locale}/exercises`}
                                     className="header__nav-link"
                                 >
-                                    {translations.navigation.games}
+                                    {translations.navigation.practice}
                                 </Link>
                             </li>
                             <li className="header__nav-item">
@@ -274,7 +275,7 @@ const Header: React.FC<HeaderProps> = ({
                                     href={`/${locale}/edugames`}
                                     className="header__nav-link"
                                 >
-                                    {translations.navigation.competitions}
+                                    {translations.navigation.games}
                                 </Link>
                             </li>
                         </ul>

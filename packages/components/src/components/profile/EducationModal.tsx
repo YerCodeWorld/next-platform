@@ -1,6 +1,7 @@
 "use client"
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useTeacherProfileApi } from '@repo/api-bridge';
 import { toast } from 'sonner';
 
@@ -19,6 +20,7 @@ const EducationModal: React.FC<EducationModalProps> = ({
                                                               }) => {
     const teacherProfileApi = useTeacherProfileApi();
     const [saving, setSaving] = useState(false);
+    const [mounted, setMounted] = useState(false);
     const [formData, setFormData] = useState({
         degree: '',
         institution: '',
@@ -56,7 +58,20 @@ const EducationModal: React.FC<EducationModalProps> = ({
         }
     };
 
-    return (
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
+    useEffect(() => {
+        document.body.style.overflow = 'hidden';
+        return () => {
+            document.body.style.overflow = 'unset';
+        };
+    }, []);
+
+    if (!mounted) return null;
+
+    const modal = (
         <div className="tp-modal-overlay" onClick={onClose}>
             <div className="tp-modal" onClick={(e) => e.stopPropagation()}>
                 <div className="tp-modal-header">
@@ -158,6 +173,8 @@ const EducationModal: React.FC<EducationModalProps> = ({
             </div>
         </div>
     );
+
+    return createPortal(modal, document.body);
 };
 
 export default EducationModal;

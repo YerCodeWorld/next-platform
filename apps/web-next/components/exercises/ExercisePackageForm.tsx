@@ -1,5 +1,6 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { X, Save } from 'lucide-react';
 import { useExercisePackagesApi, CreateExercisePackagePayload, UpdateExercisePackagePayload, ExercisePackage } from '@repo/api-bridge';
 import { User } from '@/types';
@@ -20,6 +21,7 @@ export function ExercisePackageForm({
 }: ExercisePackageFormProps) {
   const { createPackage, updatePackage } = useExercisePackagesApi();
   const [loading, setLoading] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const [error, setError] = useState<string | null>(null);
   
   const [formData, setFormData] = useState({
@@ -34,6 +36,21 @@ export function ExercisePackageForm({
     isPublished: packageToEdit?.isPublished || false,
     featured: packageToEdit?.featured || false,
   });
+
+  // Handle mounting for SSR safety
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Handle body scroll lock when modal is open
+  useEffect(() => {
+    if (isModal) {
+      document.body.style.overflow = 'hidden';
+      return () => {
+        document.body.style.overflow = 'unset';
+      };
+    }
+  }, [isModal]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -351,7 +368,9 @@ export function ExercisePackageForm({
   );
 
   if (isModal) {
-    return (
+    if (!mounted) return null;
+
+    const modal = (
       <div className="exercise-package-form-modal">
         <div className="exercise-package-form-modal__overlay" />
         <div className="exercise-package-form-modal__content">
@@ -375,6 +394,8 @@ export function ExercisePackageForm({
         </div>
       </div>
     );
+
+    return createPortal(modal, document.body);
   }
 
   return (
