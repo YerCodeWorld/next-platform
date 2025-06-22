@@ -10,9 +10,9 @@
       "home": "Home",
       "teachers": "EduTeachers",
       "journal": "EduBlog",
-      "games": "EduGames",
+      "practice": "EduPractice",
       "courses": "EduActivities",
-      "competitions": "EduGames",
+      "games": "EduGames",
       "discussion": "EduChat"
     }
   },
