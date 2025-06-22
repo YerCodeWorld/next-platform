@@ -202,10 +202,10 @@ export default async function TeacherCommentsWrapper({ locale }: TeacherComments
                                 </div>
                                 
                                 {testimony.title && (
-                                    <h5 className="testimony-title">"{testimony.title}"</h5>
+                                    <h5 className="testimony-title">&ldquo;{testimony.title}&rdquo;</h5>
                                 )}
                                 
-                                <p className="testimony-content">"{testimony.content}"</p>
+                                <p className="testimony-content">&ldquo;{testimony.content}&rdquo;</p>
                                 
                                 <div className="testimony-date">
                                     {new Date(testimony.createdAt).toLocaleDateString(locale === 'es' ? 'es-ES' : 'en-US', {

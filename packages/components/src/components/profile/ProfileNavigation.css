@@ -1,0 +1,141 @@
+.tp-nav {
+    background: white;
+    border-radius: 24px;
+    margin: 2rem 0;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+    border: 1px solid var(--tp-theme-light);
+    overflow: hidden;
+    position: relative;
+}
+
+.tp-nav-container {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    position: relative;
+}
+
+.tp-nav-tab {
+    position: relative;
+    background: none;
+    border: none;
+    padding: 32px 24px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    text-align: center;
+    color: #64748b;
+    overflow: hidden;
+    z-index: 2;
+}
+
+.tp-nav-tab::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, var(--tp-theme-primary) 0%, var(--tp-theme-secondary) 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: -1;
+}
+
+.tp-nav-tab:hover::before {
+    opacity: 0.05;
+}
+
+.tp-nav-tab.active {
+    color: white;
+    background: linear-gradient(135deg, var(--tp-theme-primary) 0%, var(--tp-theme-secondary) 100%);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+}
+
+.tp-nav-tab.active::before {
+    opacity: 0;
+}
+
+.tp-nav-icon {
+    width: 28px;
+    height: 28px;
+    transition: all 0.3s ease;
+    filter: none;
+}
+
+.tp-nav-tab:hover .tp-nav-icon {
+    transform: scale(1.1);
+}
+
+.tp-nav-tab.active .tp-nav-icon {
+    filter: brightness(0) invert(1);
+    transform: scale(1.05);
+}
+
+.tp-nav-label {
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    transition: all 0.3s ease;
+    margin: 0;
+}
+
+.tp-nav-tab.active .tp-nav-label {
+    transform: translateY(-1px);
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.tp-nav-description {
+    font-size: 13px;
+    opacity: 0.7;
+    margin: 0;
+    line-height: 1.4;
+    transition: all 0.3s ease;
+}
+
+.tp-nav-tab.active .tp-nav-description {
+    opacity: 0.9;
+}
+
+@media (max-width: 768px) {
+    .tp-nav-container {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .tp-nav-tab {
+        padding: 24px 16px;
+        gap: 8px;
+    }
+    
+    .tp-nav-icon {
+        width: 24px;
+        height: 24px;
+    }
+    
+    .tp-nav-label {
+        font-size: 14px;
+    }
+    
+    .tp-nav-description {
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .tp-nav-container {
+        grid-template-columns: 1fr;
+    }
+    
+    .tp-nav-tab {
+        padding: 20px 16px;
+        flex-direction: row;
+        gap: 16px;
+        text-align: left;
+    }
+    
+    .tp-nav-content {
+        flex: 1;
+    }
+}

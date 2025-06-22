@@ -1,3 +1,6 @@
+/* Import Modern Navigation Styles */
+@import url('../../../packages/components/src/components/profile/ModernProfileNavigation.css');
+
 /* Modal Styles */
 .tp-modal-overlay {
     position: fixed;

@@ -23,6 +23,7 @@ export { default as MissionAndValues } from "./components/site/MissionAndValues"
 export { default as SiteContact } from "./components/site/SiteContact";
 
 export * from "./components/profile"
+export type { TabType } from "./components/profile/ProfileNavigation";
 // export { default as TeacherComments } from "./components/teachers/TeacherComments";
 
 // Re-export hooks that are still needed

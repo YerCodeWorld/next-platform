@@ -21,10 +21,10 @@ interface SingleProps {
 type ColorType = '#A47BB9' | '#E08D79' | '#5C9EAD' | '#D46BA3' | '#779ECB' | '#8859A3';
 
 // Helper functions to safely access content properties
-const getContentForToc = (content: PostData | DynamicData, contentType: string): string => {
-  if (!content) return '';
-  return contentType === 'post' ? (content as PostData).content : (content as DynamicData).content;
-};
+// const getContentForToc = (content: PostData | DynamicData, contentType: string): string => {
+//   if (!content) return '';
+//   return contentType === 'post' ? (content as PostData).content : (content as DynamicData).content;
+// };
 
 const getMainContent = (content: PostData | DynamicData, contentType: string): string => {
   if (!content) return '';

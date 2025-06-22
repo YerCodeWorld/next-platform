@@ -1,6 +1,4 @@
-import { Suspense } from 'react';
 import { getTranslations } from 'next-intl/server';
-import { getCurrentUser } from '@/lib/auth';
 
 export default async function InfoPage({
                                            params
@@ -8,10 +6,7 @@ export default async function InfoPage({
     params: Promise<{ locale: string }>
 }) {
     const { locale } = await params;
-    const [t, user] = await Promise.all([
-        getTranslations('info'),
-        getCurrentUser()
-    ]);
+    const t = await getTranslations('info');
 
     return (
         <div className="info-page">

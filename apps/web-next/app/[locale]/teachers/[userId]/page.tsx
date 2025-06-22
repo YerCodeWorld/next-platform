@@ -9,7 +9,7 @@ import '@/styles/teacherProfile.css';
 
 // Import profile components
 import { ProfileHero } from '@repo/components';
-import { ProfileNavigation } from '@repo/components';
+import { ProfileNavigation, TabType } from '@repo/components';
 import { AboutSection } from '@repo/components';
 import { ExperienceSection } from '@repo/components';
 import { ResourcesSection } from '@repo/components';
@@ -122,7 +122,7 @@ const TeacherProfilePage: React.FC = () => {
     const [posts, setPosts] = useState<Post[]>([]);
     const [exercises, setExercises] = useState<Exercise[]>([]);
     const [loading, setLoading] = useState(true);
-    const [activeTab, setActiveTab] = useState('about');
+    const [activeTab, setActiveTab] = useState<TabType>('about');
     const [teacherStats, setTeacherStats] = useState<TeacherStats | null>(null);
 
     // Modal states

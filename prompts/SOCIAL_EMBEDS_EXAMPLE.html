@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>EduGuiders Social Posts</title>
+  <style>
+    :root {
+      --bg: #0f0f0f;
+      --card-radius: 20px;
+      --tiktok: #69C9D0;
+      --insta: #E1306C;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      font-family: 'Segoe UI', sans-serif;
+      color: white;
+      display: flex;
+      justify-content: center;
+      padding: 40px 20px;
+      min-height: 100vh;
+    }
+
+    .social-showcase {
+      display: grid;
+      gap: 30px;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      width: 100%;
+      max-width: 1200px;
+    }
+
+    .post-card {
+      border-radius: var(--card-radius);
+      overflow: hidden;
+      box-shadow: 0 0 20px rgba(0,0,0,0.4);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      position: relative;
+      padding: 0;
+    }
+
+    .post-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 10px 30px rgba(255, 255, 255, 0.1);
+    }
+
+    .platform-tag {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      padding: 5px 14px;
+      font-size: 13px;
+      font-weight: bold;
+      border-radius: 20px;
+      z-index: 2;
+      background: #fff;
+      color: #000;
+    }
+
+    .platform-insta { background: var(--insta); color: white; }
+    .platform-tiktok { background: var(--tiktok); color: black; }
+
+    .platform-insta-bg {
+      background: radial-gradient(circle at top left, #feda75, #fa7e1e, #d62976, #962fbf, #4f5bd5);
+    }
+
+    .platform-tiktok-bg {
+      background: linear-gradient(135deg, #69C9D0 0%, #EE1D52 100%);
+    }
+
+    .embed-wrapper {
+      width: 100%;
+      aspect-ratio: 9 / 16;
+      background: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .instagram-media, .tiktok-embed, iframe {
+      width: 100% !important;
+      max-width: 100% !important;
+      height: 100%;
+      border: none;
+    }
+
+    @media (max-width: 400px) {
+      .platform-tag {
+        font-size: 11px;
+        padding: 4px 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="social-showcase">
+
+  <!-- Instagram Post -->
+  <div class="post-card platform-insta-bg">
+    <div class="platform-tag platform-insta">Instagram</div>
+    <div class="embed-wrapper">
+      <iframe
+        src="https://www.instagram.com/p/DLDDjQnuXhJ/embed"
+        allowtransparency="true"
+        allow="encrypted-media"
+        scrolling="no"
+        loading="lazy">
+      </iframe>
+    </div>
+  </div>
+
+  <!-- TikTok Post -->
+  <div class="post-card platform-tiktok-bg">
+    <div class="platform-tag platform-tiktok">TikTok</div>
+    <div class="embed-wrapper">
+      <blockquote class="tiktok-embed"
+        cite="https://www.tiktok.com/@eduguiders/photo/7518461262624345350"
+        data-video-id="7518461262624345350"
+        style="max-width: 100%; min-width: 100%;">
+        <section>Loading TikTok...</section>
+      </blockquote>
+    </div>
+  </div>
+
+</div>
+
+<!-- TikTok Embed Script -->
+<script async src="https://www.tiktok.com/embed.js"></script>
+
+</body>
+</html>

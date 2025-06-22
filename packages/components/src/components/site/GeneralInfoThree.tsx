@@ -82,3 +82,5 @@ const GeneralInfoThree = () => {
         </section>
     );
 };
+
+export default GeneralInfoThree;

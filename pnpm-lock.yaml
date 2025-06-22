@@ -195,6 +195,9 @@ importers:
       lightgallery:
         specifier: ^2.8.2
         version: 2.8.3
+      lucide-react:
+        specifier: ^0.515.0
+        version: 0.515.0(react@19.1.0)
       next-link:
         specifier: ^2.0.0
         version: 2.0.0

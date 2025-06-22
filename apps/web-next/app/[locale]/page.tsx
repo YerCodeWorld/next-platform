@@ -9,6 +9,7 @@ import TestimonialsWrapper from '@/components/home/TestimonialsWrapper';
 import BlogShowCaseWrapper from '@/components/home/BlogShowCaseWrapper';
 import SectionsCardsTwoWrapper from '@/components/home/SectionsCardsTwoWrapper';
 import WelcomeMessage from '@/components/home/WelcomeMessage';
+import SocialMediaShowcase from '@/components/social/SocialMediaShowcase';
 import { getCurrentUser } from '@/lib/auth';
 
 export default async function HomePage({
@@ -44,6 +45,11 @@ export default async function HomePage({
                     {/* Cards Section */}
                     <Suspense fallback={<div>Loading cards...</div>}>
                         <SectionsCardsTwoWrapper locale={locale} />
+                    </Suspense>
+
+                    {/* Social Media Showcase */}
+                    <Suspense fallback={<div>Loading social media...</div>}>
+                        <SocialMediaShowcase locale={locale} />
                     </Suspense>
 
                     {/* Marquee */}

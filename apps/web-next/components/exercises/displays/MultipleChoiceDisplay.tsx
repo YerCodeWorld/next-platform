@@ -363,7 +363,7 @@ export function MultipleChoiceDisplay({
         {/* Question area with navigation */}
         <motion.div 
           className="mc-question-area"
-          key={currentQuestionIndex}
+          key={`question-area-${currentQuestionIndex}`}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, ease: 'easeOut' }}
@@ -437,7 +437,7 @@ export function MultipleChoiceDisplay({
           variants={staggerContainer}
           initial="hidden"
           animate="visible"
-          key={currentQuestionIndex} // Re-animate when question changes
+          key={`options-${currentQuestionIndex}`} // Re-animate when question changes
         >
           <AnimatePresence mode="popLayout">
             {currentQuestion.options.map((option, index) => {
