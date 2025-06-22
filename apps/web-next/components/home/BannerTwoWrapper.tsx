@@ -15,25 +15,13 @@ export default async function BannerTwoWrapper({ locale }: { locale: string }) {
                 title: t('carousel.slide1.title'),
                 subtitle: t('carousel.slide1.subtitle'),
                 buttonText: t('carousel.slide1.buttonText'),
-                buttonLink: `/${locale}/register`
+                buttonLink: `/${locale}/edugames`
             },
             {
                 title: t('carousel.slide2.title'),
                 subtitle: t('carousel.slide2.subtitle'),
                 buttonText: t('carousel.slide2.buttonText'),
-                buttonLink: `/${locale}/teachers`
-            },
-            {
-                title: t('carousel.slide3.title'),
-                subtitle: t('carousel.slide3.subtitle'),
-                buttonText: t('carousel.slide3.buttonText'),
-                buttonLink: `/${locale}/courses`
-            },
-            {
-                title: t('carousel.slide4.title'),
-                subtitle: t('carousel.slide4.subtitle'),
-                buttonText: t('carousel.slide4.buttonText'),
-                buttonLink: `/${locale}/testimonies`
+                buttonLink: `/${locale}/exercises`
             }
         ]
     };

@@ -23,14 +23,14 @@
     },
     "carousel": {
       "slide1": {
-        "title": "Find Your Ideal Course, Build Skills",
-        "subtitle": "Welcome to EduGuiders, where learning knows no bounds. Whether you're a student, professional, or lifelong learner...",
-        "buttonText": "Browse Courses"
+        "title": "Explore Educational Games",
+        "subtitle": "Discover amazing educational games designed to make learning fun and engaging. Play, learn, and master new skills!",
+        "buttonText": "Play EduGames"
       },
       "slide2": {
-        "title": "Connect with Expert Teachers",
-        "subtitle": "Learn from experienced educators who are passionate about helping you succeed.",
-        "buttonText": "Find Teachers"
+        "title": "Practice and Master Skills",
+        "subtitle": "Access comprehensive exercise packages and practice materials to enhance your learning journey.",
+        "buttonText": "Start Practicing"
       },
       "slide3": {
         "title": "Interactive Learning Experience",
@@ -315,5 +315,26 @@
   "games": {
     "title": "EduGames",
     "subtitle": "Discover amazing educational games designed to make learning fun and engaging!"
+  },
+  "info": {
+    "title": "General Information",
+    "subtitle": "Learn more about EduGuiders, our terms, and our community",
+    "aboutUs": {
+      "title": "About Us",
+      "subtitle": "Our Mission and Vision",
+      "description": "EduGuiders is an innovative educational platform designed to connect students with expert teachers and high-quality learning resources. We believe in the power of education to transform lives and create opportunities."
+    },
+    "terms": {
+      "title": "Terms of Service",
+      "subtitle": "Terms and Conditions"
+    },
+    "faqs": {
+      "title": "Frequently Asked Questions",
+      "subtitle": "Find answers to the most common questions about our platform"
+    },
+    "testimonials": {
+      "title": "What Our Users Say",
+      "subtitle": "Real experiences from our community of students and educators"
+    }
   }
 }

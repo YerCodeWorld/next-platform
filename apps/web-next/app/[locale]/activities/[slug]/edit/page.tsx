@@ -119,7 +119,7 @@ export default function EditDynamicPage({
 
             fetchDynamic();
         }
-    }, [mode, dynamicSlug, router, canEditThisDynamic, dynamicsApi]);
+    }, [mode, dynamicSlug]);
 
     // Check permissions
     useEffect(() => {
@@ -128,7 +128,7 @@ export default function EditDynamicPage({
             const currentLocale = window.location.pathname.split('/')[1];
             router.push(`/${currentLocale}/activities`);
         }
-    }, [isAuthenticated, user, router, canEditDynamics]);
+    }, [isAuthenticated, user]);
 
     // Set page title
     useEffect(() => {

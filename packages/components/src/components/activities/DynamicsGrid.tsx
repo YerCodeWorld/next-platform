@@ -17,6 +17,7 @@ interface DynamicsGridProps {
     dynamics: Dynamic[];
     user: User | null;
     locale: string;
+    onReadDynamic?: (dynamic: Dynamic) => void; // Callback to handle reading dynamics
 }
 
 interface DynamicsFilters {
@@ -29,7 +30,7 @@ interface DynamicsFilters {
 
 const DYNAMICS_PER_PAGE = 6;
 
-const DynamicsGrid: React.FC<DynamicsGridProps> = ({ dynamics, user, locale }) => {
+const DynamicsGrid: React.FC<DynamicsGridProps> = ({ dynamics, user, locale, onReadDynamic }) => {
     const [currentPage, setCurrentPage] = useState(1);
     const [filters, setFilters] = useState<DynamicsFilters>({
         dynamicType: '',
@@ -310,9 +311,18 @@ const DynamicsGrid: React.FC<DynamicsGridProps> = ({ dynamics, user, locale }) =
 
                                         {/* Title and Objective */}
                                         <h3 className="card-title">
-                                            <Link href={`/${locale}/activities/${dynamic.slug}`}>
-                                                {dynamic.title}
-                                            </Link>
+                                            {onReadDynamic ? (
+                                                <button
+                                                    onClick={() => onReadDynamic(dynamic)}
+                                                    className="title-button"
+                                                >
+                                                    {dynamic.title}
+                                                </button>
+                                            ) : (
+                                                <Link href={`/${locale}/activities/${dynamic.slug}`}>
+                                                    {dynamic.title}
+                                                </Link>
+                                            )}
                                         </h3>
                                         <p className="card-objective">
                                             {dynamic.objective}
@@ -368,13 +378,23 @@ const DynamicsGrid: React.FC<DynamicsGridProps> = ({ dynamics, user, locale }) =
                                                     </div>
                                                 </div>
                                             </div>
-                                            <Link
-                                                href={`/${locale}/activities/${dynamic.slug}`}
-                                                className="view-link"
-                                            >
-                                                {locale === 'es' ? 'Ver Dinámica' : 'View Dynamic'}
-                                                <i className="ph ph-arrow-right" />
-                                            </Link>
+                                            {onReadDynamic ? (
+                                                <button
+                                                    onClick={() => onReadDynamic(dynamic)}
+                                                    className="view-link"
+                                                >
+                                                    {locale === 'es' ? 'Ver Dinámica' : 'View Dynamic'}
+                                                    <i className="ph ph-arrow-right" />
+                                                </button>
+                                            ) : (
+                                                <Link
+                                                    href={`/${locale}/activities/${dynamic.slug}`}
+                                                    className="view-link"
+                                                >
+                                                    {locale === 'es' ? 'Ver Dinámica' : 'View Dynamic'}
+                                                    <i className="ph ph-arrow-right" />
+                                                </Link>
+                                            )}
                                         </div>
                                     </article>
                                 ))}
@@ -718,6 +738,24 @@ const DynamicsGrid: React.FC<DynamicsGridProps> = ({ dynamics, user, locale }) =
                     color: #059669;
                 }
 
+                .title-button {
+                    background: none;
+                    border: none;
+                    padding: 0;
+                    font-family: inherit;
+                    font-size: inherit;
+                    font-weight: inherit;
+                    color: inherit;
+                    text-align: left;
+                    cursor: pointer;
+                    width: 100%;
+                    line-height: inherit;
+                }
+
+                .dynamic-card:hover .title-button {
+                    color: #059669;
+                }
+
                 .card-objective {
                     color: #059669;
                     font-weight: 500;
@@ -811,6 +849,11 @@ const DynamicsGrid: React.FC<DynamicsGridProps> = ({ dynamics, user, locale }) =
                     color: #059669;
                     font-weight: 600;
                     text-decoration: none;
+                    background: none;
+                    border: none;
+                    padding: 0;
+                    cursor: pointer;
+                    font-family: inherit;
                     display: flex;
                     align-items: center;
                     gap: 0.25rem;

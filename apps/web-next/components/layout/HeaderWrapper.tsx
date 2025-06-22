@@ -17,7 +17,7 @@ export default async function HeaderWrapper({ locale }: { locale: string }) {
             practice: t('common.navigation.practice'),
             games: t('common.navigation.games'),
             courses: t('common.navigation.courses'),
-            competitions: t('common.navigation.discussion'),
+            competitions: t('common.navigation.games'),
             discussion: t('common.navigation.discussion')
         },
         buttons: {

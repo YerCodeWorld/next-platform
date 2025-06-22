@@ -17,13 +17,32 @@ interface ExercisePackagesGridWrapperProps {
   packages: ExercisePackage[];
   locale: string;
   userData?: User | null;
+  translations?: {
+    pageTitle: string;
+    hero: {
+      title: string;
+      subtitle: string;
+      searchPlaceholder: string;
+    };
+    categories: {
+      all: string;
+    };
+    card: {
+      startNow: string;
+    };
+    empty: {
+      title: string;
+      subtitle: string;
+    };
+  };
 }
 
 
 export default function ExercisePackagesGridWrapper({ 
   packages, 
   locale, 
-  userData 
+  userData,
+  translations 
 }: ExercisePackagesGridWrapperProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('');
@@ -134,7 +153,7 @@ export default function ExercisePackagesGridWrapper({
             <Search className="search-icon" />
             <input
               type="text"
-              placeholder={locale === 'es' ? 'Buscar paquetes de ejercicios...' : 'Search exercise packages...'}
+              placeholder={translations ? translations.hero.searchPlaceholder : (locale === 'es' ? 'Buscar paquetes de ejercicios...' : 'Search exercise packages...')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -146,7 +165,7 @@ export default function ExercisePackagesGridWrapper({
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
             >
-              <option value="">{locale === 'es' ? 'Todas las categorías' : 'All Categories'}</option>
+              <option value="">{translations ? translations.categories.all : (locale === 'es' ? 'Todas las categorías' : 'All Categories')}</option>
               <option value="GRAMMAR">{getCategoryLabel('GRAMMAR')}</option>
               <option value="VOCABULARY">{getCategoryLabel('VOCABULARY')}</option>
               <option value="READING">{getCategoryLabel('READING')}</option>
@@ -162,7 +181,7 @@ export default function ExercisePackagesGridWrapper({
                 className="exercise-packages__create-btn"
               >
                 <Plus className="icon" />
-                {locale === 'es' ? 'Crear Paquete' : 'Create Package'}
+                {translations ? translations.card.startNow : (locale === 'es' ? 'Crear Paquete' : 'Create Package')}
               </button>
             )}
           </div>
@@ -175,6 +194,7 @@ export default function ExercisePackagesGridWrapper({
             locale={locale} 
             userData={userData}
             getCompletionRate={getCompletionRate}
+            translations={translations}
           />
         ) : (
           <CategoryCarousels 
@@ -183,6 +203,7 @@ export default function ExercisePackagesGridWrapper({
             userData={userData}
             getCategoryLabel={getCategoryLabel}
             getCompletionRate={getCompletionRate}
+            translations={translations}
           />
         )}
 
@@ -210,6 +231,24 @@ interface CategoryCarouselsProps {
   userData?: User | null;
   getCategoryLabel: (category: string) => string;
   getCompletionRate: (packageId: string) => number;
+  translations?: {
+    pageTitle: string;
+    hero: {
+      title: string;
+      subtitle: string;
+      searchPlaceholder: string;
+    };
+    categories: {
+      all: string;
+    };
+    card: {
+      startNow: string;
+    };
+    empty: {
+      title: string;
+      subtitle: string;
+    };
+  };
 }
 
 function CategoryCarousels({ 
@@ -217,7 +256,8 @@ function CategoryCarousels({
   locale, 
   userData,
   getCategoryLabel,
-  getCompletionRate
+  getCompletionRate,
+  translations
 }: CategoryCarouselsProps) {
   return (
     <div>
@@ -230,6 +270,7 @@ function CategoryCarousels({
           userData={userData}
           getCategoryLabel={getCategoryLabel}
           getCompletionRate={getCompletionRate}
+          translations={translations}
         />
       ))}
     </div>
@@ -244,6 +285,24 @@ interface CategoryCarouselProps {
   userData?: User | null;
   getCategoryLabel: (category: string) => string;
   getCompletionRate: (packageId: string) => number;
+  translations?: {
+    pageTitle: string;
+    hero: {
+      title: string;
+      subtitle: string;
+      searchPlaceholder: string;
+    };
+    categories: {
+      all: string;
+    };
+    card: {
+      startNow: string;
+    };
+    empty: {
+      title: string;
+      subtitle: string;
+    };
+  };
 }
 
 function CategoryCarousel({
@@ -252,7 +311,8 @@ function CategoryCarousel({
   locale,
   userData,
   getCategoryLabel,
-  getCompletionRate
+  getCompletionRate,
+  translations
 }: CategoryCarouselProps) {
   const sliderRef = useRef<SliderRef>(null);
 
@@ -329,9 +389,9 @@ function CategoryCarousel({
         </Slider>
       ) : (
         <div className="category-carousel__empty">
-          {locale === 'es' 
+          {translations ? translations.empty.subtitle : (locale === 'es' 
             ? 'Esta sección aún no tiene paquetes disponibles.'
-            : 'This section does not have any packages yet.'}
+            : 'This section does not have any packages yet.')}
         </div>
       )}
     </div>
@@ -344,13 +404,32 @@ interface FilteredPackagesGridProps {
   locale: string;
   userData?: User | null;
   getCompletionRate: (packageId: string) => number;
+  translations?: {
+    pageTitle: string;
+    hero: {
+      title: string;
+      subtitle: string;
+      searchPlaceholder: string;
+    };
+    categories: {
+      all: string;
+    };
+    card: {
+      startNow: string;
+    };
+    empty: {
+      title: string;
+      subtitle: string;
+    };
+  };
 }
 
 function FilteredPackagesGrid({ 
   packages, 
   locale, 
   userData,
-  getCompletionRate
+  getCompletionRate,
+  translations
 }: FilteredPackagesGridProps) {
   return (
     <div className="filtered-packages-grid">
@@ -367,9 +446,9 @@ function FilteredPackagesGrid({
         ))
       ) : (
         <div className="filtered-packages-grid__empty">
-          {locale === 'es'
+          {translations ? translations.empty.title : (locale === 'es'
             ? 'No se encontraron paquetes que coincidan con tu búsqueda.'
-            : 'No packages found matching your search.'}
+            : 'No packages found matching your search.')}
         </div>
       )}
     </div>

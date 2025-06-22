@@ -67,7 +67,7 @@ const TiptapEditor = forwardRef<TiptapEditorRef, TiptapEditorProps>(
 
     const throttledUpdate = useCallback(
       throttle((value: Content) => onContentChange?.(value), 1500),
-      []
+      [onContentChange]
     );
 
     const handleUpdate = useCallback(
@@ -76,7 +76,7 @@ const TiptapEditor = forwardRef<TiptapEditorRef, TiptapEditorProps>(
           output === "html" ? (editor.isEmpty ? "" : editor.getHTML()) : editor.getJSON();
         throttledUpdate(content);
       },
-      [throttledUpdate, output]
+      [output, throttledUpdate]
     );
 
     const editorOptions: UseTiptapEditorOptions = {

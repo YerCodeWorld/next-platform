@@ -40,7 +40,7 @@ const TeacherCard: React.FC<TeacherCardProps> = ({ teacher, locale }) => {
                     />
                 )}
                 
-                {/* Profile Image Overlay*/}
+                {/* Profile Image Overlay */}
                 <div className="teacher-card__profile-wrapper">
                     {teacher.profileImage ? (
                         <img
@@ -188,7 +188,7 @@ const TeacherCard: React.FC<TeacherCardProps> = ({ teacher, locale }) => {
                     position: relative;
                     height: 150px;
                     width: 100%;
-                    overflow: hidden;
+                    overflow: visible;
                 }
 
                 .teacher-card__cover-image {
@@ -222,6 +222,7 @@ const TeacherCard: React.FC<TeacherCardProps> = ({ teacher, locale }) => {
                     border: 4px solid white;
                     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
                     background: white;
+                    z-index: 100;
                 }
 
                 .teacher-card__profile-image {

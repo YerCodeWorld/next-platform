@@ -23,14 +23,14 @@
     },
     "carousel": {
       "slide1": {
-        "title": "Encuentra tu Curso Ideal, Desarrolla Habilidades",
-        "subtitle": "Bienvenido a EduGuiders, donde el aprendizaje no tiene límites. Ya seas estudiante, profesional, o aprendiz de por vida...",
-        "buttonText": "Explorar Cursos"
+        "title": "Explora Juegos Educativos",
+        "subtitle": "Descubre increíbles juegos educativos diseñados para hacer que el aprendizaje sea divertido y atractivo. ¡Juega, aprende y domina nuevas habilidades!",
+        "buttonText": "Jugar EduJuegos"
       },
       "slide2": {
-        "title": "Conecta con Profesores Expertos",
-        "subtitle": "Aprende de educadores experimentados que están apasionados por ayudarte a tener éxito.",
-        "buttonText": "Encontrar Profesores"
+        "title": "Practica y Domina Habilidades",
+        "subtitle": "Accede a paquetes de ejercicios integrales y materiales de práctica para mejorar tu experiencia de aprendizaje.",
+        "buttonText": "Comenzar a Practicar"
       },
       "slide3": {
         "title": "Experiencia de Aprendizaje Interactiva",
@@ -315,5 +315,26 @@
   "games": {
     "title": "EduJuegos",
     "subtitle": "¡Descubre increíbles juegos educativos diseñados para hacer que el aprendizaje sea divertido y atractivo!"
+  },
+  "info": {
+    "title": "Información General",
+    "subtitle": "Conoce más sobre EduGuiders, nuestros términos y nuestra comunidad",
+    "aboutUs": {
+      "title": "Acerca de Nosotros",
+      "subtitle": "Nuestra Misión y Visión",
+      "description": "EduGuiders es una plataforma educativa innovadora diseñada para conectar estudiantes con profesores expertos y recursos de aprendizaje de alta calidad. Creemos en el poder de la educación para transformar vidas y crear oportunidades."
+    },
+    "terms": {
+      "title": "Términos de Servicio",
+      "subtitle": "Términos y Condiciones"
+    },
+    "faqs": {
+      "title": "Preguntas Frecuentes",
+      "subtitle": "Encuentra respuestas a las preguntas más comunes sobre nuestra plataforma"
+    },
+    "testimonials": {
+      "title": "Lo que Dicen Nuestros Usuarios",
+      "subtitle": "Experiencias reales de nuestra comunidad de estudiantes y educadores"
+    }
   }
 }

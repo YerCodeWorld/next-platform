@@ -5,6 +5,133 @@ import { createPortal } from 'react-dom';
 import { TeacherProfile, useTeacherProfileApi } from '@repo/api-bridge';
 import { toast } from 'sonner';
 
+// Cloudinary Upload Widget
+const UploadWidget = ({ children, onSuccess, onError, uploadType = 'profile' }: any) => {
+  const [isScriptLoaded, setIsScriptLoaded] = React.useState(false);
+  const cloudinaryRef = React.useRef<any>(null);
+  const widgetRef = React.useRef<any>(null);
+
+  React.useEffect(() => {
+    // Check if script is already loaded
+    if ((window as any).cloudinary) {
+      setIsScriptLoaded(true);
+      cloudinaryRef.current = (window as any).cloudinary;
+      return;
+    }
+
+    // Load script if not already present
+    const existingScript = document.querySelector('script[src*="cloudinary.com"]');
+    if (!existingScript) {
+      const script = document.createElement('script');
+      script.src = 'https://upload-widget.cloudinary.com/global/all.js';
+      script.async = true;
+      script.onload = () => {
+        setIsScriptLoaded(true);
+        cloudinaryRef.current = (window as any).cloudinary;
+      };
+      script.onerror = () => {
+        console.error('Failed to load Cloudinary script');
+        if (onError) onError('Failed to load upload widget');
+      };
+      document.head.appendChild(script);
+    }
+
+    return () => {
+      if (widgetRef.current) {
+        widgetRef.current.destroy();
+        widgetRef.current = null;
+      }
+    };
+  }, []);
+
+  const openWidget = () => {
+    if (!isScriptLoaded || !cloudinaryRef.current) {
+      toast.error('Upload widget is still loading. Please try again in a moment.');
+      return;
+    }
+
+    // Destroy existing widget if it exists
+    if (widgetRef.current) {
+      widgetRef.current.destroy();
+    }
+
+    // Configure upload options based on type
+    const uploadOptions = {
+      cloudName: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || 'your-cloud-name',
+      uploadPreset: process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || 'your-upload-preset',
+      sources: ['local', 'url', 'camera'],
+      multiple: false,
+      maxFiles: 1,
+      resourceType: 'image',
+      clientAllowedFormats: ['png', 'gif', 'jpeg', 'jpg', 'webp'],
+      maxFileSize: 5000000, // 5MB
+      folder: 'teacher-profiles',
+      tags: ['teacher', uploadType],
+      showAdvancedOptions: false,
+      cropping: uploadType === 'profile',
+      croppingAspectRatio: uploadType === 'profile' ? 1 : undefined,
+      croppingShowBackButton: true,
+      croppingCoordinatesMode: 'custom',
+      maxImageWidth: uploadType === 'profile' ? 800 : 1200,
+      maxImageHeight: uploadType === 'profile' ? 800 : 600,
+      theme: 'minimal',
+      styles: {
+        palette: {
+          window: '#FFFFFF',
+          windowBorder: '#90A0B3',
+          tabIcon: '#0078FF',
+          menuIcons: '#5A616A',
+          textDark: '#000000',
+          textLight: '#FFFFFF',
+          link: '#0078FF',
+          action: '#FF620C',
+          inactiveTabIcon: '#0E2F5A',
+          error: '#F44235',
+          inProgress: '#0078FF',
+          complete: '#20B832',
+          sourceBg: '#E4EBF1'
+        }
+      }
+    };
+
+    try {
+      widgetRef.current = cloudinaryRef.current.createUploadWidget(
+        uploadOptions,
+        (error: any, result: any) => {
+          if (error) {
+            console.error('Cloudinary upload error:', error);
+            if (onError) {
+              onError(error);
+            }
+            return;
+          }
+
+          if (result && result.event === 'success') {
+            console.log('Upload successful:', result.info);
+            if (onSuccess) {
+              onSuccess(result.info);
+            }
+          }
+
+          // Handle other events if needed
+          if (result && result.event === 'abort') {
+            console.log('Upload aborted');
+          }
+        }
+      );
+
+      widgetRef.current.open();
+    } catch (err) {
+      console.error('Error creating upload widget:', err);
+      if (onError) {
+        onError('Failed to open upload widget');
+      }
+    }
+  };
+
+  return children({ open: openWidget, isReady: isScriptLoaded });
+};
+
 interface EditProfileModalProps {
     profile: TeacherProfile;
     profileThemes: Record<string, any>;
@@ -246,23 +373,107 @@ const EditProfileModal: React.FC<EditProfileModalProps> = ({
 
                             <div className="tp-form-grid">
                                 <div className="tp-form-group">
-                                    <label>Profile Image URL</label>
-                                    <input
-                                        type="url"
-                                        value={formData.profileImage}
-                                        onChange={(e) => setFormData({ ...formData, profileImage: e.target.value })}
-                                        placeholder="https://..."
-                                    />
+                                    <label>Profile Image</label>
+                                    <div className="tp-image-upload">
+                                        {formData.profileImage && (
+                                            <div className="tp-image-preview">
+                                                <img src={formData.profileImage} alt="Profile preview" />
+                                                <button
+                                                    type="button"
+                                                    className="tp-image-remove"
+                                                    onClick={() => setFormData({ ...formData, profileImage: '' })}
+                                                    title="Remove image"
+                                                >
+                                                    ×
+                                                </button>
+                                            </div>
+                                        )}
+                                        <div className="tp-upload-options">
+                                            <UploadWidget
+                                                uploadType="profile"
+                                                onSuccess={(info: any) => {
+                                                    setFormData({ ...formData, profileImage: info.secure_url });
+                                                    toast.success('Profile image uploaded successfully!');
+                                                }}
+                                                onError={(error: any) => {
+                                                    console.error('Upload error:', error);
+                                                    toast.error('Failed to upload image. Please try again.');
+                                                }}
+                                            >
+                                                {({ open, isReady }: any) => (
+                                                    <button
+                                                        type="button"
+                                                        onClick={open}
+                                                        className="tp-upload-btn tp-upload-btn-primary"
+                                                        disabled={!isReady}
+                                                    >
+                                                        <i className="fas fa-camera"></i>
+                                                        {isReady ? 'Upload Image' : 'Loading...'}
+                                                    </button>
+                                                )}
+                                            </UploadWidget>
+                                            <span className="tp-upload-divider">or</span>
+                                            <input
+                                                type="url"
+                                                value={formData.profileImage}
+                                                onChange={(e) => setFormData({ ...formData, profileImage: e.target.value })}
+                                                placeholder="Enter image URL..."
+                                                className="tp-url-input"
+                                            />
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <div className="tp-form-group">
-                                    <label>Cover Image URL</label>
-                                    <input
-                                        type="url"
-                                        value={formData.coverImage}
-                                        onChange={(e) => setFormData({ ...formData, coverImage: e.target.value })}
-                                        placeholder="https://..."
-                                    />
+                                    <label>Cover Image</label>
+                                    <div className="tp-image-upload">
+                                        {formData.coverImage && (
+                                            <div className="tp-image-preview tp-cover-preview">
+                                                <img src={formData.coverImage} alt="Cover preview" />
+                                                <button
+                                                    type="button"
+                                                    className="tp-image-remove"
+                                                    onClick={() => setFormData({ ...formData, coverImage: '' })}
+                                                    title="Remove image"
+                                                >
+                                                    ×
+                                                </button>
+                                            </div>
+                                        )}
+                                        <div className="tp-upload-options">
+                                            <UploadWidget
+                                                uploadType="cover"
+                                                onSuccess={(info: any) => {
+                                                    setFormData({ ...formData, coverImage: info.secure_url });
+                                                    toast.success('Cover image uploaded successfully!');
+                                                }}
+                                                onError={(error: any) => {
+                                                    console.error('Upload error:', error);
+                                                    toast.error('Failed to upload cover image. Please try again.');
+                                                }}
+                                            >
+                                                {({ open, isReady }: any) => (
+                                                    <button
+                                                        type="button"
+                                                        onClick={open}
+                                                        className="tp-upload-btn tp-upload-btn-secondary"
+                                                        disabled={!isReady}
+                                                    >
+                                                        <i className="fas fa-image"></i>
+                                                        {isReady ? 'Upload Cover' : 'Loading...'}
+                                                    </button>
+                                                )}
+                                            </UploadWidget>
+                                            <span className="tp-upload-divider">or</span>
+                                            <input
+                                                type="url"
+                                                value={formData.coverImage}
+                                                onChange={(e) => setFormData({ ...formData, coverImage: e.target.value })}
+                                                placeholder="Enter image URL..."
+                                                className="tp-url-input"
+                                            />
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 

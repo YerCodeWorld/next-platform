@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useRef } from 'react';
+import { createPortal } from 'react-dom';
 
 interface TocItem {
   id: string;
@@ -17,7 +18,25 @@ export const PostTocNext: React.FC<PostTocNextProps> = ({ content, locale }) => 
   const [items, setItems] = useState<TocItem[]>([]);
   const [activeId, setActiveId] = useState<string>('');
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const observerRef = useRef<IntersectionObserver | null>(null);
+
+  // Handle mounting for SSR safety
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Handle body scroll lock when mobile modal is open
+  useEffect(() => {
+    if (isMobileOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isMobileOpen]);
 
   // Extract headings from rendered content
   useEffect(() => {
@@ -135,10 +154,51 @@ export const PostTocNext: React.FC<PostTocNextProps> = ({ content, locale }) => 
     return null;
   }
 
+  // Mobile modal portal
+  const mobileModal = isMobileOpen && mounted ? createPortal(
+    <>
+      {/* Mobile Overlay */}
+      <div 
+        className="toc-overlay visible"
+        onClick={() => setIsMobileOpen(false)}
+      />
+      
+      {/* Mobile TOC Modal */}
+      <aside className="post-toc mobile-open">
+        <div className="toc-card">
+          <div className="toc-header">
+            <svg className="toc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+            <h3 className="toc-title">
+              {locale === 'es' ? 'Contenido' : 'Contents'}
+            </h3>
+          </div>
+          
+          <nav className="toc-nav">
+            {items.map((item) => (
+              <a
+                key={item.id}
+                href={`#${item.id}`}
+                onClick={(e) => handleClick(e, item.id)}
+                className={`toc-link level-${item.level} ${activeId === item.id ? 'active' : ''}`}
+              >
+                {item.text}
+              </a>
+            ))}
+          </nav>
+        </div>
+      </aside>
+    </>,
+    document.body
+  ) : null;
+
   return (
     <>
       {/* Desktop TOC */}
-      <aside className={`post-toc ${isMobileOpen ? 'mobile-open' : ''}`}>
+      <aside className="post-toc">
         <div className="toc-card">
           <div className="toc-header">
             <svg className="toc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -179,11 +239,8 @@ export const PostTocNext: React.FC<PostTocNextProps> = ({ content, locale }) => 
         </svg>
       </button>
 
-      {/* Mobile Overlay */}
-      <div 
-        className={`toc-overlay ${isMobileOpen ? 'visible' : ''}`}
-        onClick={() => setIsMobileOpen(false)}
-      />
+      {/* Mobile Modal Portal */}
+      {mobileModal}
 
       <style jsx>{`
         .post-toc {
@@ -322,7 +379,6 @@ export const PostTocNext: React.FC<PostTocNextProps> = ({ content, locale }) => 
 
         /* Mobile toggle button */
         .toc-mobile-toggle {
-          display: none;
           position: fixed;
           bottom: 24px;
           right: 24px;
@@ -336,8 +392,18 @@ export const PostTocNext: React.FC<PostTocNextProps> = ({ content, locale }) => 
             0 4px 6px -1px rgba(0, 0, 0, 0.1),
             0 2px 4px -1px rgba(0, 0, 0, 0.06);
           cursor: pointer;
-          z-index: 50;
+          z-index: 1001;
           transition: all 0.2s ease;
+          display: none;
+        }
+
+        /* Show button on mobile and tablet */
+        @media (max-width: 1024px) {
+          .toc-mobile-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          }
         }
 
         .toc-mobile-toggle:hover {
@@ -366,7 +432,7 @@ export const PostTocNext: React.FC<PostTocNextProps> = ({ content, locale }) => 
             height: 100vh;
             max-height: 100vh;
             background: white;
-            z-index: 60;
+            z-index: 1000;
             transform: translateX(100%);
             transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             box-shadow: -4px 0 20px rgba(0, 0, 0, 0.1);
@@ -388,12 +454,6 @@ export const PostTocNext: React.FC<PostTocNextProps> = ({ content, locale }) => 
           .toc-card::before {
             border-radius: 0;
           }
-
-          .toc-mobile-toggle {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-          }
         }
 
         /* Mobile overlay */
@@ -406,7 +466,7 @@ export const PostTocNext: React.FC<PostTocNextProps> = ({ content, locale }) => 
           bottom: 0;
           background: rgba(0, 0, 0, 0.5);
           backdrop-filter: blur(4px);
-          z-index: 55;
+          z-index: 999;
           opacity: 0;
           transition: opacity 0.3s ease;
         }

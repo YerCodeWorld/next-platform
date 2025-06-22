@@ -106,7 +106,7 @@ export default function EditPostPage({
 
             fetchPost();
         }
-    }, [mode, postSlug, router, canEditThisPost, postApi]);
+    }, [mode, postSlug]);
 
     // Check permissions
     useEffect(() => {
@@ -115,7 +115,7 @@ export default function EditPostPage({
             const currentLocale = window.location.pathname.split('/')[1];
             router.push(`/${currentLocale}/blog`);
         }
-    }, [isAuthenticated, user, router, canEditPosts]);
+    }, [isAuthenticated, user]);
 
     // Set page title
     useEffect(() => {

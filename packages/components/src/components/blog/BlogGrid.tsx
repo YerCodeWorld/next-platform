@@ -3,16 +3,20 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { Post } from '@repo/api-bridge';
+import dynamic from 'next/dynamic';
+
+// Note: ReadingModal will be passed as a prop from the parent component
 
 interface BlogGridProps {
     posts: Post[];
     locale: string;
     currentUser?: { email: string; role: string } | null;
+    onReadPost?: (post: Post) => void; // Callback to handle reading posts
 }
 
 const POSTS_PER_PAGE = 9;
 
-const BlogGrid: React.FC<BlogGridProps> = ({ posts, locale, currentUser }) => {
+const BlogGrid: React.FC<BlogGridProps> = ({ posts, locale, currentUser, onReadPost }) => {
     const [currentPage, setCurrentPage] = useState(1);
     const [sortBy, setSortBy] = useState('newest');
 
@@ -157,13 +161,23 @@ const BlogGrid: React.FC<BlogGridProps> = ({ posts, locale, currentUser }) => {
 
                                 {/* Action Buttons */}
                                 <div className="post-actions">
-                                    <Link
-                                        href={`/${locale}/blog/${post.slug}`}
-                                        className="read-more-link"
-                                    >
-                                        {locale === 'es' ? 'Leer más' : 'Read more'}
-                                        <i className="ph ph-arrow-right" />
-                                    </Link>
+                                    {onReadPost ? (
+                                        <button
+                                            onClick={() => onReadPost(post)}
+                                            className="read-more-link"
+                                        >
+                                            {locale === 'es' ? 'Leer más' : 'Read more'}
+                                            <i className="ph ph-arrow-right" />
+                                        </button>
+                                    ) : (
+                                        <Link
+                                            href={`/${locale}/blog/${post.slug}`}
+                                            className="read-more-link"
+                                        >
+                                            {locale === 'es' ? 'Leer más' : 'Read more'}
+                                            <i className="ph ph-arrow-right" />
+                                        </Link>
+                                    )}
                                     
                                     {/* Edit button for post owner or admin */}
                                     {currentUser && (currentUser.role === 'ADMIN' || currentUser.email === post.authorEmail) && (
@@ -455,6 +469,12 @@ const BlogGrid: React.FC<BlogGridProps> = ({ posts, locale, currentUser }) => {
                     color: #8b5cf6;
                     font-weight: 600;
                     text-decoration: none;
+                    background: none;
+                    border: none;
+                    padding: 0;
+                    cursor: pointer;
+                    font-family: inherit;
+                    font-size: inherit;
                     transition: all 0.3s ease;
                     margin-top: auto;
                 }

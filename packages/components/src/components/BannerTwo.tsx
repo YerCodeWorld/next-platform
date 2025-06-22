@@ -292,7 +292,7 @@ const BannerTwo: React.FC<BannerTwoProps> = ({
                                 </Link>
 
                                 <Link
-                                    href={`/${locale}/about`}
+                                    href={`/${locale}/info#about-us`}
                                     className="btn btn--secondary"
                                 >
                                     {translations.aboutUsAlt}

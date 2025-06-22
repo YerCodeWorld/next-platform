@@ -355,16 +355,6 @@ export default async function TeachersPage({ params }: TeachersPageProps) {
                         </div>
                         <h2 className="teachers-cta__title">{t('cta.title')}</h2>
                         <p className="teachers-cta__subtitle">{t('cta.subtitle')}</p>
-                        <div className="teachers-cta__buttons">
-                            <a href={`/${locale}/login`} className="teachers-cta__button teachers-cta__button--primary">
-                                <span style={{ fontSize: '20px' }}>👥</span>
-                                {t('cta.findTeacher')}
-                                <span style={{ fontSize: '20px' }}>→</span>
-                            </a>
-                            <a href={`/${locale}/about`} className="teachers-cta__button teachers-cta__button--secondary">
-                                {t('cta.learnMore')}
-                            </a>
-                        </div>
                     </div>
                 </div>
 
@@ -409,59 +399,16 @@ export default async function TeachersPage({ params }: TeachersPageProps) {
                         font-weight: 800;
                         line-height: 1.2;
                         margin: 0 0 1.5rem 0;
+                        color: white;
                     }
 
                     .teachers-cta__subtitle {
                         font-size: 1.25rem;
                         line-height: 1.6;
-                        margin: 0 0 3rem 0;
-                        color: rgba(255, 255, 255, 0.9);
-                    }
-
-                    .teachers-cta__buttons {
-                        display: flex;
-                        gap: 1rem;
-                        justify-content: center;
-                        flex-wrap: wrap;
-                    }
-
-                    .teachers-cta__button {
-                        display: inline-flex;
-                        align-items: center;
-                        gap: 0.5rem;
-                        padding: 1rem 2rem;
-                        font-size: 1.125rem;
-                        font-weight: 600;
-                        border-radius: 50px;
-                        text-decoration: none;
-                        transition: all 0.3s ease;
-                        white-space: nowrap;
-                    }
-
-                    .teachers-cta__button--primary {
-                        background: white;
-                        color: #d97706;
-                        border: 2px solid white;
-                    }
-
-                    .teachers-cta__button--primary:hover {
-                        background: transparent;
+                        margin: 0;
                         color: white;
-                        transform: translateY(-2px);
-                        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
                     }
 
-                    .teachers-cta__button--secondary {
-                        background: transparent;
-                        color: white;
-                        border: 2px solid rgba(255, 255, 255, 0.5);
-                    }
-
-                    .teachers-cta__button--secondary:hover {
-                        background: rgba(255, 255, 255, 0.1);
-                        border-color: white;
-                        transform: translateY(-2px);
-                    }
 
                     @media (max-width: 768px) {
                         .teachers-cta {
@@ -478,17 +425,6 @@ export default async function TeachersPage({ params }: TeachersPageProps) {
 
                         .teachers-cta__subtitle {
                             font-size: 1.125rem;
-                        }
-
-                        .teachers-cta__buttons {
-                            flex-direction: column;
-                            align-items: center;
-                        }
-
-                        .teachers-cta__button {
-                            width: 100%;
-                            max-width: 300px;
-                            justify-content: center;
                         }
                     }
                 `}</style>

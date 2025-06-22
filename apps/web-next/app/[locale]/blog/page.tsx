@@ -5,8 +5,8 @@ import { Metadata } from 'next';
 import { Breadcrumb } from "@repo/components";
 import BlogGridWrapper from '@/components/blog/BlogGridWrapper';
 import BlogStatsWrapper from '@/components/blog/BlogStatsWrapper';
+import CreateBlogButton from '@/components/blog/CreateBlogButton';
 // import { getCurrentUser } from '@/lib/auth';
-// import Link from 'next/link';
 
 export async function generateMetadata({
                                            params
@@ -126,6 +126,9 @@ export default async function BlogPage({
                     </div>
                 </section>
             </div>
+
+            {/* Floating Create Blog Button */}
+            <CreateBlogButton locale={locale} />
         </div>
     );
 }

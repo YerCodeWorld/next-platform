@@ -1,6 +1,6 @@
 "use client"
 
-import { Ref, useEffect, useImperativeHandle } from "react";
+import { Ref, useEffect, useImperativeHandle, useRef } from "react";
 import { useEditor, type UseEditorOptions } from "@tiptap/react";  // removed editor
 import useForceUpdate from "./useForceUpdate";
 import { TiptapEditorRef } from "../components/Editor";
@@ -47,15 +47,17 @@ export default function useTiptapEditor({
     forceUpdate();
   }, [editor, placeholder]);
 
-  // Handle content updates when initialContent changes
+  // Handle content updates when initialContent changes (with ref to prevent loops)
+  const lastContentRef = useRef<string>('');
   useEffect(() => {
     if (!editor || !editorOptions.content) return;
     
-    // Only update if the content is different from current editor content
-    const currentContent = editor.getHTML();
     const newContent = typeof editorOptions.content === 'string' ? editorOptions.content : '';
     
-    if (currentContent !== newContent && newContent !== '') {
+    // Only update if the content is different from current editor content AND different from last update
+    const currentContent = editor.getHTML();
+    if (currentContent !== newContent && newContent !== '' && lastContentRef.current !== newContent) {
+      lastContentRef.current = newContent;
       // Preserve cursor position
       const { from, to } = editor.state.selection;
       editor.commands.setContent(editorOptions.content, false, {

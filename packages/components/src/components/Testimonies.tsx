@@ -1,7 +1,7 @@
 // packages/components/src/components/Testimonies.tsx
 'use client';
 
-import React, { useRef } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import Slider from "react-slick";
@@ -37,6 +37,11 @@ const TestimonialsThree: React.FC<TestimonialsProps> = ({
                                                             locale
                                                         }) => {
     const sliderRef = useRef<any>(null);
+    const [isClient, setIsClient] = useState(false);
+
+    useEffect(() => {
+        setIsClient(true);
+    }, []);
 
     const settings = {
         slidesToShow: 2,
@@ -84,7 +89,8 @@ const TestimonialsThree: React.FC<TestimonialsProps> = ({
 
     const reduceLength = (text: string) => {
         const splittedText = text.split(" ");
-        const maxWords = window.innerWidth < 576 ? 12 : 15;
+        // Use a safe default since we can't access window during SSR
+        const maxWords = isClient && window.innerWidth < 576 ? 12 : 15;
         if (splittedText.length > maxWords) {
             return splittedText
                 .slice(0, maxWords)

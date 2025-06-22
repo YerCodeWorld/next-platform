@@ -54,7 +54,7 @@ const ProfileHero: React.FC<ProfileHeroProps> = ({
                     <div className="tp-profile-main">
                         <div className="tp-avatar-wrapper">
                             <img
-                                src={profile.user?.picture || profile.profileImage || '/images/default-avatar.png'}
+                                src={profile.profileImage || profile.user?.picture || '/images/default-avatar.png'}
                                 alt={profile.displayName || profile.user?.name || 'Teacher'}
                                 className="tp-avatar"
                             />

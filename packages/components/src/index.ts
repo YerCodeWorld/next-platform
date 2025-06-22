@@ -14,6 +14,14 @@ export { default as BlogGrid } from "./components/blog/BlogGrid";
 export { default as DynamicsGrid } from "./components/activities/DynamicsGrid";
 export { default as TeachersGrid } from "./components/teachers/TeachersGrid";
 
+// Site components
+export { default as GeneralInfoOne } from "./components/site/GeneralInfoOne";
+export { default as GeneralInfoFour } from "./components/site/GeneralInfoFour";
+export { default as GeneralInfoThree } from "./components/site/GeneralInfoThree";
+export { default as GeneralInforTwo } from "./components/site/GeneralInforTwo";
+export { default as MissionAndValues } from "./components/site/MissionAndValues";
+export { default as SiteContact } from "./components/site/SiteContact";
+
 export * from "./components/profile"
 // export { default as TeacherComments } from "./components/teachers/TeacherComments";
 

@@ -26,11 +26,13 @@ interface BlogShowCaseProps {
     posts: Post[];
     locale: string;
     translations?: BlogShowCaseTranslations;
+    onReadPost?: (post: Post) => void; // Callback to handle reading posts
 }
 
 const BlogShowCase: React.FC<BlogShowCaseProps> = ({
                                                        posts,
                                                        locale,
+                                                       onReadPost,
                                                        translations = {
                                                            title: "Latest News",
                                                            subtitle: "Stay Informed, Stay Inspired",
@@ -197,14 +199,25 @@ const BlogShowCase: React.FC<BlogShowCaseProps> = ({
                                     </div>
 
                                     <div className='flex-between gap-8 pt-20 border-top border-gray-200 mt-20'>
-                                        <Link
-                                            href={`/${locale}/blog/${post.slug}`}
-                                            className='flex-align gap-8 text-main-400 hover-text-main-600 transition-2 fw-semibold text-sm'
-                                            tabIndex={0}
-                                        >
-                                            {translations.readMore}
-                                            <ArrowRight size={16} weight="bold" />
-                                        </Link>
+                                        {onReadPost ? (
+                                            <button
+                                                onClick={() => onReadPost(post)}
+                                                className='flex-align gap-8 text-main-400 hover-text-main-600 transition-2 fw-semibold text-sm bg-transparent border-0 p-0 cursor-pointer'
+                                                tabIndex={0}
+                                            >
+                                                {translations.readMore}
+                                                <ArrowRight size={16} weight="bold" />
+                                            </button>
+                                        ) : (
+                                            <Link
+                                                href={`/${locale}/blog/${post.slug}`}
+                                                className='flex-align gap-8 text-main-400 hover-text-main-600 transition-2 fw-semibold text-sm'
+                                                tabIndex={0}
+                                            >
+                                                {translations.readMore}
+                                                <ArrowRight size={16} weight="bold" />
+                                            </Link>
+                                        )}
                                     </div>
                                 </div>
                             </div>

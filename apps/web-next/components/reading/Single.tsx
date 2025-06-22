@@ -3,7 +3,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
 import { TiptapRenderer } from '@repo/edu-editor';
-import { PostTocNext } from './PostTocNext';
 import PostReadingProgressNext from './PostReadingProgressNext';
 import { PostHeader, DynamicHeader } from './ContentHeaders';
 import { 
@@ -114,7 +113,10 @@ const Single: React.FC<SingleProps> = ({ contentType, slug, locale }) => {
 
   return (
     <>
-      <PostReadingProgressNext color={progressColor as ColorType} />
+      <PostReadingProgressNext 
+        color={progressColor as ColorType} 
+        containerSelector=".prose-wrapper"
+      />
       
       <div className="notebook-container">
         {/* Navigation Header */}
@@ -134,12 +136,6 @@ const Single: React.FC<SingleProps> = ({ contentType, slug, locale }) => {
         </header>
 
         <div className="notebook-content">
-          {/* Table of Contents */}
-          <PostTocNext 
-            content={getContentForToc(content, contentType)}
-            locale={locale} 
-          />
-
           {/* Main Notebook Page */}
           <article className="notebook-page" ref={contentRef}>
             {/* Notebook Rings */}
@@ -195,7 +191,7 @@ const Single: React.FC<SingleProps> = ({ contentType, slug, locale }) => {
       <style jsx>{`
         .notebook-container {
           min-height: 100vh;
-
+          margin-top: 5%;
           background-image: 
             linear-gradient(90deg, transparent 79px, #e74c3c 79px, #e74c3c 81px, transparent 81px),
             linear-gradient(#eee .1em, transparent .1em);
@@ -685,10 +681,22 @@ const Single: React.FC<SingleProps> = ({ contentType, slug, locale }) => {
           .notebook-container {
             padding: 1rem 0;
             background-size: 100% 1.2em;
+            margin-top: 3%;
           }
 
           .nav-wrapper {
-            padding: 1rem;
+            padding: 2.5rem 1rem 1rem 1rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+          }
+
+          .back-button {
+            min-width: 0;
+            flex-shrink: 0;
+          }
+
+          .back-button span {
+            display: inline;
           }
 
           .notebook-content {
@@ -760,6 +768,7 @@ const Single: React.FC<SingleProps> = ({ contentType, slug, locale }) => {
               linear-gradient(90deg, transparent 60px, #e74c3c 60px, #e74c3c 62px, transparent 62px),
               linear-gradient(#eee .1em, transparent .1em);
             background-size: 100% 1.1em;
+            margin-top: 2%;
           }
 
           .notebook-content {
