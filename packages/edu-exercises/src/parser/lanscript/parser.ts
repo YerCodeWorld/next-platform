@@ -73,7 +73,7 @@ export class LanScriptParser {
             const line = lines[i]?.trim() ?? '';
 
             // Skip empty lines and comments
-            if (!line || line.startsWith('#')) {
+            if (!line || line.startsWith('#') || line.startsWith('//')) {
                 continue;
             }
 
@@ -225,14 +225,14 @@ export class LanScriptParser {
             return 'FILL_BLANK';
         }
 
-        // Check for matching (equals sign)
-        if (lines.some(line => line.includes('='))) {
-            return 'MATCHING';
+        // Check for multiple choice first (more specific - has brackets and equals)
+        if (lines.some(line => line.includes('[') && line.includes('='))) {
+            return 'MULTIPLE_CHOICE';
         }
 
-        // Check for multiple choice (brackets or vertical bars)
-        if (lines.some(line => line.includes('[') || (line.includes('|') && line.includes('=')))) {
-            return 'MULTIPLE_CHOICE';
+        // Check for matching (equals sign without brackets)
+        if (lines.some(line => line.includes('=') && !line.includes('['))) {
+            return 'MATCHING';
         }
 
         // Check for ordering (pipe symbols without equals)
@@ -254,33 +254,49 @@ export class LanScriptParser {
         return cleanLine;
     }
 
+    private isCommentLine(line: string): boolean {
+        const trimmed = line.trim();
+        return trimmed.startsWith('//') || trimmed.startsWith('#');
+    }
+
     private parseFillBlank(lines: string[]): FillBlankContent {
         const sentences: FillBlankContent['sentences'] = [];
 
         lines.forEach(line => {
+            // Skip comment lines during parsing but preserve them in the stored content
+            if (this.isCommentLine(line)) return;
+            
             const cleanLine = this.cleanLine(line);
             if (!cleanLine) return;
 
             const blanks: { position: number; answers: string[]; hint?: string }[] = [];
             let processedText = cleanLine;
-            let blankIndex = 0;
 
-            // Find all *answer* patterns
+            // Find all *answer* patterns and replace them one by one
             const blankPattern = /\*([^*]+)\*/g;
             let match;
+            let offset = 0; // Track cumulative text length changes
 
             while ((match = blankPattern.exec(cleanLine)) !== null) {
                 const answers = match[1].split('|').map(a => a.trim());
                 const blankPlaceholder = '___';
+                const originalLength = match[0].length; // Length of *answer*
+                const newLength = blankPlaceholder.length; // Length of ___
+                
+                // Calculate actual position in the processed text
+                const actualPosition = match.index + offset;
                 
                 blanks.push({
-                    position: blankIndex,
+                    position: actualPosition,
                     answers,
                     hint: undefined // Could be extracted from decorators later
                 });
 
+                // Replace the first occurrence of this pattern
                 processedText = processedText.replace(match[0], blankPlaceholder);
-                blankIndex++;
+                
+                // Update offset for next replacements
+                offset += (newLength - originalLength);
             }
 
             if (blanks.length > 0) {
@@ -298,6 +314,9 @@ export class LanScriptParser {
         const pairs: MatchingContent['pairs'] = [];
 
         lines.forEach(line => {
+            // Skip comment lines during parsing but preserve them in the stored content
+            if (this.isCommentLine(line)) return;
+            
             const cleanLine = this.cleanLine(line);
             if (!cleanLine || !cleanLine.includes('=')) return;
 
@@ -318,12 +337,14 @@ export class LanScriptParser {
         const questions: MultipleChoiceContent['questions'] = [];
 
         lines.forEach(line => {
+            // Skip comment lines during parsing but preserve them in the stored content
+            if (this.isCommentLine(line)) return;
+            
             const cleanLine = this.cleanLine(line);
             if (!cleanLine) return;
 
             // Format: "Question = option1 | option2 | option3 [correct1, correct2]"
             const equalIndex = cleanLine.indexOf('=');
-            const bracketIndex = cleanLine.indexOf('[');
             
             if (equalIndex === -1) return;
 
@@ -331,9 +352,10 @@ export class LanScriptParser {
             const optionsAndAnswers = cleanLine.substring(equalIndex + 1).trim();
 
             let optionsText, answersText;
+            const bracketIndex = optionsAndAnswers.indexOf('[');
             if (bracketIndex !== -1) {
-                optionsText = optionsAndAnswers.substring(0, bracketIndex - equalIndex - 1).trim();
-                answersText = optionsAndAnswers.substring(bracketIndex - equalIndex).trim();
+                optionsText = optionsAndAnswers.substring(0, bracketIndex).trim();
+                answersText = optionsAndAnswers.substring(bracketIndex).trim();
             } else {
                 optionsText = optionsAndAnswers;
                 answersText = '';
@@ -367,6 +389,9 @@ export class LanScriptParser {
         const sentences: OrderingContent['sentences'] = [];
 
         lines.forEach(line => {
+            // Skip comment lines during parsing but preserve them in the stored content
+            if (this.isCommentLine(line)) return;
+            
             const cleanLine = this.cleanLine(line);
             if (!cleanLine || !cleanLine.includes('|')) return;
 

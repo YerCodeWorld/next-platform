@@ -1,7 +1,6 @@
 import { Metadata } from 'next';
 import { getCurrentUser } from '@/lib/auth';
 import { getAllExercisePackages } from '@/lib/api-server';
-import { ExercisePackageBreadcrumb } from '@/components/exercises/ExercisePackageBreadcrumb';
 import ExercisePackagesGridWrapper from '@/components/exercises/ExercisePackagesGridWrapper';
 import ExerciseStatsWrapper from '@/components/exercises/ExerciseStatsWrapper';
 import { getTranslations } from 'next-intl/server';
@@ -71,18 +70,7 @@ export default async function ExercisesPage({ params }: { params: Promise<{ loca
   }
 
   return (
-    <div className="exercise-packages__container">
-      {/* Custom Game-Oriented Breadcrumb */}
-      <ExercisePackageBreadcrumb 
-        title={translations.pageTitle}
-        subtitle={translations.hero.subtitle}
-        items={[
-          { label: locale === 'es' ? 'Inicio' : 'Home', href: `/${locale}` },
-          { label: translations.hero.title }
-        ]}
-        locale={locale}
-      />
-      
+    <div className="exercise-packages__container">      
       {/* Filters & Search */}
       <ExercisePackagesGridWrapper 
         packages={packages} 

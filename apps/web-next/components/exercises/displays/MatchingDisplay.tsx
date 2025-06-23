@@ -51,6 +51,8 @@ export function MatchingDisplay({
   const [timeElapsed, setTimeElapsed] = useState(0);
   const [isCompleted, setIsCompleted] = useState(false);
   const [shuffledWordBank, setShuffledWordBank] = useState<Array<{text: string; originalIndex: number; color: string}>>([]);
+  const [shuffledPairOrder, setShuffledPairOrder] = useState<number[]>([]);
+  const [shuffledRightItems, setShuffledRightItems] = useState<number[]>([]);
   
   // Sound effects
   const { initializeSounds, playClick, playSuccess, playError, playNavigation } = useSounds();
@@ -60,9 +62,19 @@ export function MatchingDisplay({
     const avgLeftLength = content.pairs.reduce((sum, pair) => sum + pair.left.length, 0) / content.pairs.length;
     const avgRightLength = content.pairs.reduce((sum, pair) => sum + pair.right.length, 0) / content.pairs.length;
     
-    // Use question-based layout when there's significant length difference or very long content
-    const shouldUseQuestionBased = Math.abs(avgLeftLength - avgRightLength) > 30 || 
-                                  Math.max(avgLeftLength, avgRightLength) > 50;
+    // Check if any column has items with more than 3 words
+    const hasMultiWordItems = content.pairs.some(pair => 
+      pair.left.trim().split(/\s+/).length > 3 || 
+      pair.right.trim().split(/\s+/).length > 3
+    );
+    
+    // Use question-based layout when:
+    // 1. Any item has more than 3 words, OR
+    // 2. There's significant length difference, OR  
+    // 3. Very long content (character-based)
+    const shouldUseQuestionBased = hasMultiWordItems || 
+                                  Math.abs(avgLeftLength - avgRightLength) > 40 || 
+                                  Math.max(avgLeftLength, avgRightLength) > 80;
     
     if (!shouldUseQuestionBased) {
       return {
@@ -108,14 +120,55 @@ export function MatchingDisplay({
     return shuffled;
   };
 
+  // Create shuffled order for side-by-side layout
+  const createShuffledPairOrder = (): number[] => {
+    const indices = Array.from({ length: content.pairs.length }, (_, i) => i);
+    
+    // Fisher-Yates shuffle
+    for (let i = indices.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [indices[i], indices[j]] = [indices[j], indices[i]];
+    }
+    
+    return indices;
+  };
+
+  // Create shuffled order for right column items
+  const createShuffledRightItems = (): number[] => {
+    const indices = Array.from({ length: content.pairs.length }, (_, i) => i);
+    
+    // Fisher-Yates shuffle
+    for (let i = indices.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [indices[i], indices[j]] = [indices[j], indices[i]];
+    }
+    
+    return indices;
+  };
+
   const questions = getQuestions();
   const currentQuestion = questions[currentQuestionIndex];
 
   // Initialize sounds and word bank
   useEffect(() => {
     initializeSounds();
-    if (layoutInfo.useQuestionBasedLayout) {
-      setShuffledWordBank(createShuffledWordBank());
+    
+    // Only shuffle if randomize is enabled in content
+    if (content.randomize) {
+      if (layoutInfo.useQuestionBasedLayout) {
+        setShuffledWordBank(createShuffledWordBank());
+      } else {
+        // For side-by-side layout, shuffle both left and right columns independently
+        setShuffledPairOrder(createShuffledPairOrder());
+        setShuffledRightItems(createShuffledRightItems());
+      }
+    } else {
+      // If randomize is false, use original order
+      if (!layoutInfo.useQuestionBasedLayout) {
+        const originalOrder = Array.from({ length: content.pairs.length }, (_, i) => i);
+        setShuffledPairOrder(originalOrder);
+        setShuffledRightItems(originalOrder);
+      }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -292,9 +345,15 @@ export function MatchingDisplay({
     setTimeElapsed(0);
     setIsCompleted(false);
     
-    // Reshuffle word bank for question-based layout
-    if (layoutInfo.useQuestionBasedLayout) {
-      setShuffledWordBank(createShuffledWordBank());
+    // Reshuffle based on layout type (only if randomize is enabled)
+    if (content.randomize) {
+      if (layoutInfo.useQuestionBasedLayout) {
+        setShuffledWordBank(createShuffledWordBank());
+      } else {
+        // For side-by-side layout, reshuffle both columns independently
+        setShuffledPairOrder(createShuffledPairOrder());
+        setShuffledRightItems(createShuffledRightItems());
+      }
     }
     
     playNavigation();
@@ -474,13 +533,14 @@ export function MatchingDisplay({
           <div className="md-grid">
             {/* Left Column */}
             <div className="md-column md-column-left">
-              {content.pairs.map((pair, index) => {
+              {shuffledPairOrder.map((pairIndex) => {
+                const pair = content.pairs[pairIndex];
                 const isSelected = selectedLeft === pair.left;
                 const isMatched = matchingState.matches[pair.left] !== undefined;
                 
                 return (
                   <div
-                    key={index}
+                    key={pairIndex}
                     className={`md-item ${isSelected ? 'md-item-selected' : ''} ${isMatched ? 'md-item-matched' : ''}`}
                     onClick={() => handleSideBySideClick(pair.left, 'left')}
                   >
@@ -491,24 +551,16 @@ export function MatchingDisplay({
               })}
             </div>
 
-            {/* Middle Column - Progress */}
-            <div className="md-column md-column-middle">
-              {Array.from({ length: Object.keys(matchingState.matches).length }, (_, index) => (
-                <div key={index} className="md-progress-circle">
-                  {index + 1}
-                </div>
-              ))}
-            </div>
-
             {/* Right Column */}
             <div className="md-column md-column-right">
-              {content.pairs.map((pair, index) => {
+              {shuffledRightItems.map((pairIndex) => {
+                const pair = content.pairs[pairIndex];
                 const isSelected = selectedRight === pair.right;
                 const isMatched = Object.values(matchingState.matches).includes(pair.right);
                 
                 return (
                   <div
-                    key={index}
+                    key={`right-${pairIndex}`}
                     className={`md-item ${isSelected ? 'md-item-selected' : ''} ${isMatched ? 'md-item-matched' : ''}`}
                     onClick={() => handleSideBySideClick(pair.right, 'right')}
                   >

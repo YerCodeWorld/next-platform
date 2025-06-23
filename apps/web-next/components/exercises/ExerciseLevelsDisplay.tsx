@@ -6,6 +6,7 @@ import { ExercisePackage, PackageExercise, User, ExerciseDifficulty, useExercise
 import { ExerciseBuilderModal } from './ExerciseBuilderModal';
 import { ExerciseDifficultyModal } from './ExerciseDifficultyModal';
 import { useRouter } from 'next/navigation';
+import { useSounds } from '../../utils/sounds';
 
 interface ExerciseLevelsDisplayProps {
   package: ExercisePackage;
@@ -76,6 +77,7 @@ export default function ExerciseLevelsDisplay({
   
   const exercisePackagesApi = useExercisePackagesApi();
   const router = useRouter();
+  const { initializeSounds, playClick, playHover, playNavigation } = useSounds();
 
   // Group exercises by difficulty
   const exercisesByDifficulty = exerciseData.reduce((acc, exercise) => {
@@ -94,6 +96,11 @@ export default function ExerciseLevelsDisplay({
       ? `Información del nivel ${translateLevel(level.title)}...`
       : `${level.title} level info...`
   }));
+
+  // Initialize sounds on mount
+  useEffect(() => {
+    initializeSounds();
+  }, [initializeSounds]);
 
   // Fetch user progress on component mount and when user changes
   useEffect(() => {
@@ -175,12 +182,14 @@ export default function ExerciseLevelsDisplay({
   };
 
   const handleCardClick = (levelKey: string) => {
+    playClick();
     setFocusedLevel(levelKey);
     setSelectedDifficultyForModal(levelKey as ExerciseDifficulty);
     setShowDifficultyModal(true);
   };
 
   const handleStartClick = (levelKey: string) => {
+    playClick();
     setSelectedDifficultyForModal(levelKey as ExerciseDifficulty);
     setShowDifficultyModal(true);
   };
@@ -216,6 +225,7 @@ export default function ExerciseLevelsDisplay({
   };
 
   const handleBackToPackages = () => {
+    playNavigation();
     router.push(`/${locale}/exercises`);
   };
 
@@ -265,6 +275,7 @@ export default function ExerciseLevelsDisplay({
               onInfoClick={(e) => handleInfoClick(e, level.info)}
               onPlusClick={(e) => handleLevelPlusClick(e, level.key as ExerciseDifficulty)}
               onStartClick={() => handleStartClick(level.key)}
+              onHover={() => playHover()}
               animationDelay={index * 200}
               getCompletionCount={getCompletionCount}
             />
@@ -326,6 +337,7 @@ interface LevelCardProps {
   onInfoClick: (e: React.MouseEvent) => void;
   onPlusClick: (e: React.MouseEvent) => void;
   onStartClick: () => void;
+  onHover: () => void;
   animationDelay: number;
   getCompletionCount: (exercises: PackageExercise[]) => number;
 }
@@ -339,6 +351,7 @@ function LevelCard({
   onInfoClick,
   onPlusClick,
   onStartClick,
+  onHover,
   animationDelay,
   getCompletionCount
 }: LevelCardProps) {
@@ -400,6 +413,7 @@ function LevelCard({
       className={`card-wrapper ${level.key.toLowerCase().replace('_', '-')} ${isFocused ? 'focused' : ''}`}
       style={{ '--color': level.color } as React.CSSProperties}
       onClick={onClick}
+      onMouseEnter={onHover}
     >
       <div 
         ref={cardBgRef}

@@ -840,6 +840,108 @@
   border: 2px solid #ef4444;
 }
 
+/* Exercise Progress Bar Styles */
+.exercise-progress-bar {
+  margin: 1rem 0;
+}
+
+.progress-track {
+  display: flex;
+  gap: 0.25rem;
+  padding: 0.5rem;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 1rem;
+  backdrop-filter: blur(10px);
+}
+
+.progress-segment {
+  flex: 1;
+  height: 2.5rem;
+  border-radius: 0.5rem;
+  border: 2px solid transparent;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  cursor: default;
+}
+
+.progress-segment.clickable {
+  cursor: pointer;
+}
+
+.progress-segment.clickable:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.progress-segment.unanswered {
+  background: #e5e7eb;
+  border-color: #d1d5db;
+}
+
+.progress-segment.current {
+  background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+  border-color: #1d4ed8;
+  animation: pulse-current 2s ease-in-out infinite;
+}
+
+.progress-segment.answered {
+  background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+  border-color: #0e7490;
+}
+
+.progress-segment.correct {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  border-color: #047857;
+  animation: success-pulse 0.6s ease-out;
+}
+
+.progress-segment.incorrect {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  border-color: #b91c1c;
+  animation: error-shake 0.5s ease-out;
+}
+
+.segment-inner {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.segment-number {
+  color: white;
+  font-weight: 600;
+  font-size: 0.875rem;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.progress-segment.unanswered .segment-number {
+  color: #6b7280;
+}
+
+@keyframes pulse-current {
+  0%, 100% { 
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4);
+  }
+  50% { 
+    box-shadow: 0 0 0 8px rgba(59, 130, 246, 0);
+  }
+}
+
+@keyframes success-pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+@keyframes error-shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-3px); }
+  20%, 40%, 60%, 80% { transform: translateX(3px); }
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .exercise-header-content {

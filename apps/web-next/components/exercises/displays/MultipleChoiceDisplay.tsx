@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Exercise, ExercisePackage, User, MultipleChoiceContent } from '@repo/api-bridge';
 import { Clock, Lightbulb, ChevronUp, ChevronDown, X, CheckCircle, XCircle } from 'lucide-react';
@@ -39,6 +39,9 @@ export function MultipleChoiceDisplay({
   const [timeElapsed, setTimeElapsed] = useState(0);
   const [isCompleted, setIsCompleted] = useState(false);
   const [autoAdvance, setAutoAdvance] = useState(true);
+  
+  // Auto-advance timer ref for cleanup
+  const autoAdvanceTimerRef = useRef<NodeJS.Timeout | null>(null);
   
   // Enhanced sound effects
   const { 
@@ -110,12 +113,18 @@ export function MultipleChoiceDisplay({
       
       // Auto-advance to next question after a delay for single choice (if enabled)
       if (autoAdvance) {
-        setTimeout(() => {
+        // Clear any existing timer to prevent race conditions
+        if (autoAdvanceTimerRef.current) {
+          clearTimeout(autoAdvanceTimerRef.current);
+        }
+        
+        autoAdvanceTimerRef.current = setTimeout(() => {
           if (currentQuestionIndex < content.questions.length - 1) {
             playNavigation();
             setCurrentQuestionIndex(prev => prev + 1);
             setShowHint(false);
           }
+          autoAdvanceTimerRef.current = null;
         }, 800);
       }
     }
@@ -162,6 +171,12 @@ export function MultipleChoiceDisplay({
 
   const handleNext = useCallback(() => {
     if (currentQuestionIndex < content.questions.length - 1) {
+      // Clear any existing auto-advance timer to prevent race conditions
+      if (autoAdvanceTimerRef.current) {
+        clearTimeout(autoAdvanceTimerRef.current);
+        autoAdvanceTimerRef.current = null;
+      }
+      
       playNavigation();
       setCurrentQuestionIndex(prev => prev + 1);
       setShowHint(false);
@@ -171,6 +186,12 @@ export function MultipleChoiceDisplay({
 
   const handlePrevious = useCallback(() => {
     if (currentQuestionIndex > 0) {
+      // Clear any existing auto-advance timer to prevent race conditions
+      if (autoAdvanceTimerRef.current) {
+        clearTimeout(autoAdvanceTimerRef.current);
+        autoAdvanceTimerRef.current = null;
+      }
+      
       playNavigation();
       setCurrentQuestionIndex(prev => prev - 1);
       setShowHint(false);
@@ -207,6 +228,17 @@ export function MultipleChoiceDisplay({
     playNavigation();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [content.questions]);
+
+  // Cleanup effect for auto-advance timer
+  useEffect(() => {
+    // Clear any pending auto-advance timer on unmount
+    return () => {
+      if (autoAdvanceTimerRef.current) {
+        clearTimeout(autoAdvanceTimerRef.current);
+        autoAdvanceTimerRef.current = null;
+      }
+    };
+  }, []); // Empty dependency array ensures this only runs on mount/unmount
 
   // Keyboard navigation
   useEffect(() => {

@@ -8,8 +8,9 @@
 
   // Notebook-style container with proper theming
   &__container {
-    margin: 0 auto;
-    padding: 5%;
+    margin: 2rem auto;
+    padding: 4rem 6%;
+    max-width: 1400px;
 
     background: white;
     border: 3px solid var(--primary); // Use CSS variable for theming
@@ -46,6 +47,7 @@
     @media (max-width: 768px) {
       margin: 1rem;
       padding: 2rem;
+      border-radius: var(--border-radius-md);
 
       &::before {
         left: 2rem;
@@ -55,6 +57,12 @@
         left: 1.5rem;
         top: 1.5rem;
       }
+    }
+
+    @media (max-width: 480px) {
+      margin: 0.5rem;
+      padding: 1.5rem;
+      border-width: 2px;
     }
   }
 
@@ -449,10 +457,38 @@
 // Animations
 @keyframes float {
   0%, 100% {
-    transform: translateY(0px);
+    transform: translate3d(0, 0, 0);
+  }
+  25% {
+    transform: translate3d(0, -10px, 0);
   }
   50% {
-    transform: translateY(-20px);
+    transform: translate3d(0, -20px, 0);
+  }
+  75% {
+    transform: translate3d(0, -10px, 0);
+  }
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 30px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
   }
 }
 
