@@ -5,6 +5,7 @@ import { Breadcrumb } from '@repo/components';
 import TeachersGridWrapper from '@/components/teachers/TeachersGridWrapper';
 import TeachersStatisticsWrapper from '@/components/teachers/TeachersStatisticsWrapper';
 import TeacherCommentsWrapper from '@/components/teachers/TeacherCommentsWrapper';
+import { generateSEOMetadata } from '@/lib/seo-utils';
 // Replaced phosphor-react icons with Unicode symbols to fix React 19 compatibility
 
 interface TeachersPageProps {
@@ -25,42 +26,13 @@ export async function generateMetadata({ params }: TeachersPageProps): Promise<M
         ? 'Connect with qualified English teachers from around the world. Find the perfect instructor for your learning goals with personalized lessons and expert guidance.'
         : 'Conéctate con profesores de inglés calificados de todo el mundo. Encuentra el instructor perfecto para tus objetivos de aprendizaje con clases personalizadas y orientación experta.';
 
-    const ogImage = '/images/teachers-og.jpg';
-
-    return {
+    return generateSEOMetadata({
         title,
         description,
-        keywords: locale === 'en' 
-            ? 'English teachers, online tutors, language instructors, English lessons, qualified teachers, language learning'
-            : 'profesores de inglés, tutores en línea, instructores de idiomas, clases de inglés, profesores calificados, aprendizaje de idiomas',
-        openGraph: {
-            title,
-            description,
-            images: [
-                {
-                    url: ogImage,
-                    width: 1200,
-                    height: 630,
-                    alt: title,
-                },
-            ],
-            type: 'website',
-            locale: locale === 'en' ? 'en_US' : 'es_ES',
-        },
-        twitter: {
-            card: 'summary_large_image',
-            title,
-            description,
-            images: [ogImage],
-        },
-        alternates: {
-            canonical: `/${locale}/teachers`,
-            languages: {
-                'en': '/en/teachers',
-                'es': '/es/teachers',
-            },
-        },
-    };
+        contentType: 'teachers',
+        locale,
+        canonical: `/${locale}/teachers`,
+    });
 }
 
 // Loading components

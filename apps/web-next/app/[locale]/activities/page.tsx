@@ -5,6 +5,7 @@ import { getTranslations } from 'next-intl/server';
 import { Breadcrumb } from '@repo/components';
 import DynamicsGridWrapper from "@/components/activities/DynamicsGridWrapper";
 import DynamicsStatsWrapper from '@/components/activities/DynamicsStatisticsWrapper';
+import { generateSEOMetadata } from '@/lib/seo-utils';
 // import { getCurrentUser } from '@/lib/auth';
 
 export async function generateMetadata({
@@ -14,36 +15,21 @@ export async function generateMetadata({
 }): Promise<Metadata> {
     const { locale } = await params;
 
-    return {
-        title: locale === 'es'
-            ? 'EduActividades - Dinámicas y Estrategias de Enseñanza'
-            : 'EduActivities - Teaching Dynamics and Strategies',
-        description: locale === 'es'
-            ? 'Descubre dinámicas innovadoras y estrategias de enseñanza creadas por educadores expertos. Recursos para todos los grupos de edad y niveles.'
-            : 'Discover innovative teaching dynamics and strategies created by expert educators. Resources for all age groups and levels.',
-        keywords: locale === 'es'
-            ? 'dinámicas educativas, estrategias de enseñanza, actividades escolares, métodos educativos, recursos para maestros'
-            : 'educational dynamics, teaching strategies, classroom activities, educational methods, teacher resources',
-        openGraph: {
-            title: locale === 'es' ? 'EduActividades - Dinámicas Educativas' : 'EduActivities - Educational Dynamics',
-            description: locale === 'es'
-                ? 'Estrategias y dinámicas de enseñanza innovadoras'
-                : 'Innovative teaching strategies and dynamics',
-            images: ['/images/dynamics-og.jpg'],
-            type: 'website',
-        },
-        twitter: {
-            card: 'summary_large_image',
-            images: ['/images/dynamics-og.jpg'],
-        },
-        alternates: {
-            canonical: `/${locale}/activities`,
-            languages: {
-                'es': '/es/activities',
-                'en': '/en/activities',
-            },
-        },
-    };
+    const title = locale === 'es'
+        ? 'EduActividades - Dinámicas y Estrategias de Enseñanza'
+        : 'EduActivities - Teaching Dynamics and Strategies';
+    
+    const description = locale === 'es'
+        ? 'Descubre dinámicas innovadoras y estrategias de enseñanza creadas por educadores expertos. Recursos para todos los grupos de edad y niveles.'
+        : 'Discover innovative teaching dynamics and strategies created by expert educators. Resources for all age groups and levels.';
+
+    return generateSEOMetadata({
+        title,
+        description,
+        contentType: 'activities',
+        locale,
+        canonical: `/${locale}/activities`,
+    });
 }
 
 /**

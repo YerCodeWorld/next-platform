@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 // import { getTranslations } from 'next-intl/server';
 import Single from '@/components/reading/Single';
 import { getPostBySlug } from '@/lib/data';
+import { generateSEOMetadata, generateEducationalContentStructuredData } from '@/lib/seo-utils';
 
 interface BlogPostPageProps {
     params: Promise<{
@@ -25,45 +26,20 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
             };
         }
 
-        const title = `${post.title} - ${locale === 'es' ? 'Blog Educativo' : 'Educational Blog'}`;
+        const title = post.title;
         const description = post.summary;
 
-        return {
+        return generateSEOMetadata({
             title,
             description,
-            keywords: locale === 'es' 
-                ? 'blog educativo, artículo, educación, enseñanza, aprendizaje'
-                : 'educational blog, article, education, teaching, learning',
-            openGraph: {
-                title,
-                description,
-                type: 'article',
-                publishedTime: post.createdAt,
-                modifiedTime: post.updatedAt,
-                authors: [post.user?.name || 'Anonymous'],
-                images: post.coverImage ? [
-                    {
-                        url: post.coverImage,
-                        width: 1200,
-                        height: 630,
-                        alt: post.title,
-                    }
-                ] : undefined,
-            },
-            twitter: {
-                card: 'summary_large_image',
-                title,
-                description,
-                images: post.coverImage ? [post.coverImage] : undefined,
-            },
-            alternates: {
-                canonical: `/${locale}/blog/${slug}`,
-                languages: {
-                    'en': `/en/blog/${slug}`,
-                    'es': `/es/blog/${slug}`,
-                },
-            },
-        };
+            image: post.coverImage || undefined,
+            contentType: 'blog',
+            locale,
+            canonical: `/${locale}/blog/${slug}`,
+            publishedTime: post.createdAt,
+            modifiedTime: post.updatedAt,
+            authors: [post.user?.name || 'Anonymous'],
+        });
     } catch (err) {
         console.error(err);
         return {
@@ -256,16 +232,34 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
             notFound();
         }
 
+        // Generate structured data for the blog post
+        const structuredData = generateEducationalContentStructuredData({
+            title: post.title,
+            description: post.summary,
+            author: post.user?.name,
+            datePublished: post.createdAt,
+            dateModified: post.updatedAt,
+            image: post.coverImage || undefined,
+        }, 'Article', locale);
+
         return (
-            <main className="blog-post-page">
-                <Suspense fallback={<PostSkeleton />}>
-                    <Single 
-                        contentType="post"
-                        slug={slug}
-                        locale={locale}
-                    />
-                </Suspense>
-            </main>
+            <>
+                <script
+                    type="application/ld+json"
+                    dangerouslySetInnerHTML={{
+                        __html: JSON.stringify(structuredData),
+                    }}
+                />
+                <main className="blog-post-page">
+                    <Suspense fallback={<PostSkeleton />}>
+                        <Single 
+                            contentType="post"
+                            slug={slug}
+                            locale={locale}
+                        />
+                    </Suspense>
+                </main>
+            </>
         );
     } catch (error) {
         console.error('Error loading blog post page:', error);

@@ -1,12 +1,38 @@
+import { Metadata } from 'next';
 import { getCurrentUser } from '@/lib/auth';
 import { getAllExercisePackages } from '@/lib/api-server';
 import { ExercisePackageBreadcrumb } from '@/components/exercises/ExercisePackageBreadcrumb';
 import ExercisePackagesGridWrapper from '@/components/exercises/ExercisePackagesGridWrapper';
 import ExerciseStatsWrapper from '@/components/exercises/ExerciseStatsWrapper';
 import { getTranslations } from 'next-intl/server';
+import { generateSEOMetadata } from '@/lib/seo-utils';
 
 // Import the SCSS styling system
 import '@repo/components/globals.scss';
+
+export async function generateMetadata({
+  params
+}: {
+  params: Promise<{ locale: string }>
+}): Promise<Metadata> {
+  const { locale } = await params;
+
+  const title = locale === 'es'
+    ? 'EduEjercicios - Ejercicios Interactivos de Inglés'
+    : 'EduExercises - Interactive English Exercises';
+  
+  const description = locale === 'es'
+    ? 'Practica inglés con ejercicios interactivos diseñados por educadores expertos. Mejora tu gramática, vocabulario y comprensión con actividades gamificadas.'
+    : 'Practice English with interactive exercises designed by expert educators. Improve your grammar, vocabulary, and comprehension with gamified activities.';
+
+  return generateSEOMetadata({
+    title,
+    description,
+    contentType: 'exercises',
+    locale,
+    canonical: `/${locale}/exercises`,
+  });
+}
 
 export default async function ExercisesPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;

@@ -27,8 +27,26 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-    title: "EduGuiders - Find Your Perfect English Teacher Online",
-    description: "Connect with expert English teachers on EduGuiders.",
+    title: {
+        template: '%s | EduGuiders',
+        default: 'EduGuiders - Find Your Perfect English Teacher Online'
+    },
+    description: "Connect with expert English teachers on EduGuiders. Learn English with personalized lessons, interactive exercises, and a global community of educators.",
+    metadataBase: new URL('https://eduguiders.com'),
+    keywords: 'English teachers, online English lessons, learn English, language learning, educational platform',
+    authors: [{ name: 'EduGuiders Team' }],
+    creator: 'EduGuiders',
+    publisher: 'EduGuiders',
+    formatDetection: {
+        email: false,
+        address: false,
+        telephone: false,
+    },
+    verification: {
+        // Add your verification codes here when you have them
+        // google: 'your-google-verification-code',
+        // yandex: 'your-yandex-verification-code',
+    },
 };
 
 export function generateStaticParams() {
