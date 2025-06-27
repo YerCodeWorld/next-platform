@@ -15,23 +15,32 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'No credential provided' }, { status: 400 });
         }
 
-        const decoded = jwtDecode<never>(credential);
+        const decoded = jwtDecode<{
+            email: string;
+            name: string;
+            picture: string;
+            sub: string;
+        }>(credential);
         const { email, name, picture, sub } = decoded;
 
         // Try to get user from your external API first
-        let user;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        let user: any = null;
         try {
-            user = await fetch(`https://api.ieduguide.com/api/users/email/${encodeURIComponent(email)}`, {
+            const userResponse = await fetch(`https://api.ieduguide.com/api/users/email/${encodeURIComponent(email)}`, {
                 method: 'GET',
                 headers: { 'Content-Type': 'application/json' }
-            }).then(res => res.json());
+            });
 
-            if (user.data) {
-                user = user.data;
+            if (userResponse.ok) {
+                const userData = await userResponse.json();
+                if (userData.data) {
+                    user = userData.data;
+                }
             }
         } catch (error) {
             // User doesn't exist, we need to create them
-            console.log('User not found in API, creating new user', error);
+            console.log('User not found in API, will create new user:', error instanceof Error ? error.message : 'Unknown error');
         }
 
         // If user doesn't exist, create them via API
@@ -57,14 +66,31 @@ export async function POST(request: NextRequest) {
                     })
                 });
 
-                if (createResponse.ok) {
-                    const newUserData = await createResponse.json();
-                    user = newUserData.data;
+                if (!createResponse.ok) {
+                    console.error('Failed to create user, status:', createResponse.status);
+                    const errorData = await createResponse.text();
+                    console.error('Error response:', errorData);
+                    return NextResponse.json({ error: 'Failed to create user account' }, { status: 500 });
                 }
+
+                const newUserData = await createResponse.json();
+                if (!newUserData.data) {
+                    console.error('Invalid response from user creation:', newUserData);
+                    return NextResponse.json({ error: 'Invalid user creation response' }, { status: 500 });
+                }
+                
+                user = newUserData.data;
+                console.log('Successfully created new user:', user?.email || 'unknown');
             } catch (createError) {
                 console.error('Failed to create user via API:', createError);
                 return NextResponse.json({ error: 'Failed to create user' }, { status: 500 });
             }
+        }
+
+        // Verify we have a valid user before proceeding
+        if (!user || !user.id) {
+            console.error('No valid user data available');
+            return NextResponse.json({ error: 'Failed to authenticate user' }, { status: 500 });
         }
 
         // Set cookie
