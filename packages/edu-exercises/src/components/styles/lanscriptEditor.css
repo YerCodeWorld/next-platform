@@ -405,3 +405,69 @@
 .lanscript-monaco-editor > div {
     height: 100% !important;
 }
+
+/* Enhanced Mobile Support */
+@media (max-width: 768px) {
+    /* Improve touch targets */
+    .monaco-editor .cursors-layer .cursor {
+        width: 3px !important;
+    }
+    
+    /* Better mobile text selection */
+    .monaco-editor .lines-content {
+        -webkit-user-select: text !important;
+        user-select: text !important;
+    }
+    
+    /* Improve tap targets */
+    .monaco-editor .line {
+        line-height: 1.6 !important;
+    }
+    
+    /* Better mobile scrolling */
+    .monaco-editor {
+        -webkit-overflow-scrolling: touch;
+        overflow: auto;
+    }
+}
+
+/* Mobile paste support enhancements */
+.monaco-editor textarea {
+    position: absolute !important;
+    left: -9999px !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+
+/* On mobile, make textarea more accessible for paste */
+@media (max-width: 768px) {
+    .monaco-editor textarea {
+        position: fixed !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: 1px !important;
+        height: 1px !important;
+        opacity: 0.01 !important;
+        pointer-events: auto !important;
+        z-index: 1000 !important;
+    }
+}
+
+/* Focus styles for better mobile usability */
+.monaco-editor:focus-within {
+    outline: 2px solid #7c3aed;
+    outline-offset: 2px;
+}
+
+/* Better mobile autocomplete */
+@media (max-width: 768px) {
+    .monaco-editor .suggest-widget {
+        font-size: 16px !important;
+        min-height: 44px !important;
+    }
+    
+    .monaco-editor .suggest-widget .monaco-list-row {
+        height: 44px !important;
+        line-height: 44px !important;
+    }
+}

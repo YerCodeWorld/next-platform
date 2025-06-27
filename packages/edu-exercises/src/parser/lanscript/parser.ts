@@ -9,6 +9,10 @@ import {
     MultipleChoiceContent,
     OrderingContent
 } from '@repo/api-bridge';
+import { logger, logParserError, measurePerformance } from '../../utils/logger';
+import { sanitizeExercisePayload } from '../../utils/sanitization';
+import { validateExerciseByType } from '../validator';
+import { exerciseRegistry } from '../../exercises';
 
 export interface LanScriptBlock {
     metadata: {
@@ -40,27 +44,64 @@ export interface LanScriptParseResult {
 
 export class LanScriptParser {
     parse(script: string, authorEmail: string): LanScriptParseResult {
-        const errors: string[] = [];
-        const exercises: CreateExercisePayload[] = [];
+        return measurePerformance('lanscript_parse', () => {
+            const errors: string[] = [];
+            const exercises: CreateExercisePayload[] = [];
 
-        try {
-            const blocks = this.parseBlocks(script);
+            try {
+                logger.debug('Starting LanScript parsing', { 
+                    scriptLength: script.length, 
+                    authorEmail 
+                });
 
-            for (const block of blocks) {
-                try {
-                    const exercise = this.parseBlock(block, authorEmail);
-                    exercises.push(exercise);
-                } catch (error) {
-                    const errorMessage = error instanceof Error ? error.message : 'Unknown parsing error';
-                    errors.push(`Block parsing error: ${errorMessage}`);
+                const blocks = this.parseBlocks(script);
+                logger.debug('Parsed blocks', { blockCount: blocks.length });
+
+                for (const [index, block] of blocks.entries()) {
+                    try {
+                        const exercise = this.parseBlock(block, authorEmail);
+                        
+                        // Sanitize the exercise payload
+                        const sanitizedExercise = sanitizeExercisePayload(exercise);
+                        
+                        // Validate the exercise
+                        const validation = validateExerciseByType(sanitizedExercise);
+                        if (!validation.isValid) {
+                            errors.push(`Exercise ${index + 1} validation failed: ${validation.errors.join(', ')}`);
+                            logger.warn('Exercise validation failed', { 
+                                exerciseIndex: index + 1, 
+                                errors: validation.errors 
+                            });
+                        } else {
+                            exercises.push(sanitizedExercise);
+                            logger.debug('Exercise parsed successfully', { 
+                                exerciseIndex: index + 1, 
+                                type: sanitizedExercise.type 
+                            });
+                        }
+                    } catch (error) {
+                        const errorMessage = error instanceof Error ? error.message : 'Unknown parsing error';
+                        const blockError = `Block ${index + 1} parsing error: ${errorMessage}`;
+                        errors.push(blockError);
+                        
+                        logParserError(`Block ${index + 1}`, error instanceof Error ? error : new Error(errorMessage));
+                    }
                 }
+            } catch (error) {
+                const errorMessage = error instanceof Error ? error.message : 'Unknown script parsing error';
+                const scriptError = `Script parsing error: ${errorMessage}`;
+                errors.push(scriptError);
+                
+                logParserError(script, error instanceof Error ? error : new Error(errorMessage));
             }
-        } catch (error) {
-            const errorMessage = error instanceof Error ? error.message : 'Unknown script parsing error';
-            errors.push(`Script parsing error: ${errorMessage}`);
-        }
 
-        return { exercises, errors };
+            logger.info('LanScript parsing completed', { 
+                exerciseCount: exercises.length, 
+                errorCount: errors.length 
+            });
+
+            return { exercises, errors };
+        }, { scriptLength: script.length });
     }
 
     private parseBlocks(script: string): LanScriptBlock[] {
@@ -177,32 +218,20 @@ export class LanScriptParser {
     private parseBlock(block: LanScriptBlock, authorEmail: string): CreateExercisePayload {
         const { metadata, content } = block;
 
-        // Auto-detect type if not specified
-        const exerciseType = metadata.type || this.detectType(content);
+        // Auto-detect type if not specified using registry
+        const exerciseType = metadata.type || exerciseRegistry.detectType(content);
+        
+        if (!exerciseType) {
+            throw new Error('Could not detect exercise type from content');
+        }
 
         // Apply default metadata
         const title = metadata.title || `${exerciseType} Exercise`;
         const difficulty = metadata.difficulty || 'INTERMEDIATE';
         const category = metadata.category || 'GENERAL';
 
-        let exerciseContent;
-
-        switch (exerciseType) {
-            case 'FILL_BLANK':
-                exerciseContent = this.parseFillBlank(content);
-                break;
-            case 'MATCHING':
-                exerciseContent = this.parseMatching(content);
-                break;
-            case 'MULTIPLE_CHOICE':
-                exerciseContent = this.parseMultipleChoice(content);
-                break;
-            case 'ORDERING':
-                exerciseContent = this.parseOrdering(content);
-                break;
-            default:
-                throw new Error(`Unknown exercise type: ${exerciseType}`);
-        }
+        // Parse content using registry
+        const exerciseContent = exerciseRegistry.parseContent(exerciseType, content);
 
         return {
             title,
@@ -219,31 +248,16 @@ export class LanScriptParser {
         };
     }
 
+    // Type detection is now handled by the registry
+    // This method is kept for backwards compatibility but delegates to registry
     private detectType(lines: string[]): ExerciseType {
-        // Check for fill-in-the-blank (asterisks)
-        if (lines.some(line => line.includes('*') && line.split('*').length >= 3)) {
-            return 'FILL_BLANK';
-        }
-
-        // Check for multiple choice first (more specific - has brackets and equals)
-        if (lines.some(line => line.includes('[') && line.includes('='))) {
-            return 'MULTIPLE_CHOICE';
-        }
-
-        // Check for matching (equals sign without brackets)
-        if (lines.some(line => line.includes('=') && !line.includes('['))) {
-            return 'MATCHING';
-        }
-
-        // Check for ordering (pipe symbols without equals)
-        if (lines.some(line => line.includes('|') && !line.includes('='))) {
-            return 'ORDERING';
-        }
-
-        // Default to fill-in-the-blank
-        return 'FILL_BLANK';
+        const detected = exerciseRegistry.detectType(lines);
+        return detected || 'FILL_BLANK'; // Fallback to fill blank
     }
 
+    // All parsing methods are now handled by the exercise registry
+    // Keeping these utility methods for backwards compatibility
+    
     private cleanLine(line: string): string {
         // Remove decorators like @hint(...), @explanation(...)
         let cleanLine = line.replace(/@\w+\([^)]*\)/g, '');
@@ -257,153 +271,5 @@ export class LanScriptParser {
     private isCommentLine(line: string): boolean {
         const trimmed = line.trim();
         return trimmed.startsWith('//') || trimmed.startsWith('#');
-    }
-
-    private parseFillBlank(lines: string[]): FillBlankContent {
-        const sentences: FillBlankContent['sentences'] = [];
-
-        lines.forEach(line => {
-            // Skip comment lines during parsing but preserve them in the stored content
-            if (this.isCommentLine(line)) return;
-            
-            const cleanLine = this.cleanLine(line);
-            if (!cleanLine) return;
-
-            const blanks: { position: number; answers: string[]; hint?: string }[] = [];
-            let processedText = cleanLine;
-
-            // Find all *answer* patterns and replace them one by one
-            const blankPattern = /\*([^*]+)\*/g;
-            let match;
-            let offset = 0; // Track cumulative text length changes
-
-            while ((match = blankPattern.exec(cleanLine)) !== null) {
-                const answers = match[1].split('|').map(a => a.trim());
-                const blankPlaceholder = '___';
-                const originalLength = match[0].length; // Length of *answer*
-                const newLength = blankPlaceholder.length; // Length of ___
-                
-                // Calculate actual position in the processed text
-                const actualPosition = match.index + offset;
-                
-                blanks.push({
-                    position: actualPosition,
-                    answers,
-                    hint: undefined // Could be extracted from decorators later
-                });
-
-                // Replace the first occurrence of this pattern
-                processedText = processedText.replace(match[0], blankPlaceholder);
-                
-                // Update offset for next replacements
-                offset += (newLength - originalLength);
-            }
-
-            if (blanks.length > 0) {
-                sentences.push({
-                    text: processedText,
-                    blanks
-                });
-            }
-        });
-
-        return { sentences };
-    }
-
-    private parseMatching(lines: string[]): MatchingContent {
-        const pairs: MatchingContent['pairs'] = [];
-
-        lines.forEach(line => {
-            // Skip comment lines during parsing but preserve them in the stored content
-            if (this.isCommentLine(line)) return;
-            
-            const cleanLine = this.cleanLine(line);
-            if (!cleanLine || !cleanLine.includes('=')) return;
-
-            const [left, right] = cleanLine.split('=').map(part => part.trim());
-            if (left && right) {
-                pairs.push({
-                    left,
-                    right,
-                    hint: undefined
-                });
-            }
-        });
-
-        return { pairs, randomize: true };
-    }
-
-    private parseMultipleChoice(lines: string[]): MultipleChoiceContent {
-        const questions: MultipleChoiceContent['questions'] = [];
-
-        lines.forEach(line => {
-            // Skip comment lines during parsing but preserve them in the stored content
-            if (this.isCommentLine(line)) return;
-            
-            const cleanLine = this.cleanLine(line);
-            if (!cleanLine) return;
-
-            // Format: "Question = option1 | option2 | option3 [correct1, correct2]"
-            const equalIndex = cleanLine.indexOf('=');
-            
-            if (equalIndex === -1) return;
-
-            const question = cleanLine.substring(0, equalIndex).trim();
-            const optionsAndAnswers = cleanLine.substring(equalIndex + 1).trim();
-
-            let optionsText, answersText;
-            const bracketIndex = optionsAndAnswers.indexOf('[');
-            if (bracketIndex !== -1) {
-                optionsText = optionsAndAnswers.substring(0, bracketIndex).trim();
-                answersText = optionsAndAnswers.substring(bracketIndex).trim();
-            } else {
-                optionsText = optionsAndAnswers;
-                answersText = '';
-            }
-
-            const options = optionsText.split('|').map(opt => opt.trim());
-            
-            let correctIndices: number[] = [];
-            if (answersText) {
-                const answers = answersText.replace(/[\[\]]/g, '').split(',').map(a => a.trim());
-                correctIndices = answers.map(answer => 
-                    options.findIndex(opt => opt.toLowerCase() === answer.toLowerCase())
-                ).filter(idx => idx !== -1);
-            }
-
-            if (options.length > 1) {
-                questions.push({
-                    question,
-                    options,
-                    correctIndices,
-                    hint: undefined,
-                    explanation: undefined
-                });
-            }
-        });
-
-        return { questions };
-    }
-
-    private parseOrdering(lines: string[]): OrderingContent {
-        const sentences: OrderingContent['sentences'] = [];
-
-        lines.forEach(line => {
-            // Skip comment lines during parsing but preserve them in the stored content
-            if (this.isCommentLine(line)) return;
-            
-            const cleanLine = this.cleanLine(line);
-            if (!cleanLine || !cleanLine.includes('|')) return;
-
-            const segments = cleanLine.split('|').map(segment => segment.trim());
-            if (segments.length > 1) {
-                sentences.push({
-                    segments,
-                    hint: undefined
-                });
-            }
-        });
-
-        return { sentences };
     }
 }

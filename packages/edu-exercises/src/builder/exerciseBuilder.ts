@@ -7,7 +7,7 @@ import {
     MultipleChoiceContent,
     OrderingContent
 } from '@repo/api-bridge';
-import { validateExercise } from '../parser';
+import { validateExerciseByType } from '../parser/validator';
 
 export class ExerciseBuilder {
     private exercise: Partial<CreateExercisePayload> = {
@@ -79,7 +79,7 @@ export class ExerciseBuilder {
     }
 
     build(): CreateExercisePayload {
-        const validation = validateExercise(this.exercise as CreateExercisePayload);
+        const validation = validateExerciseByType(this.exercise as CreateExercisePayload);
         if (!validation.isValid) {
             throw new Error(`Invalid exercise: ${validation.errors.join(', ')}`);
         }

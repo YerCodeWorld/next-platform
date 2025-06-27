@@ -12,16 +12,33 @@ import {
     MultipleChoiceContent,
     OrderingContent
 } from '@repo/api-bridge';
+import { exerciseRegistry } from '../../registry/ExerciseRegistry';
 import { ExercisePreview } from './ExercisePreview';
 
 import { toast } from 'sonner';
 import '../styles/lanscriptEditor.css';
+import { initializeExerciseRegistry } from '../../exercises';
 
-// Register LanScript language
-monaco.languages.register({ id: 'lanscript' });
+// Initialize the exercise registry
+initializeExerciseRegistry();
 
-// Define language tokens
-monaco.languages.setMonarchTokensProvider('lanscript', {
+// We'll register the language inside the component to ensure it happens
+let languageRegistered = false;
+
+function registerLanScriptLanguage() {
+    if (languageRegistered) {
+        console.log('🔧 LanScript language already registered');
+        return;
+    }
+    
+    console.log('🚀 Registering LanScript language for Monaco Editor...');
+    
+    // Register LanScript language
+    monaco.languages.register({ id: 'lanscript' });
+    console.log('✅ LanScript language registered');
+    
+    // Define language tokens
+    monaco.languages.setMonarchTokensProvider('lanscript', {
     tokenizer: {
         root: [
             // Comments
@@ -62,126 +79,142 @@ monaco.languages.setMonarchTokensProvider('lanscript', {
             [/[{}]/, 'delimiter.bracket'],
         ]
     }
-});
+    });
 
-// Define language configuration
-monaco.languages.setLanguageConfiguration('lanscript', {
-    comments: {
-        lineComment: '//',
-    },
-    brackets: [
-        ['{', '}'],
-        ['[', ']'],
-        ['(', ')']
-    ],
-    autoClosingPairs: [
-        { open: '{', close: '}' },
-        { open: '[', close: ']' },
-        { open: '(', close: ')' },
-        { open: '"', close: '"' },
-        { open: "'", close: "'" },
-        { open: '*', close: '*' },
-    ],
-    surroundingPairs: [
-        { open: '{', close: '}' },
-        { open: '[', close: ']' },
-        { open: '(', close: ')' },
-        { open: '"', close: '"' },
-        { open: "'", close: "'" },
-        { open: '*', close: '*' },
-    ],
-});
+    // Define language configuration
+    monaco.languages.setLanguageConfiguration('lanscript', {
+        comments: {
+            lineComment: '//',
+        },
+        brackets: [
+            ['{', '}'],
+            ['[', ']'],
+            ['(', ')']
+        ],
+        autoClosingPairs: [
+            { open: '{', close: '}' },
+            { open: '[', close: ']' },
+            { open: '(', close: ')' },
+            { open: '"', close: '"' },
+            { open: "'", close: "'" },
+            { open: '*', close: '*' },
+        ],
+        surroundingPairs: [
+            { open: '{', close: '}' },
+            { open: '[', close: ']' },
+            { open: '(', close: ')' },
+            { open: '"', close: '"' },
+            { open: "'", close: "'" },
+            { open: '*', close: '*' },
+        ],
+    });
 
-// Define theme
-monaco.editor.defineTheme('lanscript-theme', {
-    base: 'vs',
-    inherit: true,
-    rules: [
-        { token: 'keyword', foreground: '7c3aed', fontStyle: 'bold' },
-        { token: 'keyword.global', foreground: '059669', fontStyle: 'bold' },
-        { token: 'decorator', foreground: '0891b2' },
-        { token: 'string', foreground: 'dc2626' },
-        { token: 'string.answer', foreground: 'ea580c', fontStyle: 'bold' },
-        { token: 'operator.match', foreground: '7c3aed', fontStyle: 'bold' },
-        { token: 'operator.order', foreground: '0891b2', fontStyle: 'bold' },
-        { token: 'annotation.correct', foreground: '059669', fontStyle: 'bold' },
-        { token: 'comment', foreground: '6b7280', fontStyle: 'italic' },
-        { token: 'number', foreground: '0891b2' },
-        { token: 'keyword.boolean', foreground: '7c3aed' },
-        { token: 'delimiter.bracket', foreground: '4b5563', fontStyle: 'bold' },
-    ],
-    colors: {
-        'editor.foreground': '#1f2937',
-        'editor.background': '#ffffff',
-        'editorLineNumber.foreground': '#9ca3af',
-        'editorIndentGuide.background': '#e5e7eb',
-        'editor.selectionBackground': '#ddd6fe',
-        'editorCursor.foreground': '#7c3aed',
+    // Define theme
+    monaco.editor.defineTheme('lanscript-theme', {
+        base: 'vs',
+        inherit: true,
+        rules: [
+            { token: 'keyword', foreground: '7c3aed', fontStyle: 'bold' },
+            { token: 'keyword.global', foreground: '059669', fontStyle: 'bold' },
+            { token: 'decorator', foreground: '0891b2' },
+            { token: 'string', foreground: 'dc2626' },
+            { token: 'string.answer', foreground: 'ea580c', fontStyle: 'bold' },
+            { token: 'operator.match', foreground: '7c3aed', fontStyle: 'bold' },
+            { token: 'operator.order', foreground: '0891b2', fontStyle: 'bold' },
+            { token: 'annotation.correct', foreground: '059669', fontStyle: 'bold' },
+            { token: 'comment', foreground: '6b7280', fontStyle: 'italic' },
+            { token: 'number', foreground: '0891b2' },
+            { token: 'keyword.boolean', foreground: '7c3aed' },
+            { token: 'delimiter.bracket', foreground: '4b5563', fontStyle: 'bold' },
+        ],
+        colors: {
+            'editor.foreground': '#1f2937',
+            'editor.background': '#ffffff',
+            'editorLineNumber.foreground': '#9ca3af',
+            'editorIndentGuide.background': '#e5e7eb',
+            'editor.selectionBackground': '#ddd6fe',
+            'editorCursor.foreground': '#7c3aed',
+        }
+    });
+    
+    console.log('✅ LanScript language configuration complete');
+    languageRegistered = true;
+}
+
+// Generate hover information with registry data
+const getHoverInfo = (): Record<string, { title: string; docs: string }> => {
+    const registeredTypes = exerciseRegistry.getExerciseTypes();
+    const metadata = exerciseRegistry.getExerciseMetadata();
+    
+    let typesDocs = 'Exercise type. Options:\n';
+    if (metadata.length > 0) {
+        typesDocs += metadata.map(m => `- \`${m.type.toLowerCase()}\` - ${m.description || m.displayName}`).join('\n');
+    } else {
+        typesDocs += '- `fill_blank` - Fill in the blanks\n- `matching` - Match pairs\n- `multiple_choice` - Multiple choice questions\n- `ordering` - Put words in order\n- `letter_soup` - Word search puzzle';
     }
-});
-
-// Hover information data
-const hoverInfo: Record<string, { title: string; docs: string }> = {
-    'type': {
-        title: '**type**',
-        docs: 'Exercise type. Options:\n- `fill_blank` - Fill in the blanks\n- `matching` - Match pairs\n- `multiple_choice` - Multiple choice questions\n- `ordering` - Put words in order\n- `letter_soup` - Word search puzzle'
-    },
-    'difficulty': {
-        title: '**difficulty**',
-        docs: 'Set difficulty level:\n- `BEGINNER`\n- `INTERMEDIATE`\n- `ADVANCED`'
-    },
-    'category': {
-        title: '**category**',
-        docs: 'Exercise category:\n- `GRAMMAR`\n- `VOCABULARY`\n- `READING`\n- `WRITING`\n- `SPEAKING`\n- `CONVERSATION`\n- `GENERAL`'
-    },
-    'title': {
-        title: '**title**',
-        docs: 'The exercise title shown to students'
-    },
-    'instructions': {
-        title: '**instructions**',
-        docs: 'Optional instructions for completing the exercise'
-    },
-    'topic': {
-        title: '**topic**',
-        docs: 'Topic tag for the exercise (e.g., "animals", "food")'
-    },
-    'theme': {
-        title: '**theme** (Letter Soup)',
-        docs: 'Theme for word search puzzle (e.g., "Animals", "Verbs")'
-    },
-    'size': {
-        title: '**size** (Letter Soup)',
-        docs: 'Grid size for word search (8-20)'
-    },
-    'gridSize': {
-        title: '**gridSize** (Letter Soup)',
-        docs: 'Alternative to size. Grid dimensions (8-20)'
-    },
-    'caseSensitive': {
-        title: '**caseSensitive** (Letter Soup)',
-        docs: 'Whether word search is case sensitive (true/false)'
-    },
-    'allowBackwards': {
-        title: '**allowBackwards** (Letter Soup)',
-        docs: 'Allow words to appear backwards (true/false)'
-    },
-    '@hint': {
-        title: '**@hint()**',
-        docs: 'Add a hint for this specific question.\nExample: `@hint(Think about past tense)`'
-    },
-    '@explanation': {
-        title: '**@explanation()**',
-        docs: 'Add explanation for this specific question.\nShown after the student answers.'
-    },
-    'hint': {
-        title: '**HINT()**',
-        docs: 'Global hint for the entire exercise.\nUse `@hint()` for question-specific hints.'
-    },
-    'explanation': {
-        title: '**EXPLANATION()**',
-        docs: 'Global explanation for the entire exercise.\nUse `@explanation()` for question-specific explanations.'
-    }
+    
+    return {
+        'type': {
+            title: '**type**',
+            docs: typesDocs
+        },
+        'difficulty': {
+            title: '**difficulty**',
+            docs: 'Set difficulty level:\n- `BEGINNER`\n- `INTERMEDIATE`\n- `ADVANCED`'
+        },
+        'category': {
+            title: '**category**',
+            docs: 'Exercise category:\n- `GRAMMAR`\n- `VOCABULARY`\n- `READING`\n- `WRITING`\n- `SPEAKING`\n- `CONVERSATION`\n- `GENERAL`'
+        },
+        'title': {
+            title: '**title**',
+            docs: 'The exercise title shown to students'
+        },
+        'instructions': {
+            title: '**instructions**',
+            docs: 'Optional instructions for completing the exercise'
+        },
+        'topic': {
+            title: '**topic**',
+            docs: 'Topic tag for the exercise (e.g., "animals", "food")'
+        },
+        'theme': {
+            title: '**theme** (Letter Soup)',
+            docs: 'Theme for word search puzzle (e.g., "Animals", "Verbs")'
+        },
+        'size': {
+            title: '**size** (Letter Soup)',
+            docs: 'Grid size for word search (8-20)'
+        },
+        'gridSize': {
+            title: '**gridSize** (Letter Soup)',
+            docs: 'Alternative to size. Grid dimensions (8-20)'
+        },
+        'caseSensitive': {
+            title: '**caseSensitive** (Letter Soup)',
+            docs: 'Whether word search is case sensitive (true/false)'
+        },
+        'allowBackwards': {
+            title: '**allowBackwards** (Letter Soup)',
+            docs: 'Allow words to appear backwards (true/false)'
+        },
+        '@hint': {
+            title: '**@hint()**',
+            docs: 'Add a hint for this specific question.\nExample: `@hint(Think about past tense)`'
+        },
+        '@explanation': {
+            title: '**@explanation()**',
+            docs: 'Add explanation for this specific question.\nShown after the student answers.'
+        },
+        'hint': {
+            title: '**HINT()**',
+            docs: 'Global hint for the entire exercise.\nUse `@hint()` for question-specific hints.'
+        },
+        'explanation': {
+            title: '**EXPLANATION()**',
+            docs: 'Global explanation for the entire exercise.\nUse `@explanation()` for question-specific explanations.'
+        }
+    };
 };
 
 interface LanScriptEditorProps {
@@ -227,6 +260,9 @@ export const LanScriptEditor: React.FC<LanScriptEditorProps> = ({
     useEffect(() => {
         if (!editorRef.current) return;
 
+        // Register the language first
+        registerLanScriptLanguage();
+
         // Create Monaco editor
         const editor = monaco.editor.create(editorRef.current, {
             value: initialScript || defaultScript,
@@ -253,15 +289,52 @@ export const LanScriptEditor: React.FC<LanScriptEditorProps> = ({
                 strings: true
             },
             padding: { top: 10, bottom: 10 },
+            // Mobile-friendly options
+            acceptSuggestionOnEnter: 'smart',
+            acceptSuggestionOnCommitCharacter: true,
+            tabCompletion: 'on',
+            quickSuggestionsDelay: 100,
+            // Better mobile editing
+            glyphMargin: false,
+            contextmenu: true,
+            // Improved mobile paste support
+            domReadOnly: false,
+            readOnly: false,
         });
 
         monacoRef.current = editor;
 
+        // Enhanced mobile support - better paste handling
+        if (typeof window !== 'undefined' && 'ontouchstart' in window) {
+            // Mobile-specific enhancements
+            const editorDomNode = editor.getDomNode();
+            if (editorDomNode) {
+                // Add touch-friendly styles
+                editorDomNode.style.touchAction = 'manipulation';
+                
+                // Improve paste support on mobile
+                const textArea = editorDomNode.querySelector('textarea');
+                if (textArea) {
+                    textArea.addEventListener('paste', (e) => {
+                        // Ensure paste works properly on mobile
+                        e.stopPropagation();
+                        setTimeout(() => {
+                            // Trigger parse after paste
+                            handleParse(editor.getValue());
+                        }, 100);
+                    });
+                }
+            }
+        }
+
         // Register hover provider with better implementation
+        console.log('🔧 Registering Monaco hover provider for lanscript language');
         const hoverProvider = monaco.languages.registerHoverProvider('lanscript', {
             provideHover: (model, position) => {
+                console.log('🎯 Hover triggered!', { position });
                 const line = model.getLineContent(position.lineNumber);
                 const offset = position.column - 1; // Monaco uses 1-based columns
+                const hoverInfo = getHoverInfo(); // Get dynamic hover info
 
                 // Check for decorators first
                 if (line.includes('@')) {
@@ -358,9 +431,11 @@ export const LanScriptEditor: React.FC<LanScriptEditorProps> = ({
         });
 
         // Register completion provider with better context awareness
+        console.log('🔧 Registering Monaco completion provider for lanscript language');
         const completionProvider = monaco.languages.registerCompletionItemProvider('lanscript', {
-            triggerCharacters: ['@', ' ', '\n', '{'],
+            triggerCharacters: ['@', ' ', '\n', '{', 't', 'd', 'c'], // Add common starting letters
             provideCompletionItems: (model, position, context) => {
+                console.log('🎯 Autocomplete triggered!', { position, context, character: context.triggerCharacter });
                 const line = model.getLineContent(position.lineNumber);
                 const lineUntilPosition = line.substring(0, position.column - 1);
                 const textUntilPosition = model.getValueInRange({
@@ -407,7 +482,7 @@ export const LanScriptEditor: React.FC<LanScriptEditorProps> = ({
                         label: 'exercise-block',
                         kind: monaco.languages.CompletionItemKind.Snippet,
                         insertText: `{
-  type \${1|fill_blank,matching,multiple_choice,ordering,letter_soup|}
+  type \${1|fill_blank,matching,multiple_choice,ordering|}
   title \${2:Exercise Title}
   difficulty \${3|BEGINNER,INTERMEDIATE,ADVANCED|}
   
@@ -421,13 +496,21 @@ export const LanScriptEditor: React.FC<LanScriptEditorProps> = ({
 
                 // Metadata completions (only at start of line inside block)
                 if (insideBlock && /^\s*$/.test(lineUntilPosition)) {
+                    // Get registered exercise types from registry
+                    const registeredTypes = exerciseRegistry.getExerciseTypes();
+                    console.log('🎯 Registry types available:', registeredTypes);
+                    const typeOptions = registeredTypes.length > 0 
+                        ? registeredTypes.map(type => type.toLowerCase()).join(',')
+                        : 'fill_blank,matching,multiple_choice,ordering';
+                    console.log('🎯 Type options for autocomplete:', typeOptions);
+                        
                     // Type
                     suggestions.push({
                         label: 'type',
                         kind: monaco.languages.CompletionItemKind.Property,
-                        insertText: 'type ${1|fill_blank,matching,multiple_choice,ordering,letter_soup|}',
+                        insertText: `type \${1|${typeOptions}|}`,
                         insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
-                        documentation: 'Set exercise type',
+                        documentation: 'Set exercise type (from registry)',
                         range: monaco.Range.fromPositions(position)
                     });
 
@@ -707,6 +790,10 @@ export const LanScriptEditor: React.FC<LanScriptEditorProps> = ({
     const insertTemplate = (type: string) => {
         if (!monacoRef.current) return;
 
+        // Get registry metadata for better templates
+        const metadata = exerciseRegistry.getExerciseMetadata();
+        const exerciseConfig = metadata.find(m => m.type.toLowerCase() === type.replace(/([A-Z])/g, '_$1').toLowerCase());
+        
         const templates: Record<string, string> = {
             fillBlank: `{
   type fill_blank
@@ -753,27 +840,6 @@ export const LanScriptEditor: React.FC<LanScriptEditorProps> = ({
   I | like | to | read | books
   The | quick | brown | fox | jumps
   She | is | studying | English | grammar @hint(present continuous)
-}`,
-            letterSoup: `{
-  type letter_soup
-  title Find the Hidden Words
-  difficulty ${defaultMetadata.difficulty}
-  category ${defaultMetadata.category}
-  
-  // Optional settings
-  theme Animals
-  size 10
-  caseSensitive false
-  allowBackwards true
-  placementDifficulty hard
-  
-  // List words to find (minimum 3 letters each)
-  CAT
-  DOG
-  BIRD
-  FISH
-  RABBIT
-  MOUSE
 }`
         };
 
@@ -806,10 +872,6 @@ export const LanScriptEditor: React.FC<LanScriptEditorProps> = ({
                     <button onClick={() => insertTemplate('ordering')} title="Insert Ordering template">
                         <i className="fas fa-arrows-up-down"></i>
                         <span>Ordering</span>
-                    </button>
-                    <button onClick={() => insertTemplate('letterSoup')} title="Insert Letter Soup template">
-                        <i className="fas fa-grip"></i>
-                        <span>Letter Soup</span>
                     </button>
                     <div className="toolbar-separator"></div>
                     <button onClick={() => setShowPreview(!showPreview)} className={showPreview ? 'active' : ''}>
