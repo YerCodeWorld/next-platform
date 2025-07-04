@@ -5,7 +5,7 @@ export interface User {
     name: string;
     picture?: string | null;
     role: 'ADMIN' | 'TEACHER' | 'STUDENT';
-    country: string;
+    exp: number;
     createdAt: string;
     preferredColor: string;
     preferredLanguage: 'ENGLISH' | 'SPANISH';

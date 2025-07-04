@@ -1,0 +1,250 @@
+FUNCTIONS
+
+@metadata(
+  TITLE,
+  TYPE,
+  INSTRUCTIONS,
+  DIFFICULTY
+)
+@config(
+  VARIATION,
+  STYLE,
+  TIME,
+  LIMIT,
+  LIVES,
+  ...
+)
+
+@notes(text)  // only global, replacer for previous @explanation()
+Used to store explanations and tips for that particular exercise.
+
+@ins(text)
+Used to store instructions for the question it is used in, as a
+context helper.
+I *am not|'m not* your doctor. @ins('negative be form')
+
+@img(URL_text)
+Stores an URL used to fetch the corresponding image.
+
+@hint(text)  // should be replaced with @idea()
+Stores a hint to help the student complete the question
+
+@audio(text)  // do not add, only proposal
+
+@fill(lib, amount, difficulty)
+Autocompletes a question using a specified library which is stored in
+the code.
+
+Example in python
+
+```
+import random
+
+animals = [
+  'cat',
+  'dog',
+  'tiger',
+  'lion',
+  'turtle',
+  'lizard',
+  'fox',
+  'eagle'
+  ]
+
+# what would be called if we got @fill()
+def fill(lib, amount=1, difficulty='A1'):
+    amount = min(amount, len(lib))  # Prevent error if amount too big
+    return random.sample(lib, k=amount)
+
+multiple = fill(animals, 4)
+single = fill(animals)
+
+```
+
+// @length() ??
+// Returns the length of a pattern, sentence or word
+
+// @default() ??
+
+@randomize()
+Helpers to make specific exercises appear differently on each new tries.
+
+@var -> @var()
+Stores a pattern and returns different values on each new use.
+
+@define("lib_name", content)
+Creates a local library
+
+____________________________________
+FILL_BLANK
+
+A Classical exercise type where students might complete letters of a word,
+words of a text or sentence as well as whole sentences. Basic. Renders the
+sentences with the corresponding input entry component.
+
+Variations: original | single | match
+
+Original
+
+Uses "**" to determine which words will be blank. Uses "|" inside of the
+astheristics to indicate different possible answers.
+
+Example: She *is* my *little|younger* sister.
+
+
+Single
+
+Intended for single words exercises, uses "[]" to catch the letters that would
+appear blank. Must use a unique display that renders each letter separately.
+
+Example: W[a]te[rme]lon
+
+Matches
+
+Inspired by matching exercises, just a simple new display that renders columns
+where one of the blocks is a blank. Only difference between this and the original
+variation is the display. Serves to make more clear practice of things like antonyms,
+synonyms and related things in general (like female/male version of certain words).
+Uses "=" to indicate the match and "**" to place the blank
+
+Example
+
+happy = *sad*
+_____________________________________
+
+
+_________________________________________________
+MULTIPLE_CHOICE
+
+Another classic. User encounters a question where they have several options
+to take as an answer.
+
+variations: original | mathches | cards | TRUE_FALSE ??
+
+Original
+Takes the content before "=" as an instruction, splits later content with "|"
+to render options, takes the options wrapped in "[]" as correct asnwers.
+The sky can be = [blue] | red | green | [pink]
+
+Matches
+Displays questions along side a <select /> with all the available answers.
+Student must assign an answer to each question.
+
+Example:
+
+apple = red
+banana = yellow
+= green
+
+Cards
+Exclusively changes display. Better for a more playful experience in not-so-serious
+cases, also good for image rendering.
+
+True_False
+Better off as a style change than a variation itself. We need to add the style property
+to the @config() function. Syntax is same as original variation.
+_________________________________________________
+
+
+
+____________________________________________________
+ORDERING
+Classic. Let the student wrap their haads to categorize or organize ideas,
+patterns or structures nicely.
+
+Variations: original | single | aligner
+
+Original
+Each separated word after "|" split can be ordered.
+I | am | not | your | friend
+
+Single
+Each letter can be ordered. Accepts three words at most.
+Beautiful // should be splitted and shuffled
+
+Aligner
+Structure facts based on what happens first or last, most important to
+least important, biggest to smallest, or whatever other condition.
+Order by fastest = eagle | cheetah | turtle (water)
+____________________________________________________
+
+
+
+____________________________________________________
+MATCHING
+
+Another classic, where users must align two different columns following
+previous instructions.
+
+variations: original | new | threesome
+
+Original
+apple = red
+
+New
+All possible matches in right column are rendered, while the other column
+is rendered one by one.
+the red new sea = the blue old sky
+
+Threesome
+Mega display where objects need to be matched thrice.
+apple = fruit = red
+____________________________________________________
+
+
+____________________________________________________
+CATEGORIZE
+Well-known type. User needs to separate concepts, strucutures, ideas and
+more based on the specified instructions.
+
+variations: original | ordering | lake
+
+Original
+Boxes are displayed with words on a finite canvas, user categorizes them.
+ASIA         = @fill('asian countries', 5)
+EUROPE       = UK | France | Ukraine | Germany | Italy
+
+Ordering
+Different columns are displayed with already-categorized words, but many
+are wrongly-categorize. User needs to fix them.
+
+COLD   = Coat     | Scarff      | Gloves | Boots      | Hat
+HOT    = Frannels | Flip Flops  | Shorts | Sunglasses | t-shirt
+
+Lake
+Words or sentences are displayed in an finite canvas and students needs to select
+all possible answers based on instructions.
+Select all fruits that are not and cannot be red =
+[banana, apple, grapes, strawberry, kiwi, melon, mango]
+____________________________________________________
+
+
+____________________________________________________
+SELECTOR
+New type on my end. User does not have to enter any input but
+rather spot a specified thing.
+
+Variations: on-text | cards | image
+
+on-text
+Select words in a sentence.
+she [are] a doctor. [An] [doctors] of the people.  // the wrong word(s) would be clicked
+
+image
+Is supposed to render an image that user would be able to click
+anywhere and it would be saved. If marked places indicate a position
+close to a marked (by the creator) one, it should be marked correct.
+It is similar to some capchas to determine if a user is a robot.
+____________________________________________________
+____________________________________________________
+READING
+Future implementation
+____________________________________________________
+
+
+____________________________________________________
+CONVERSATION
+Future implementation
+____________________________________________________
+
+

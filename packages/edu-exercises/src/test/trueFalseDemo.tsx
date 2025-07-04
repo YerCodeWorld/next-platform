@@ -31,7 +31,7 @@ interface TrueFalseContent {
 }
 
 // Simple display component (in real app, this would be more sophisticated)
-const TrueFalseDisplay: React.FC<ExerciseDisplayProps<TrueFalseContent>> = ({ 
+const TrueFalseDisplay: React.FC<ExerciseDisplayProps<any>> = ({ 
     content, 
     exercise, 
     onComplete 
@@ -50,7 +50,7 @@ const TrueFalseDisplay: React.FC<ExerciseDisplayProps<TrueFalseContent>> = ({
     const checkAnswers = () => {
         setShowResults(true);
         const correct = userAnswers.every((answer, index) => 
-            answer === content.statements[index].isTrue
+            answer === content.statements[index]?.isTrue
         );
         onComplete?.(correct);
     };
@@ -166,7 +166,7 @@ const TrueFalseDisplay: React.FC<ExerciseDisplayProps<TrueFalseContent>> = ({
 };
 
 // Simple builder component
-const TrueFalseBuilder: React.FC<ExerciseBuilderProps<TrueFalseContent>> = ({ 
+const TrueFalseBuilder: React.FC<ExerciseBuilderProps<any>> = ({ 
     content, 
     onChange 
 }) => {
@@ -309,12 +309,12 @@ function parseTrueFalseContent(lines: string[]): TrueFalseContent {
         
         if (trueMatch) {
             statements.push({
-                statement: trueMatch[1].trim(),
+                statement: trueMatch[1]?.trim() || '',
                 isTrue: true
             });
         } else if (falseMatch) {
             statements.push({
-                statement: falseMatch[1].trim(),
+                statement: falseMatch[1]?.trim() || '',
                 isTrue: false
             });
         }
@@ -376,7 +376,7 @@ function trueFalseToLanScript(content: TrueFalseContent): string {
  * TRUE/FALSE EXERCISE TYPE CONFIGURATION
  * This single file defines everything needed for a new exercise type!
  */
-export const trueFalseExercise: ExerciseTypeConfig<TrueFalseContent> = {
+export const trueFalseExercise: ExerciseTypeConfig<any> = {
     type: 'TRUE_FALSE' as any, // Cast needed since it's not in the main enum yet
     displayName: 'True or False',
     description: 'Statements that students must identify as true or false',

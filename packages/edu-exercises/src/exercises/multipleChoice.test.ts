@@ -30,19 +30,21 @@ describe('multipleChoice exercise type', () => {
   })
 
   describe('detectPattern', () => {
+    const detectFn = multipleChoiceExercise.detectPattern as (lines: string[]) => boolean
+    
     it('should detect multiple choice format', () => {
       const lines = [
         'What is 2+2? = 3 | 4 | 5 [4]',
         'Which is correct? = A | B | C [A]'
       ]
       
-      expect(multipleChoiceExercise.detectPattern(lines)).toBe(true)
+      expect(detectFn(lines)).toBe(true)
     })
 
     it('should require all three elements: |, [, and =', () => {
-      expect(multipleChoiceExercise.detectPattern(['Has = and | but no brackets'])).toBe(false)
-      expect(multipleChoiceExercise.detectPattern(['Has = and [brackets] but no pipes'])).toBe(false)
-      expect(multipleChoiceExercise.detectPattern(['Has | pipes and [brackets] but no equals'])).toBe(false)
+      expect(detectFn(['Has = and | but no brackets'])).toBe(false)
+      expect(detectFn(['Has = and [brackets] but no pipes'])).toBe(false)
+      expect(detectFn(['Has | pipes and [brackets] but no equals'])).toBe(false)
     })
 
     it('should ignore comment lines', () => {
@@ -51,12 +53,12 @@ describe('multipleChoice exercise type', () => {
         'Real question = A | B [A]'
       ]
       
-      expect(multipleChoiceExercise.detectPattern(lines)).toBe(true)
+      expect(detectFn(lines)).toBe(true)
     })
 
     it('should return false for empty or non-matching lines', () => {
-      expect(multipleChoiceExercise.detectPattern([])).toBe(false)
-      expect(multipleChoiceExercise.detectPattern(['Just plain text'])).toBe(false)
+      expect(detectFn([])).toBe(false)
+      expect(detectFn(['Just plain text'])).toBe(false)
     })
   })
 
@@ -85,7 +87,7 @@ describe('multipleChoice exercise type', () => {
       
       const result = multipleChoiceExercise.parseContent(lines)
       
-      expect(result.questions[0].correctIndices).toEqual([0, 2]) // Dog and Cat
+      expect(result.questions[0]?.correctIndices).toEqual([0, 2]) // Dog and Cat
     })
 
     it('should handle case-insensitive answer matching', () => {
@@ -95,7 +97,7 @@ describe('multipleChoice exercise type', () => {
       
       const result = multipleChoiceExercise.parseContent(lines)
       
-      expect(result.questions[0].correctIndices).toEqual([0, 1])
+      expect(result.questions[0]?.correctIndices).toEqual([0, 1])
     })
 
     it('should default to first option if no correct answers specified', () => {
@@ -105,7 +107,7 @@ describe('multipleChoice exercise type', () => {
       
       const result = multipleChoiceExercise.parseContent(lines)
       
-      expect(result.questions[0].correctIndices).toEqual([0])
+      expect(result.questions[0]?.correctIndices).toEqual([0])
     })
 
     it('should skip lines without equals sign', () => {
@@ -140,7 +142,7 @@ describe('multipleChoice exercise type', () => {
       const result = multipleChoiceExercise.parseContent(lines)
       
       expect(result.questions).toHaveLength(1)
-      expect(result.questions[0].question).toBe('Valid question')
+      expect(result.questions[0]?.question).toBe('Valid question')
     })
 
     it('should handle empty questions gracefully', () => {
@@ -152,7 +154,7 @@ describe('multipleChoice exercise type', () => {
       const result = multipleChoiceExercise.parseContent(lines)
       
       expect(result.questions).toHaveLength(1)
-      expect(result.questions[0].question).toBe('Valid')
+      expect(result.questions[0]?.question).toBe('Valid')
     })
 
     it('should parse multiple questions', () => {
@@ -164,8 +166,8 @@ describe('multipleChoice exercise type', () => {
       const result = multipleChoiceExercise.parseContent(lines)
       
       expect(result.questions).toHaveLength(2)
-      expect(result.questions[0].question).toBe('Question 1')
-      expect(result.questions[1].question).toBe('Question 2')
+      expect(result.questions[0]?.question).toBe('Question 1')
+      expect(result.questions[1]?.question).toBe('Question 2')
     })
   })
 

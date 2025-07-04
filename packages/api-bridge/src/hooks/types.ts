@@ -4,7 +4,7 @@ export interface User {
     email: string;
     name: string;
     role: 'ADMIN' | 'TEACHER' | 'STUDENT';
-    country: string;
+    exp: number;
     picture?: string | null;
     createdAt: string;
     preferredColor: string;
@@ -17,7 +17,6 @@ export interface CreateUserPayload {
     email: string;
     name: string;
     role?: 'ADMIN' | 'TEACHER' | 'STUDENT';
-    country: string;
     picture?: string;
     preferredColor?: string;
     preferredLanguage?: 'SPANISH' | 'ENGLISH';
@@ -30,7 +29,6 @@ export interface Testimony {
     content: string;
     createdAt: string;
     rating: number;
-    title?: string;
     featured: boolean;
     userEmail: string;
 
@@ -44,7 +42,6 @@ export interface Testimony {
 export interface CreateTestimonyPayload {
     content: string;
     rating: number;
-    title?: string;
     userEmail: string;
 }
 

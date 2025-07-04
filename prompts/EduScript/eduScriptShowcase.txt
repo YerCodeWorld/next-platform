@@ -1,0 +1,553 @@
+.Example usage
+
+// ==============================================
+// FILL BLANK
+// ==============================================
+{
+    @metadata(
+        type = fill blank
+        title = ...
+        instructions = ...
+        difficulty = ...
+    )
+
+    @config(
+        // on absense of this, remain with default variation
+        variation = original
+    )
+
+    She *is* my *little|younger* sister.
+    We *are not* your friends.              @ins(negative be)
+
+    // if @prev() != "correct" > @message("You can do it!") // example of possible use of conditionals, but
+    // not too convincing at the moment.
+
+    *When* was the party?                   @ins(WH word for time)
+    Sometimes you *are* a good friend.
+    I You He She We They                    @randomize(blank, 2)   // two of these words would appear blank
+    I would love to eat all those *apples*  @image(URL)
+},
+
+{
+    @metadata(...)
+
+    @config(
+        variation = single
+        limit     = 10   // even if we have more available, only show 10 questions
+    )
+
+    T[r]ans[for]mati[o]n   // T _ ans _ _ _  mati _ n
+    W[a]te[rme]lon
+
+    // each word would be randomized with blanks and returned to the parser
+    @randomize(@fill('fruits', 5), singleBlank)  // default amount of blanks is a third of the length of the word
+
+    // another use case with helper functions, looks like its own little variation
+    [Baseball Player]        @ins(Write the profession of a person who plays baseball) /
+    @idea(the last 5 is: player)
+
+    [Singer]                 @ins(Write the main profession of Michael Jackson)
+
+    // let's say global instructions indicate to write the country
+    [Japan]                  @ins(Ramen + Anime)
+    [America]                @ins(Flag has 50 stars)
+
+    // More variation
+    [Apple]                  @image(URL)  // This would be shown on top, just like the instructions
+    G[r]ap[e]s               @image(URL)
+},
+
+{
+    @metadata(
+        ...
+        instructions = Write the antonym of each word
+    )
+
+    @config(
+        variation = matches
+        limit     = 6
+        shuffle   = true
+    )
+
+    // GLOBAL HINT PROPOSAL, that uses function calls
+    // A hint that is added to each word, in indicates the length of the blank of each word as a hint
+    @HINT(@length(@blank))
+
+    happy           = *sad*
+    funny           = *boring*
+    clean           = *dirty*
+    *popular*       = unpopular
+    *big|large*     = small
+
+},
+
+
+
+// ==============================================
+// MATCHING
+// ==============================================
+{
+    @metadata(
+        type = match
+        title = ...
+        instructions = Match The Fruits with their Color
+        difficulty = ...
+    )
+
+    @config(
+        // on absense of this, remain with default variation
+        variation = original
+        time = 120
+    )
+
+
+    @fill('red_fruit')       = red        @hint(What color is the most famous apple?)
+
+    banana                   = yellow
+    watermelon               = green      @hint(Come on now! We are not talking about the meat!!!)
+    coconut                  = white      @ins(MEAT)
+
+    // extra matches, just decoration to increase difficulty.
+    // notice how these belong to the right column as it uses = symbol.
+    = @fill('colors', 2)
+},
+
+{
+    @metadata(...)
+
+    @config(
+        variation = original
+        style = custom  // custom display for long sentences
+    )
+
+    This fruit can be green, red and yellow  = apple
+    This fruit is not straight               = banana
+    This fruit can look like a bowling ball  = coconut
+    This fruit can be bigger than a backpack = watermelon /
+    @hint(it is mostly water)
+
+    = @fill('fruits', 3)
+
+    // Could we use image stuff? Might need some thinking
+},
+
+{
+    @metadata(
+        ...
+        instructions = Write the antonym of each word
+    )
+
+    @config(
+        variation = threesome  // custom display for long sentences
+    )
+
+    // remember default for functions that require amounts is 1
+    // singular = @var(@fill('singular_subject')  = is  = @fill('prefessions')) OsR
+    // @define("singular", @fill('singular_subject') = is = @fill('professions')) and used like @var("singular")
+    // plural   = @var(@fill('plural_subject')    = are = @fill('prefessions'))
+
+    I    = am  = a student
+    She  = is  = a nurse
+    We   = are = doctors
+    They = are = baseball players @ins(third person!)
+
+    // I'm seriously thinking these variables thing could be a great addition
+    // @var(plural)
+    // @var(singular)
+    // OR EVEN
+    // @fill(@var(singular), 3) !!!
+}
+
+
+
+// ==============================================
+// MULTIPLE CHOICE
+// ==============================================
+
+{
+    @metadata(
+        type         = multiple choice
+        title        = ...
+        instructions = Select the Right Daily Routine
+        difficulty   = ...
+    )
+
+    @config(
+        variation = original
+        limit     = 10
+    )
+
+    // if library does not exist, let's declare one locally, but I will warn to do this
+    // only with very unique lists that won't ever be found in the global ones
+    @declare("daily routines", ["...", "...", "..."])
+
+    // Example of var usefulness
+    @var routines = @fill('daily routines', 3)
+    // could be used in literally most questions
+
+    The last activity we do in the day = take a shower   | eat dinner | [go to bed]       | speak English
+    When eat in the morning            = do exercise     | have lunch | [have breakfast]
+    Taking you pet for some fresh air  = listen to music | study      | walk the dog      | do the dishes
+
+    // using functions = assuming interpreter would automatically dismiss returning a repeated one, comparing to the hard-coded ones
+    Getting up in the yellow bus       = @fill('daily routines', 3) | [going to school]
+    Washing those things you ate on    = @fill('daily routines', 3) | [do the dishes]
+
+    // using images - would automatically activate a cards display
+    What activity represents cleaning our body? = @image(URL) | [@image(URL)] | @image(URL)
+
+},
+
+{
+    @metadata(
+        type         = multiple choice
+        instructions = Select the Country
+        ...
+    )
+
+    @config(
+        variation = original
+        style     = cards
+        limit     = 10
+    )
+
+    // VARIABLES INTEGRATION PROPOSAL
+    // const - does not store any value, simply have it like a function call that returns in each question
+    // it might be called. So that it returns randomized outcomes every time.
+    @var cities = @fill('cities', 2) | WOULD BE called like @var(cities), I believe parser/compiler might store variables somewhere
+    @var question = @fill('cities', 2) | @fill('neighborhoods', 1) | [@fill('countries', 1)]
+
+    // normal
+    [Dom. Rep] | New York City | Lima | Shibuya
+
+    [Japan]  | @fill('cities', 3)   // example end result: a) Madrid b) Santiago c) Japan d) ...
+    [Russia] | @fill('neighborhoods', 2)  | Buenos Aires
+
+    // Answer does not have to be written at the beginning, syntax is flexible
+    @fill('geographic_locations', 2) | [Egypt] | @fill('cities', 2)
+
+    // As our var would return randomized value questions, we could do:
+    @var(question)  // may result in something like: a) barcelona b) ... c) Brazil d) Queens
+    @var(question)
+},
+
+{
+    @metadata(
+        type         = multiple choice
+        instructions = Select all Correct Animals
+        ...
+    )
+
+    @config(
+        variation = original
+        style     = cards
+        limit     = 10
+    )
+
+    // using functions, most useful
+    Select All Sea Animals = @fill('land_animals', 5) | [@fill('sea_animals')]
+    Select All Mammals     = [@fill('mammals', 5)]    | @fill('reptiles', 5)  // PROPOSAL: @fill('dict', amount, difficulty)
+    Select All Pets        = @fill('wild animals', 5) | [@fill('pets', 5)]
+
+    // Could also be hardcoded
+    Select All Land Animals = [Lion] | [Tiger] | Shark | Whale | Eagle | Owl | [Snake]
+
+    // we could create exercises with full sentences, like 'select all past simple sentences'
+    // But those could work as their own independent example with a single 'question'
+},
+
+{
+    @metadata(
+        type         = multiple choice
+        instructions = Match Correct Answers
+        ...
+    )
+
+    @config(
+        variation = matches
+        limit     = 10
+    )
+
+    // would be like a matching exercise
+    // User would open a select on each match
+
+    Present Simple     = She does not usually go to the gym
+    Past Simple        = Our family went to the USA last summer
+    Future Simple      = I will think about your idea
+    Present Continuous = Who is thinking what I am thinking?    @idea(This is a nice phrase! Can you think on when to use it?)
+    @idea() is the same as @hint(), I would deprecate the latter since @idea is more broad to use cases.
+
+    // Extra answers
+    = I have been here for a long time!
+    = We will have graduated by the time you come back...
+
+}
+
+
+
+// ==============================================
+// ORDERING
+// ==============================================
+{
+    @metadata(
+        type         = ORDERING
+        instructions = ...
+        ...
+    )
+
+    @config(
+        variation = original
+    )
+
+    // PROPOSAL: default function. Grabs the words and places it as a helper for the answer
+    //@default(I) | am | someone | you | can | trust | in
+
+    We    | can  | be  | good | friends
+    This  | city | is  | wonderful!
+    Where | is   | the | park?
+
+},
+
+{
+    @metadata(
+        type         = ORDERING
+        instructions = ...
+        ...
+    )
+
+    @config(
+        variation = single
+    )
+
+    Cinema   // would be shuffled
+    Restaurant
+    Beach
+
+    // Or simply
+    @fill('city places', 5)
+},
+
+
+{
+    @metadata(
+        type         = ORDERING
+        instructions = Order the events from earliest to last
+        ...
+    )
+
+    @config(
+        variation = aligner
+    )
+
+    You open the fridge
+    You take a cartoon of milk and open it
+    You pour some milk in a glass
+    The glass falls and spills on the floor
+    You sweep the mess
+    You pour some milk again in another glass
+    You drink the milk
+}
+
+
+// ==============================================
+// CATEGORIZE
+// ==============================================
+
+{
+    @metadata(
+        type         = CATEGORIZE
+        title        = ...
+        instructions = Categorize the countries with their continents
+        difficulty   = UPPER_INTERMEDIATE
+    )
+
+    @config(
+        variation = original
+        style     = corners  // in case we create different designs for the same thing
+    )
+
+    // reminder proposal to do @fill('asian countries', 5, beginner)
+    ASIA         = @fill('asian countries', 5)
+    EUROPE       = UK | France | Ukraine | Germany | Italy
+    THE AMERICAS = @fill('american countries', 5)
+    AFRICA       = @fill('african countries', 5)
+},
+
+{
+    @metadata(
+        type         = CATEGORIZE
+        title        = ...
+        instructions = Reorder the Pieces of Clothing with their Context
+        difficulty   = UPPER_INTERMEDIATE
+    )
+
+    @config(
+        variation = ordering
+    )
+
+    // Diplay would do all the magic here, categorizing and shuffling answers so user can fix them
+    COLD   = Coat     | Scarff      | Gloves | Boots      | Hat
+    HOT    = Frannels | Flip Flops  | Shorts | Sunglasses | t-shirt
+    FORMAL = Suit     | Tie | Watch | Blazer | Shoes
+},
+
+{
+    @metadata(
+        instructions = "Select All the Planets"
+    )
+
+    @config(
+        variation: lake
+    )
+
+    // "=" indicates these are correct answers
+    = @fill('planets', 5)
+
+    @fill('stars', 5)
+    @fill('asteroids', 5)
+
+}
+
+// ==============================================
+// SELECTOR
+// ==============================================
+{
+    @metadata(
+        type         = SELECTOR
+        instructions = Select All Grammatical Errors
+    )
+
+    @config(
+        variation = original
+        time      = 75
+    )
+
+    I [is] a baseball player
+    The family will be here [yesterday]
+    She is [more smart] than here
+    // etc
+},
+
+{
+    @metadata(
+        type         = SELECTOR
+        instructions = Select Following Instructions
+    )
+
+    @config(
+        variation = original
+        time      = 75
+    )
+
+    I [was] not thining you [were] going to do something like that. I am surely amazed /
+    by the amount of things you [did]. @ins(Select All Past Tense Verbs)
+
+    Yesterday, some of my relatives [visited] a place where it [was] impossible to get access before. /
+    authorities [considered] that it [was[] already suitable for local visitors so they [opened] it. @ins(Select All Past Tense Verbs)
+
+    When are we [going] to [play] basketball? I have [been] [watching] tiktok all day, I [need] to do something /
+    different than just [procrastinating]. @ins(Select All Verbs)
+
+},
+
+{
+    @metadata(
+        type         = SELECTOR
+        instructions = Select Following Instructions
+    )
+
+    @config(
+        variation = original
+        time      = 75
+    )
+
+    I [was] not thining you [were] going to do something like that. I am surely amazed /
+    by the amount of things you [did]. @ins(Select All Past Tense Verbs)
+
+    Yesterday, some of my relatives [visited] a place where it [was] impossible to get access before. /
+    authorities [considered] that it [was[] already suitable for local visitors so they [opened] it. @ins(Select All Past Tense Verbs)
+
+    When are we [going] to [play] basketball? I have [been] [watching] tiktok all day, I [need] to do something /
+    different than just [procrastinating]. @ins(Select All Verbs)
+
+},
+
+{
+    @metadata(
+        ...
+        instructions = Spot All Places in the Image Where a House Item Appears
+    )
+
+    @config(
+        variation = images
+    )
+
+    // THIS IS EXPERIMENTAL
+    // HOW COULD WE APPLY SOMETHING LIKE THIS?
+    @img()
+
+}
+
+
+// ==============================================
+// EXTRAS: Just snippets, not real examples
+// ==============================================
+
+// ==============================================
+// CONVERSATION - JUST A SKETCH, NOTHING OFFICIAL
+// ==============================================
+{
+    @metadata(
+        type         = CONVERSATION
+        instructions = ...
+        ...
+    )
+
+    @config(
+        variation = original
+    )
+
+
+    // make use of:
+    // @blank()
+    // @choice()
+    // @match()
+    // @order()
+
+    // we need a way to create chars for the conversation.
+    pedro  = @char()
+    isabel = @char()
+
+    @char(pedro) = Hello!
+    @user        = @choice([Hi!] | I'm bad | My name is Yahir)
+    @char(pedro) = Are you still down for the show tonight?
+    @user        = @blank(Yes! I *really* like those activities!) @ins("Intensifier")
+    ...
+
+}
+
+
+
+
+// ==============================================
+// READING
+// ==============================================
+{
+    @metadata(
+        type         = READING
+        instructions = ...
+        ...
+    )
+
+    @config(
+        variation = original
+    )
+
+    // make use of:
+    // @blank()
+    // @choice()
+    // @match()
+    // for dynamic stories
+
+    // for normal reading exercises, just attatch the text and do a separate exercise about it
+}

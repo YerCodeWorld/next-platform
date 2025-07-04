@@ -4,8 +4,9 @@
 
 import React, { ReactElement } from 'react'
 import { render, RenderOptions } from '@testing-library/react'
-import { CreateExercisePayload, ExerciseType } from '@repo/api-bridge'
+import { CreateExercisePayload, ExerciseType, ExerciseContent } from '@repo/api-bridge'
 import { ExerciseTypeConfig } from '../registry/ExerciseRegistry'
+import { vi } from 'vitest'
 
 // Re-export everything from React Testing Library
 export * from '@testing-library/react'
@@ -25,7 +26,7 @@ const AllTheProviders = ({ children }: { children: React.ReactNode }) => {
 const customRender = (
   ui: ReactElement,
   options?: Omit<RenderOptions, 'wrapper'>
-) => render(ui, { wrapper: AllTheProviders, ...options })
+): ReturnType<typeof render> => render(ui, { wrapper: AllTheProviders, ...options })
 
 export { customRender as render }
 
@@ -95,7 +96,7 @@ export const createMockExercise = (
 /**
  * Mock exercise type configuration factory
  */
-export const createMockExerciseTypeConfig = <T extends any>(
+export const createMockExerciseTypeConfig = <T extends ExerciseContent>(
   type: ExerciseType,
   overrides: Partial<ExerciseTypeConfig<T>> = {}
 ): ExerciseTypeConfig<T> => ({

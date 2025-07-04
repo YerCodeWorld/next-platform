@@ -60,7 +60,6 @@ export async function POST(request: NextRequest) {
                         name,
                         picture,
                         role: 'STUDENT',
-                        country: 'Unknown',
                         preferredColor: 'LAVENDER',
                         preferredLanguage: 'SPANISH'
                     })

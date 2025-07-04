@@ -49,7 +49,7 @@ export function testRegistrySystem() {
         console.log('Fill Blank parsed:', JSON.stringify(fbContent, null, 2));
         
     } catch (error) {
-        console.log('Parsing error (expected due to placeholder components):', error.message);
+        console.log('Parsing error (expected due to placeholder components):', error instanceof Error ? error.message : 'Unknown error');
     }
     
     // Test 4: Validation
@@ -111,8 +111,8 @@ export function testLanScriptIntegration() {
         
         return { success: result.exercises.length > 0, errors: result.errors };
     } catch (error) {
-        console.log('LanScript test error:', error.message);
-        return { success: false, errors: [error.message] };
+        console.log('LanScript test error:', error instanceof Error ? error.message : 'Unknown error');
+        return { success: false, errors: [error instanceof Error ? error.message : 'Unknown error'] };
     }
 }
 

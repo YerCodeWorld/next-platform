@@ -14,15 +14,21 @@ export function useAuth() {
                 body: JSON.stringify({ credential })
             });
 
-            const data = await response.json();
-
-            if (response.ok) {
-                toast.success('Login successful!');
-                // Force a hard refresh to update the server components
-                window.location.href = '/';
-            } else {
+            if (!response.ok) {
+                const data = await response.json();
                 throw new Error(data.error || 'Login failed');
             }
+
+            const data = await response.json();
+            
+            // Verify we received user data
+            if (!data.user) {
+                throw new Error('Invalid login response - no user data received');
+            }
+
+            toast.success('Login successful!');
+            // Force a hard refresh to update the server components
+            window.location.href = '/';
         } catch (error) {
             console.error('Login error:', error);
             toast.error(error instanceof Error ? error.message : 'An error occurred during login');

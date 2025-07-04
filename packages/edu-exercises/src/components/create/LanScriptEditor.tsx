@@ -150,7 +150,7 @@ const getHoverInfo = (): Record<string, { title: string; docs: string }> => {
     if (metadata.length > 0) {
         typesDocs += metadata.map(m => `- \`${m.type.toLowerCase()}\` - ${m.description || m.displayName}`).join('\n');
     } else {
-        typesDocs += '- `fill_blank` - Fill in the blanks\n- `matching` - Match pairs\n- `multiple_choice` - Multiple choice questions\n- `ordering` - Put words in order\n- `letter_soup` - Word search puzzle';
+        typesDocs += '- `fill_blank` - Fill in the blanks\n- `matching` - Match pairs\n- `multiple_choice` - Multiple choice questions\n- `ordering` - Put words in order\n- `categorizer` - Categorize items\n- `selector` - Select items\n- `reading` - Reading comprehension\n- `conversation` - Conversation exercise\n- `puzzle` - Puzzle exercise';
     }
     
     return {

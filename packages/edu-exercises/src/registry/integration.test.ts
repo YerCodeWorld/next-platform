@@ -69,7 +69,7 @@ describe('Exercise Registry Integration', () => {
       
       const mcContent = registry.parseContent(mcType!, mcLines)
       expect(mcContent).toBeDefined()
-      expect(mcContent.questions).toHaveLength(1)
+      expect((mcContent as any).questions).toHaveLength(1)
       
       const mcValidation = registry.validateContent(mcType!, mcContent)
       expect(mcValidation.isValid).toBe(true)
@@ -81,7 +81,7 @@ describe('Exercise Registry Integration', () => {
       
       const fbContent = registry.parseContent(fbType!, fbLines)
       expect(fbContent).toBeDefined()
-      expect(fbContent.sentences).toHaveLength(1)
+      expect((fbContent as any).sentences).toHaveLength(1)
       
       const fbValidation = registry.validateContent(fbType!, fbContent)
       expect(fbValidation.isValid).toBe(true)
@@ -93,7 +93,7 @@ describe('Exercise Registry Integration', () => {
       
       const matchContent = registry.parseContent(matchType!, matchLines)
       expect(matchContent).toBeDefined()
-      expect(matchContent.pairs).toHaveLength(2)
+      expect((matchContent as any).pairs).toHaveLength(2)
       
       const matchValidation = registry.validateContent(matchType!, matchContent)
       expect(matchValidation.isValid).toBe(true)
@@ -105,7 +105,7 @@ describe('Exercise Registry Integration', () => {
       
       const orderContent = registry.parseContent(orderType!, orderLines)
       expect(orderContent).toBeDefined()
-      expect(orderContent.sentences).toHaveLength(1)
+      expect((orderContent as any).sentences).toHaveLength(1)
       
       const orderValidation = registry.validateContent(orderType!, orderContent)
       expect(orderValidation.isValid).toBe(true)
@@ -196,11 +196,11 @@ describe('Exercise Registry Integration', () => {
       expect(() => registry.parseContent('MULTIPLE_CHOICE', [])).toThrow()
       
       // validateContent returns error result instead of throwing
-      const validation = registry.validateContent('MULTIPLE_CHOICE', {})
+      const validation = registry.validateContent('MULTIPLE_CHOICE', {} as any)
       expect(validation.isValid).toBe(false)
       expect(validation.errors).toContain('Unknown exercise type: MULTIPLE_CHOICE')
       
-      expect(() => registry.toLanScript('MULTIPLE_CHOICE', {})).toThrow()
+      expect(() => registry.toLanScript('MULTIPLE_CHOICE', {} as any)).toThrow()
     })
   })
 
@@ -219,7 +219,7 @@ describe('Exercise Registry Integration', () => {
       expect(type).toBe('MULTIPLE_CHOICE')
       
       const content = registry.parseContent(type!, complexLines)
-      expect(content.questions).toHaveLength(3) // Should skip comment
+      expect((content as any).questions).toHaveLength(3) // Should skip comment
       
       const validation = registry.validateContent(type!, content)
       expect(validation.isValid).toBe(true)
@@ -239,7 +239,7 @@ describe('Exercise Registry Integration', () => {
       expect(type).toBe('FILL_BLANK')
       
       const content = registry.parseContent(type!, complexLines)
-      expect(content.sentences).toHaveLength(3) // Should skip comment
+      expect((content as any).sentences).toHaveLength(3) // Should skip comment
       
       const validation = registry.validateContent(type!, content)
       expect(validation.isValid).toBe(true)

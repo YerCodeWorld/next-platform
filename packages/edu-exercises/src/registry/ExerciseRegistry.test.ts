@@ -215,7 +215,7 @@ describe('ExerciseRegistry', () => {
     })
 
     it('should return error for unknown exercise type', () => {
-      const result = registry.validateContent('UNKNOWN' as ExerciseType, {})
+      const result = registry.validateContent('UNKNOWN' as ExerciseType, {} as any)
       
       expect(result.isValid).toBe(false)
       expect(result.errors).toContain('Unknown exercise type: UNKNOWN')
@@ -251,7 +251,7 @@ describe('ExerciseRegistry', () => {
 
     it('should throw error for unknown exercise type', () => {
       expect(() => {
-        registry.toLanScript('UNKNOWN' as ExerciseType, {})
+        registry.toLanScript('UNKNOWN' as ExerciseType, {} as any)
       }).toThrow('Unknown exercise type: UNKNOWN')
     })
   })
@@ -399,7 +399,7 @@ describe('ExerciseRegistry', () => {
         type: 'TEST' as ExerciseType,
         displayName: 'Test',
         detectPattern: /test/,
-        parseContent: () => ({}),
+        parseContent: () => ({} as any),
         validateContent: () => ({ isValid: true, errors: [] }),
         toLanScript: () => '',
         errorMessages: {

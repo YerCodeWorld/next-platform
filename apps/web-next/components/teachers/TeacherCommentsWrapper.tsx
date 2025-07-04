@@ -201,9 +201,6 @@ export default async function TeacherCommentsWrapper({ locale }: TeacherComments
                                     </div>
                                 </div>
                                 
-                                {testimony.title && (
-                                    <h5 className="testimony-title">&ldquo;{testimony.title}&rdquo;</h5>
-                                )}
                                 
                                 <p className="testimony-content">&ldquo;{testimony.content}&rdquo;</p>
                                 

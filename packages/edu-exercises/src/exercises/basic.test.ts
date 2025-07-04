@@ -24,7 +24,8 @@ describe('Basic Exercise Testing', () => {
       expect(isFunction).toBe(true)
       
       if (isFunction) {
-        const result = multipleChoiceExercise.detectPattern([
+        const detectFn = multipleChoiceExercise.detectPattern as (lines: string[]) => boolean
+        const result = detectFn([
           'What is 2+2? = 3 | 4 | 5 [4]'
         ])
         expect(result).toBe(true)

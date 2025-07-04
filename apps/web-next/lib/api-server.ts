@@ -37,7 +37,7 @@ async function serverFetch<T>(endpoint: string, options: RequestInit = {}): Prom
 
         if (!response.ok) {
             console.error(`API Error: ${response.status} ${response.statusText} for ${url}`);
-            console.error(Error(`API request failed: ${response.statusText}`));
+            throw new Error(`API request failed: ${response.statusText}`);
         }
 
         const data = await response.json();

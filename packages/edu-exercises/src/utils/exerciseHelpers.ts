@@ -37,7 +37,7 @@ export function parsePipeSeparated(text: string): string[] {
  */
 export function extractBracketContent(text: string): string | null {
     const match = text.match(/\[([^\]]+)\]/);
-    return match ? match[1].trim() : null;
+    return match && match[1] ? match[1].trim() : null;
 }
 
 /**
@@ -61,7 +61,7 @@ export function removeDecorators(text: string): string {
 export function extractDecorator(text: string, decoratorName: string): string | null {
     const pattern = new RegExp(`@${decoratorName}\\(([^)]*)\\)`, 'i');
     const match = text.match(pattern);
-    return match ? match[1].trim() : null;
+    return match && match[1] ? match[1].trim() : null;
 }
 
 /**
@@ -86,7 +86,9 @@ export function shuffleArray<T>(array: T[]): T[] {
     const shuffled = [...array];
     for (let i = shuffled.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
-        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+        const temp = shuffled[i];
+        shuffled[i] = shuffled[j] as T;
+        shuffled[j] = temp as T;
     }
     return shuffled;
 }
