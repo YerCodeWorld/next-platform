@@ -11,6 +11,8 @@ import {
   InlineDecorator
 } from './types';
 import { FunctionRegistry, parseFunctionCall } from './functions';
+import { exerciseRegistry } from '../../registry/ExerciseRegistry';
+import { CreateExercisePayload } from '@repo/api-bridge';
 
 export class EduScriptParser {
   private functionRegistry: FunctionRegistry;
@@ -40,8 +42,11 @@ export class EduScriptParser {
       // Parse each block
       blocks.forEach((block, index) => {
         try {
-          const exercise = this.parseExerciseBlock(block, authorEmail, index);
-          result.exercises.push(exercise);
+          const parsedExercise = this.parseExerciseBlock(block, authorEmail, index);
+          
+          // Convert ParsedExercise to CreateExercisePayload using exercise registry
+          const exercisePayload = this.convertToExercisePayload(parsedExercise, authorEmail);
+          result.exercises.push(exercisePayload);
         } catch (error) {
           result.errors.push(`Block ${index + 1}: ${error instanceof Error ? error.message : String(error)}`);
           result.success = false;
@@ -376,6 +381,62 @@ export class EduScriptParser {
     }
 
     return decorators;
+  }
+
+  private convertToExercisePayload(parsedExercise: ParsedExercise, authorEmail: string): CreateExercisePayload {
+    const { metadata, config, content, raw } = parsedExercise;
+    
+    // Get exercise type from metadata and normalize it
+    let exerciseType = metadata.type?.toUpperCase();
+    if (!exerciseType) {
+      throw new Error('Exercise type is required in metadata');
+    }
+    
+    // Normalize type names (handle spaces and common variations)
+    exerciseType = exerciseType.replace(/\s+/g, '_');
+    
+    // Handle common type variations
+    const typeMap: Record<string, string> = {
+      'FILL_BLANK': 'FILL_BLANK',
+      'FILL_BLANKS': 'FILL_BLANK',
+      'MULTIPLE_CHOICE': 'MULTIPLE_CHOICE',
+      'MULTI_CHOICE': 'MULTIPLE_CHOICE',
+      'MATCHING': 'MATCHING',
+      'ORDERING': 'ORDERING',
+      'CATEGORIZE': 'CATEGORIZER',
+      'SELECTOR': 'SELECTOR'
+    };
+    
+    exerciseType = typeMap[exerciseType] || exerciseType;
+
+    // Use exercise registry to parse the content for this exercise type
+    // The registry expects lines array, not a raw string
+    const contentLines = content.split('\n').filter(line => line.trim() !== '');
+    const parseResult = exerciseRegistry.parseContentWithVariation(exerciseType, contentLines, {
+      variation: config.style || config.variation // 'style' takes precedence over 'variation' for display preference
+    });
+
+    // Create the payload in the format expected by the API
+    const payload: CreateExercisePayload = {
+      type: exerciseType as any,
+      title: metadata.title || `${exerciseType} Exercise`,
+      instructions: metadata.instructions || '',
+      difficulty: metadata.difficulty as any || 'INTERMEDIATE',
+      category: metadata.category as any || 'GENERAL',
+      isPublished: false,
+      content: parseResult.content,
+      authorEmail,
+      // New fields for preserving original EduScript
+      rawEduScript: raw,
+      variation: parseResult.variation, // Use detected variation
+      // Optional fields
+      hints: metadata.hints || [],
+      tags: metadata.tags || [],
+      explanation: metadata.explanation,
+      timeLimit: config.time
+    };
+
+    return payload;
   }
 }
 

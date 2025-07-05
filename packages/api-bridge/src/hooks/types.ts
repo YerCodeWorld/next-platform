@@ -82,7 +82,7 @@ export interface CreatePostPayload {
 
 // packages/exercises/src/types/index.ts
 // Base types
-export type ExerciseType = 'FILL_BLANK' | 'MATCHING' | 'MULTIPLE_CHOICE' | 'ORDERING';
+export type ExerciseType = 'FILL_BLANK' | 'MATCHING' | 'MULTIPLE_CHOICE' | 'ORDERING' | 'CATEGORIZER' | 'SELECTOR';
 export type ExerciseDifficulty = 'BEGINNER' | 'UPPER_BEGINNER' | 'INTERMEDIATE' | 'UPPER_INTERMEDIATE' | 'ADVANCED' | 'SUPER_ADVANCED';
 export type ExerciseCategory = 'GRAMMAR' | 'VOCABULARY' | 'READING' | 'WRITING' |
     'LISTENING' | 'SPEAKING' | 'CONVERSATION' | 'GENERAL';
@@ -116,6 +116,7 @@ export interface MultipleChoiceContent {
         hint?: string;
         explanation?: string;
     }>;
+    extraAnswers?: string[]; // Extra distractor answers for matches variation
 }
 
 export interface OrderingContent {
@@ -125,12 +126,60 @@ export interface OrderingContent {
     }>;
 }
 
+export interface CategorizeContent {
+    categories: Array<{
+        name: string;
+        items: string[];
+        hint?: string;
+    }>;
+    variation?: 'original' | 'ordering.txt' | 'lake';
+    // For lake variation
+    instruction?: string;
+    allItems?: string[];
+    targetCategory?: string;
+    // For ordering.txt variation
+    prefilledCategories?: Array<{
+        name: string;
+        correctItems: string[];
+        wrongItems: string[];
+    }>;
+}
+
+export interface SelectorContent {
+    variation?: 'on-text' | 'image';
+    // For on-text variation
+    sentences?: Array<{
+        text: string;
+        selectableWords: Array<{
+            wordIndex: number;
+            isTarget: boolean;
+            word: string;
+        }>;
+        instruction?: string;
+    }>;
+    // For image variation
+    image?: {
+        url: string;
+        selectableAreas: Array<{
+            x: number;
+            y: number;
+            width: number;
+            height: number;
+            isTarget: boolean;
+            label?: string;
+        }>;
+        instruction?: string;
+    };
+    globalInstruction?: string;
+}
 
 export type ExerciseContent =
     | FillBlankContent
     | MatchingContent
     | MultipleChoiceContent
-    | OrderingContent;
+    | OrderingContent
+    | CategorizeContent
+    | SelectorContent;
 
 // Main exercise interface
 export interface Exercise {
@@ -138,9 +187,11 @@ export interface Exercise {
     title: string;
     instructions?: string;
     type: ExerciseType;
+    variation?: string;
     difficulty: ExerciseDifficulty;
     category: ExerciseCategory;
     content: ExerciseContent;
+    rawEduScript?: string;
     hints: string[];
     explanation?: string;
     tags: string[];
@@ -161,9 +212,11 @@ export interface CreateExercisePayload {
     title: string;
     instructions?: string;
     type: ExerciseType;
+    variation?: string;
     difficulty?: ExerciseDifficulty;
     category?: ExerciseCategory;
     content: ExerciseContent;
+    rawEduScript?: string;
     hints?: string[];
     explanation?: string;
     tags?: string[];

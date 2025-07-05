@@ -46,7 +46,7 @@ export interface EduScriptFunction {
 
 export interface EduScriptParseResult {
   success: boolean;
-  exercises: any[];
+  exercises: any[]; // CreateExercisePayload[] after conversion
   errors: string[];
   warnings: string[];
 }

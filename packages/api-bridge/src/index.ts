@@ -27,6 +27,8 @@ export type {
     MatchingContent,
     MultipleChoiceContent,
     OrderingContent,
+    CategorizeContent,
+    SelectorContent,
     ExerciseContent
 } from './hooks/types';
 

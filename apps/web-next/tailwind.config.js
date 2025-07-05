@@ -63,6 +63,7 @@ module.exports = {
             fontFamily: {
                 inter: ['var(--font-family-primary)', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
                 primary: ['var(--font-family-primary)', 'sans-serif'],
+                comic: ['Comic Sans MS', 'comic sans', 'cursive', 'sans-serif'],
             },
 
             fontSize: {

@@ -21,7 +21,7 @@ export function detectExerciseType(lines: string[]): ExerciseType | null {
         return 'MATCHING';
     }
 
-    // Check for ordering pattern: Order: or contains numbered segments
+    // Check for ordering.txt pattern: Order: or contains numbered segments
     if (firstLine.toLowerCase().includes('order') ||
         lines.some(line => line.split('|').length > 2)) {
         return 'ORDERING';

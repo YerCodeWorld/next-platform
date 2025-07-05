@@ -226,6 +226,284 @@ function fillBlankToLanScript(content: FillBlankContent): string {
 }
 
 /**
+ * Detect FILL_BLANK variation based on syntax patterns
+ */
+function detectFillBlankVariation(lines: string[]): string {
+    const relevantLines = lines.filter(line => 
+        line.trim() && !isCommentLine(line) && !line.includes('@ins(') && !line.includes('@idea(')
+    );
+
+    // Check for single variation: W[a]te[rme]lon
+    const hasSinglePattern = relevantLines.some(line => 
+        /\[[^\]]*\]/.test(line) && !line.includes('=')
+    );
+    if (hasSinglePattern) {
+        return 'single';
+    }
+
+    // Check for matches variation: happy = *sad*
+    const hasMatchesPattern = relevantLines.some(line => 
+        line.includes('=') && /\*[^*]+\*/.test(line)
+    );
+    if (hasMatchesPattern) {
+        return 'matches';
+    }
+
+    // Default to original
+    return 'original';
+}
+
+/**
+ * Parse original variation (existing function renamed)
+ */
+function parseFillBlankOriginal(lines: string[], baseContent: FillBlankContent): FillBlankContent {
+    return parseFillBlankContent(lines);
+}
+
+/**
+ * Parse single variation: W[a]te[rme]lon
+ */
+function parseFillBlankSingle(lines: string[], baseContent: FillBlankContent): FillBlankContent {
+    const sentences: Array<{
+        text: string;
+        blanks: Array<{
+            position: number;
+            answers: string[];
+            hint?: string;
+        }>;
+    }> = [];
+
+    for (const line of lines) {
+        const trimmedLine = line.trim();
+        if (!trimmedLine || isCommentLine(trimmedLine)) continue;
+
+        // Extract hint if present
+        let hint: string | undefined;
+        let cleanLine = trimmedLine;
+        const hintMatch = trimmedLine.match(/@(idea|hint)\s*\(([^)]+)\)/);
+        if (hintMatch && hintMatch[2]) {
+            hint = hintMatch[2].replace(/['"]/g, '');
+            cleanLine = trimmedLine.replace(/@(idea|hint)\s*\([^)]+\)/, '').trim();
+        }
+
+        // Parse single letter blanks: W[a]te[rme]lon
+        const words = cleanLine.split(/\s+/);
+        
+        for (const word of words) {
+            if (!/\[[^\]]*\]/.test(word)) continue;
+
+            let reconstructedWord = '';
+            let currentPos = 0;
+            const blanks: Array<{
+                position: number;
+                answers: string[];
+                hint?: string;
+            }> = [];
+
+            // Process each character/bracket group
+            let i = 0;
+            while (i < word.length) {
+                if (word[i] === '[') {
+                    // Find closing bracket
+                    const closeIndex = word.indexOf(']', i);
+                    if (closeIndex !== -1) {
+                        const bracketContent = word.substring(i + 1, closeIndex);
+                        
+                        // Add blank at current position
+                        blanks.push({
+                            position: currentPos,
+                            answers: [bracketContent],
+                            hint
+                        });
+
+                        reconstructedWord += bracketContent;
+                        currentPos += bracketContent.length;
+                        i = closeIndex + 1;
+                    } else {
+                        // Malformed bracket, treat as regular character
+                        reconstructedWord += word[i];
+                        currentPos++;
+                        i++;
+                    }
+                } else {
+                    reconstructedWord += word[i];
+                    currentPos++;
+                    i++;
+                }
+            }
+
+            if (blanks.length > 0) {
+                sentences.push({
+                    text: reconstructedWord,
+                    blanks
+                });
+            }
+        }
+    }
+
+    return { sentences };
+}
+
+/**
+ * Parse matches variation: happy = *sad*
+ */
+function parseFillBlankMatches(lines: string[], baseContent: FillBlankContent): FillBlankContent {
+    const sentences: Array<{
+        text: string;
+        blanks: Array<{
+            position: number;
+            answers: string[];
+            hint?: string;
+        }>;
+    }> = [];
+
+    for (const line of lines) {
+        const trimmedLine = line.trim();
+        if (!trimmedLine || isCommentLine(trimmedLine)) continue;
+
+        // Extract hint if present
+        let hint: string | undefined;
+        let cleanLine = trimmedLine;
+        const hintMatch = trimmedLine.match(/@(idea|hint)\s*\(([^)]+)\)/);
+        if (hintMatch && hintMatch[2]) {
+            hint = hintMatch[2].replace(/['"]/g, '');
+            cleanLine = trimmedLine.replace(/@(idea|hint)\s*\([^)]+\)/, '').trim();
+        }
+
+        // Parse matches format: happy = *sad*
+        const equalIndex = cleanLine.indexOf('=');
+        if (equalIndex === -1) continue;
+
+        const leftSide = cleanLine.substring(0, equalIndex).trim();
+        const rightSide = cleanLine.substring(equalIndex + 1).trim();
+
+        // Check which side has the blank
+        const leftHasBlank = /\*[^*]+\*/.test(leftSide);
+        const rightHasBlank = /\*[^*]+\*/.test(rightSide);
+
+        if (leftHasBlank) {
+            // Left side has blank: *happy* = sad
+            const blankMatch = leftSide.match(/\*([^*]+)\*/);
+            if (blankMatch && blankMatch[1]) {
+                const blankText = blankMatch[1];
+                const answers = blankText.split('|').map(a => a.trim());
+                const textWithBlank = leftSide.replace(/\*[^*]+\*/, '___');
+                
+                sentences.push({
+                    text: `${textWithBlank} = ${rightSide}`,
+                    blanks: [{
+                        position: textWithBlank.indexOf('___'),
+                        answers,
+                        hint
+                    }]
+                });
+            }
+        } else if (rightHasBlank) {
+            // Right side has blank: happy = *sad*
+            const blankMatch = rightSide.match(/\*([^*]+)\*/);
+            if (blankMatch && blankMatch[1]) {
+                const blankText = blankMatch[1];
+                const answers = blankText.split('|').map(a => a.trim());
+                const fullText = `${leftSide} = ___`;
+                
+                sentences.push({
+                    text: fullText,
+                    blanks: [{
+                        position: fullText.indexOf('___'),
+                        answers,
+                        hint
+                    }]
+                });
+            }
+        }
+    }
+
+    return { sentences };
+}
+
+/**
+ * Validate original variation
+ */
+function validateFillBlankOriginal(content: FillBlankContent): ValidationResult {
+    return validateFillBlankContent(content);
+}
+
+/**
+ * Validate single variation
+ */
+function validateFillBlankSingle(content: FillBlankContent): ValidationResult {
+    const errors: string[] = [];
+    const warnings: string[] = [];
+
+    if (!content.sentences || content.sentences.length === 0) {
+        errors.push('Single variation requires at least one word with letter blanks');
+        return { isValid: false, errors, warnings };
+    }
+
+    content.sentences.forEach((sentence, index) => {
+        if (!sentence.text || sentence.text.trim().length === 0) {
+            errors.push(`Word ${index + 1}: Text cannot be empty`);
+        }
+
+        if (!sentence.blanks || sentence.blanks.length === 0) {
+            errors.push(`Word ${index + 1}: Must have at least one letter blank`);
+        } else {
+            // Check that blanks don't exceed word length
+            const maxPosition = sentence.text.length;
+            sentence.blanks.forEach((blank, blankIndex) => {
+                if (blank.position >= maxPosition) {
+                    errors.push(`Word ${index + 1}, blank ${blankIndex + 1}: Position exceeds word length`);
+                }
+                if (!blank.answers || blank.answers.length === 0) {
+                    errors.push(`Word ${index + 1}, blank ${blankIndex + 1}: Must have at least one answer`);
+                }
+            });
+        }
+    });
+
+    return {
+        isValid: errors.length === 0,
+        errors,
+        warnings
+    };
+}
+
+/**
+ * Validate matches variation
+ */
+function validateFillBlankMatches(content: FillBlankContent): ValidationResult {
+    const errors: string[] = [];
+    const warnings: string[] = [];
+
+    if (!content.sentences || content.sentences.length === 0) {
+        errors.push('Matches variation requires at least one matching pair');
+        return { isValid: false, errors, warnings };
+    }
+
+    content.sentences.forEach((sentence, index) => {
+        if (!sentence.text || sentence.text.trim().length === 0) {
+            errors.push(`Match ${index + 1}: Text cannot be empty`);
+        }
+
+        if (!sentence.text.includes('=')) {
+            errors.push(`Match ${index + 1}: Must contain equals sign for matching format`);
+        }
+
+        if (!sentence.blanks || sentence.blanks.length === 0) {
+            errors.push(`Match ${index + 1}: Must have exactly one blank`);
+        } else if (sentence.blanks.length > 1) {
+            warnings.push(`Match ${index + 1}: Has multiple blanks, only first will be used`);
+        }
+    });
+
+    return {
+        isValid: errors.length === 0,
+        errors,
+        warnings
+    };
+}
+
+/**
  * Fill Blank Exercise Type Configuration
  */
 export const fillBlankExercise: ExerciseTypeConfig<FillBlankContent> = {
@@ -245,6 +523,42 @@ export const fillBlankExercise: ExerciseTypeConfig<FillBlankContent> = {
     
     parseContent: parseFillBlankContent,
     validateContent: validateFillBlankContent,
+    
+    // Variation support
+    defaultVariation: 'original',
+    detectVariation: (lines: string[], content: FillBlankContent) => {
+        return detectFillBlankVariation(lines);
+    },
+    
+    variations: {
+        original: {
+            name: 'original',
+            displayName: 'Original',
+            description: 'Standard fill-in-the-blank with asterisk syntax',
+            icon: 'edit',
+            exampleContent: 'She *is* my *little|younger* sister.',
+            parseContent: parseFillBlankOriginal,
+            validateContent: validateFillBlankOriginal
+        },
+        single: {
+            name: 'single',
+            displayName: 'Single Letter',
+            description: 'Letter-by-letter completion for single words',
+            icon: 'font',
+            exampleContent: 'W[a]te[rme]lon',
+            parseContent: parseFillBlankSingle,
+            validateContent: validateFillBlankSingle
+        },
+        matches: {
+            name: 'matches',
+            displayName: 'Matches',
+            description: 'Column-based matching with blanks',
+            icon: 'columns',
+            exampleContent: 'happy = *sad*',
+            parseContent: parseFillBlankMatches,
+            validateContent: validateFillBlankMatches
+        }
+    },
     
     // Components are provided by the main app
     // DisplayComponent: will be injected by app-level code

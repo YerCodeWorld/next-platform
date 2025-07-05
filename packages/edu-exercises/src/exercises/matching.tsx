@@ -179,6 +179,183 @@ function matchingToLanScript(content: MatchingContent): string {
 }
 
 /**
+ * Detect MATCHING variation based on syntax patterns
+ */
+function detectMatchingVariation(lines: string[]): string {
+    const relevantLines = lines.filter(line => 
+        line.trim() && !isCommentLine(line) && !line.includes('@ins(') && !line.includes('@idea(')
+    );
+
+    // Check for threesome variation: A = B = C format
+    const hasThreesomePattern = relevantLines.some(line => {
+        const equalCount = (line.match(/=/g) || []).length;
+        return equalCount === 2;
+    });
+    if (hasThreesomePattern) {
+        return 'threesome';
+    }
+
+    // Check for new variation: determine by content length (longer content gets "new" display)
+    const hasNewPattern = relevantLines.some(line => {
+        const cleanLine = line.replace(/@(idea|hint)\s*\([^)]+\)/g, '').trim();
+        if (cleanLine.includes('=')) {
+            const parts = cleanLine.split('=');
+            if (parts.length === 2) {
+                const left = parts[0]?.trim() || '';
+                const right = parts[1]?.trim() || '';
+                // If either side is longer than typical short words, use "new" display
+                return left.length > 15 || right.length > 15;
+            }
+        }
+        return false;
+    });
+    if (hasNewPattern) {
+        return 'new';
+    }
+
+    // Default to original
+    return 'original';
+}
+
+/**
+ * Parse original variation (existing function renamed)
+ */
+function parseMatchingOriginal(lines: string[], baseContent: MatchingContent): MatchingContent {
+    return parseMatchingContent(lines);
+}
+
+/**
+ * Parse new variation: same as original, just different display for longer content
+ */
+function parseMatchingNew(lines: string[], baseContent: MatchingContent): MatchingContent {
+    // "new" is just a display variation for longer content, uses same parsing as original
+    return parseMatchingContent(lines);
+}
+
+/**
+ * Parse threesome variation: A = B = C format
+ */
+function parseMatchingThreesome(lines: string[], baseContent: MatchingContent): MatchingContent {
+    const pairs: Array<{
+        left: string;
+        right: string;
+        hint?: string;
+    }> = [];
+
+    for (const line of lines) {
+        const trimmedLine = line.trim();
+        if (!trimmedLine || isCommentLine(trimmedLine)) continue;
+
+        // Extract hint if present
+        let hint: string | undefined;
+        let cleanLine = trimmedLine;
+        const hintMatch = trimmedLine.match(/@(idea|hint)\s*\(([^)]+)\)/);
+        if (hintMatch && hintMatch[2]) {
+            hint = hintMatch[2].replace(/['"]/g, '');
+            cleanLine = trimmedLine.replace(/@(idea|hint)\s*\([^)]+\)/, '').trim();
+        }
+
+        // Parse threesome format: A = B = C
+        const parts = cleanLine.split('=').map(p => p.trim());
+        if (parts.length === 3) {
+            const [first, second, third] = parts;
+            
+            if (first && second && third) {
+                // Create pairs: first-second and second-third
+                pairs.push({
+                    left: first,
+                    right: second,
+                    hint
+                });
+                pairs.push({
+                    left: second,
+                    right: third,
+                    hint
+                });
+            }
+        }
+    }
+
+    return {
+        pairs,
+        randomize: true
+    };
+}
+
+/**
+ * Validate original variation
+ */
+function validateMatchingOriginal(content: MatchingContent): ValidationResult {
+    return validateMatchingContent(content);
+}
+
+/**
+ * Validate new variation
+ */
+function validateMatchingNew(content: MatchingContent): ValidationResult {
+    const errors: string[] = [];
+    const warnings: string[] = [];
+
+    if (!content.pairs || content.pairs.length === 0) {
+        errors.push('New variation requires at least one matching pair');
+        return { isValid: false, errors, warnings };
+    }
+
+    content.pairs.forEach((pair, index) => {
+        if (!pair.left || pair.left.trim().length === 0) {
+            errors.push(`Pair ${index + 1}: Left item cannot be empty`);
+        }
+
+        if (!pair.right || pair.right.trim().length === 0) {
+            errors.push(`Pair ${index + 1}: Right item cannot be empty`);
+        }
+
+        if (pair.left === pair.right) {
+            warnings.push(`Pair ${index + 1}: Left and right items are identical`);
+        }
+    });
+
+    return {
+        isValid: errors.length === 0,
+        errors,
+        warnings
+    };
+}
+
+/**
+ * Validate threesome variation
+ */
+function validateMatchingThreesome(content: MatchingContent): ValidationResult {
+    const errors: string[] = [];
+    const warnings: string[] = [];
+
+    if (!content.pairs || content.pairs.length === 0) {
+        errors.push('Threesome variation requires at least one three-way relationship');
+        return { isValid: false, errors, warnings };
+    }
+
+    if (content.pairs.length % 2 !== 0) {
+        warnings.push('Threesome variation should have an even number of pairs (pairs of pairs)');
+    }
+
+    content.pairs.forEach((pair, index) => {
+        if (!pair.left || pair.left.trim().length === 0) {
+            errors.push(`Relationship ${index + 1}: Left item cannot be empty`);
+        }
+
+        if (!pair.right || pair.right.trim().length === 0) {
+            errors.push(`Relationship ${index + 1}: Right item cannot be empty`);
+        }
+    });
+
+    return {
+        isValid: errors.length === 0,
+        errors,
+        warnings
+    };
+}
+
+/**
  * Matching Exercise Type Configuration
  */
 export const matchingExercise: ExerciseTypeConfig<MatchingContent> = {
@@ -197,6 +374,42 @@ export const matchingExercise: ExerciseTypeConfig<MatchingContent> = {
     
     parseContent: parseMatchingContent,
     validateContent: validateMatchingContent,
+    
+    // Variation support
+    defaultVariation: 'original',
+    detectVariation: (lines: string[], content: MatchingContent) => {
+        return detectMatchingVariation(lines);
+    },
+    
+    variations: {
+        original: {
+            name: 'original',
+            displayName: 'Original',
+            description: 'Standard two-column matching with equals syntax',
+            icon: 'link',
+            exampleContent: 'Happy = Sad',
+            parseContent: parseMatchingOriginal,
+            validateContent: validateMatchingOriginal
+        },
+        new: {
+            name: 'new',
+            displayName: 'Enhanced',
+            description: 'Enhanced matching with function syntax and features',
+            icon: 'link-variant',
+            exampleContent: 'This fruit can be green, red and yellow = apple',
+            parseContent: parseMatchingNew,
+            validateContent: validateMatchingNew
+        },
+        threesome: {
+            name: 'threesome',
+            displayName: 'Three-way',
+            description: 'Three-way relationships with chained matching',
+            icon: 'link-plus',
+            exampleContent: 'France = Paris = Eiffel Tower',
+            parseContent: parseMatchingThreesome,
+            validateContent: validateMatchingThreesome
+        }
+    },
     
     // Components are provided by the main app
     // DisplayComponent: will be injected by app-level code

@@ -108,31 +108,34 @@ user        User   @relation("UserDynamics", fields: [authorEmail], references: 
 }
 
 model Exercise {
-id    String @id @default(uuid())
-title String
+  id    String @id @default(uuid())
+  title String
 
-instructions String?
-type         ExerciseType
+  instructions String?
+  type         ExerciseType
+  variation    String?
 
-difficulty ExerciseDifficulty @default(INTERMEDIATE)
-category   ExerciseCategory   @default(GENERAL)
-content    Json
+  difficulty ExerciseDifficulty @default(INTERMEDIATE)
+  category   ExerciseCategory   @default(GENERAL)
+  content    Json
 
-hints       String[]
-explanation String?
+  rawEduScript   String?    @db.Text
 
-tags           String[]
-timesCompleted Int      @default(0)
+  hints       String[]
+  explanation String?
 
-isPublished Boolean  @default(false)
-createdAt   DateTime @default(now())
-updatedAt   DateTime @updatedAt
+  tags           String[]
+  timesCompleted Int      @default(0)
 
-packageId String?
-package   ExercisePackage? @relation("PackageExercises", fields: [packageId], references: [id], onDelete: SetNull)
+  isPublished Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
-authorEmail String
-user        User   @relation("UserExercises", fields: [authorEmail], references: [email], onDelete: Cascade)
+  packageId String?
+  package   ExercisePackage? @relation("PackageExercises", fields: [packageId], references: [id], onDelete: SetNull)
+
+  authorEmail String
+  user        User   @relation("UserExercises", fields: [authorEmail], references: [email], onDelete: Cascade)
 
 @@index([authorEmail])
 @@index([type])

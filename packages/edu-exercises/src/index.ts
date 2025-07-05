@@ -25,6 +25,7 @@ export { LanScriptParser } from './parser/lanscript/parser';
 export { EduScriptParser, detectScriptType } from './parser/eduscript/parser';
 export { ExerciseBuilder } from './builder/exerciseBuilder';
 export { ExerciseCreator } from './components/create/ExerciseCreator';
+export { EduScriptEditor } from './components/create/EduScriptEditor';
 export { ExerciseDisplay } from './components/display/ExerciseDisplay';
 
 // Phase 0 convenience exports

@@ -1,4 +1,4 @@
-// packages/edu-exercises/src/exercises/ordering.ts
+// packages/edu-exercises/src/exercises/ordering.txt.ts
 
 import * as React from 'react';
 import { OrderingContent } from '@repo/api-bridge';
@@ -18,7 +18,7 @@ import { logger } from '../utils/logger';
 
 /**
  * Ordering Exercise Type Implementation
- * Everything needed for word/sentence ordering exercises in one place
+ * Everything needed for word/sentence ordering.txt exercises in one place
  */
 
 // Components are implemented in the main app at:
@@ -27,7 +27,7 @@ import { logger } from '../utils/logger';
 // The registry focuses on parsing and validation logic only
 
 /**
- * Parse ordering content from LanScript lines
+ * Parse ordering.txt content from LanScript lines
  * Format: "The | cat | is | sleeping | peacefully"
  */
 function parseOrderingContent(lines: string[]): OrderingContent {
@@ -56,7 +56,7 @@ function parseOrderingContent(lines: string[]): OrderingContent {
         // Check for empty segments
         const emptySegments = segments.filter(segment => !segment.trim());
         if (emptySegments.length > 0) {
-            logger.warn('Empty segments found in ordering sentence', { 
+            logger.warn('Empty segments found in ordering.txt sentence', {
                 lineIndex: lineIndex + 1,
                 emptyCount: emptySegments.length
             });
@@ -68,7 +68,7 @@ function parseOrderingContent(lines: string[]): OrderingContent {
             hint: undefined // TODO: Extract from decorators
         });
         
-        logger.debug('Parsed ordering sentence', { 
+        logger.debug('Parsed ordering.txt sentence', {
             lineIndex: lineIndex + 1,
             segmentCount: segments.length
         });
@@ -78,7 +78,7 @@ function parseOrderingContent(lines: string[]): OrderingContent {
 }
 
 /**
- * Validate ordering content
+ * Validate ordering.txt content
  */
 function validateOrderingContent(content: OrderingContent): ValidationResult {
     const errors: string[] = [];
@@ -159,7 +159,7 @@ function validateOrderingContent(content: OrderingContent): ValidationResult {
 }
 
 /**
- * Convert ordering content to LanScript format
+ * Convert ordering.txt content to LanScript format
  */
 function orderingToLanScript(content: OrderingContent): string {
     return content.sentences.map(sentence => {
@@ -172,6 +172,217 @@ function orderingToLanScript(content: OrderingContent): string {
         
         return line;
     }).join('\n');
+}
+
+/**
+ * Detect ORDERING variation based on syntax patterns
+ */
+function detectOrderingVariation(lines: string[]): string {
+    const relevantLines = lines.filter(line => 
+        line.trim() && !isCommentLine(line) && !line.includes('@ins(') && !line.includes('@idea(')
+    );
+
+    // Check for aligner variation: @align() function
+    const hasAlignerPattern = relevantLines.some(line => 
+        /@align\s*\(/.test(line)
+    );
+    if (hasAlignerPattern) {
+        return 'aligner';
+    }
+
+    // Check for single variation: single words without pipes (for letter unscrambling)
+    const hasSinglePattern = relevantLines.some(line => {
+        const cleanLine = line.replace(/@(idea|hint)\s*\([^)]+\)/g, '').trim();
+        return !cleanLine.includes('|') && cleanLine.split(/\s+/).every(word => word.length > 1 && /^[a-zA-Z]+$/.test(word));
+    });
+    if (hasSinglePattern) {
+        return 'single';
+    }
+
+    // Default to original
+    return 'original';
+}
+
+/**
+ * Parse original variation (existing function renamed)
+ */
+function parseOrderingOriginal(lines: string[], baseContent: OrderingContent): OrderingContent {
+    return parseOrderingContent(lines);
+}
+
+/**
+ * Parse single variation: individual words with letters to be unscrambled
+ * Example: Cinema -> letters get shuffled, user needs to rearrange to spell "Cinema"
+ */
+function parseOrderingSingle(lines: string[], baseContent: OrderingContent): OrderingContent {
+    const sentences: Array<{
+        segments: string[];
+        hint?: string;
+    }> = [];
+
+    for (const line of lines) {
+        const trimmedLine = line.trim();
+        if (!trimmedLine || isCommentLine(trimmedLine)) continue;
+
+        // Extract hint if present
+        let hint: string | undefined;
+        let cleanLine = trimmedLine;
+        const hintMatch = trimmedLine.match(/@(idea|hint)\s*\(([^)]+)\)/);
+        if (hintMatch && hintMatch[2]) {
+            hint = hintMatch[2].replace(/['"]/g, '');
+            cleanLine = trimmedLine.replace(/@(idea|hint)\s*\([^)]+\)/, '').trim();
+        }
+
+        // Each word becomes a "sentence" where segments are the letters
+        const words = cleanLine.split(/\s+/).filter(word => word.trim());
+        
+        words.forEach(word => {
+            if (word.trim()) {
+                // Convert word to array of letters (segments)
+                const letters = word.split('');
+                sentences.push({
+                    segments: letters,
+                    hint
+                });
+            }
+        });
+    }
+
+    return { sentences };
+}
+
+/**
+ * Parse aligner variation: timeline/sequence ordering.txt
+ * Example: Sequential events that need to be ordered chronologically
+ */
+function parseOrderingAligner(lines: string[], baseContent: OrderingContent): OrderingContent {
+    const sentences: Array<{
+        segments: string[];
+        hint?: string;
+    }> = [];
+    
+    const events: string[] = [];
+    let currentHint: string | undefined;
+
+    for (const line of lines) {
+        const trimmedLine = line.trim();
+        if (!trimmedLine || isCommentLine(trimmedLine)) continue;
+
+        // Extract hint if present
+        const hintMatch = trimmedLine.match(/@(idea|hint)\s*\(([^)]+)\)/);
+        if (hintMatch && hintMatch[2]) {
+            currentHint = hintMatch[2].replace(/['"]/g, '');
+            const cleanLine = trimmedLine.replace(/@(idea|hint)\s*\([^)]+\)/, '').trim();
+            if (cleanLine) {
+                events.push(cleanLine);
+            }
+            continue;
+        }
+
+        // Parse @align() function if present (enhanced syntax)
+        const alignMatch = trimmedLine.match(/@align\s*\(([^)]+)\)/);
+        if (alignMatch && alignMatch[1]) {
+            const alignContent = alignMatch[1];
+            // Split by comma, respecting quoted strings
+            const segments = alignContent.split(',').map(s => s.trim().replace(/^["']|["']$/g, ''));
+            
+            if (segments.length > 0) {
+                sentences.push({
+                    segments,
+                    hint: currentHint
+                });
+            }
+            continue;
+        }
+
+        // Regular event line
+        if (trimmedLine) {
+            events.push(trimmedLine);
+        }
+    }
+
+    // If we collected events without @align() function, create one sequence
+    if (events.length > 0) {
+        sentences.push({
+            segments: events,
+            hint: currentHint
+        });
+    }
+
+    return { sentences };
+}
+
+/**
+ * Validate original variation
+ */
+function validateOrderingOriginal(content: OrderingContent): ValidationResult {
+    return validateOrderingContent(content);
+}
+
+/**
+ * Validate single variation
+ */
+function validateOrderingSingle(content: OrderingContent): ValidationResult {
+    const errors: string[] = [];
+    const warnings: string[] = [];
+
+    if (!content.sentences || content.sentences.length === 0) {
+        errors.push('Single variation requires at least one sentence to order');
+        return { isValid: false, errors, warnings };
+    }
+
+    content.sentences.forEach((sentence, index) => {
+        if (!sentence.segments || sentence.segments.length === 0) {
+            errors.push(`Sentence ${index + 1}: Must have at least one word`);
+        } else if (sentence.segments.length < 2) {
+            warnings.push(`Sentence ${index + 1}: Only has ${sentence.segments.length} word(s), ordering may not be meaningful`);
+        }
+
+        sentence.segments.forEach((segment, segmentIndex) => {
+            if (!segment || segment.trim().length === 0) {
+                errors.push(`Sentence ${index + 1}, word ${segmentIndex + 1}: Cannot be empty`);
+            }
+        });
+    });
+
+    return {
+        isValid: errors.length === 0,
+        errors,
+        warnings
+    };
+}
+
+/**
+ * Validate aligner variation
+ */
+function validateOrderingAligner(content: OrderingContent): ValidationResult {
+    const errors: string[] = [];
+    const warnings: string[] = [];
+
+    if (!content.sentences || content.sentences.length === 0) {
+        errors.push('Aligner variation requires at least one alignment set');
+        return { isValid: false, errors, warnings };
+    }
+
+    content.sentences.forEach((sentence, index) => {
+        if (!sentence.segments || sentence.segments.length === 0) {
+            errors.push(`Alignment ${index + 1}: Must have at least one element`);
+        } else if (sentence.segments.length < 2) {
+            warnings.push(`Alignment ${index + 1}: Only has ${sentence.segments.length} element(s), alignment may not be meaningful`);
+        }
+
+        sentence.segments.forEach((segment, segmentIndex) => {
+            if (!segment || segment.trim().length === 0) {
+                errors.push(`Alignment ${index + 1}, element ${segmentIndex + 1}: Cannot be empty`);
+            }
+        });
+    });
+
+    return {
+        isValid: errors.length === 0,
+        errors,
+        warnings
+    };
 }
 
 /**
@@ -193,6 +404,42 @@ export const orderingExercise: ExerciseTypeConfig<OrderingContent> = {
     
     parseContent: parseOrderingContent,
     validateContent: validateOrderingContent,
+    
+    // Variation support
+    defaultVariation: 'original',
+    detectVariation: (lines: string[], content: OrderingContent) => {
+        return detectOrderingVariation(lines);
+    },
+    
+    variations: {
+        original: {
+            name: 'original',
+            displayName: 'Original',
+            description: 'Standard word/phrase ordering.txt with pipe separators',
+            icon: 'sort',
+            exampleContent: 'The | cat | is | sleeping | peacefully',
+            parseContent: parseOrderingOriginal,
+            validateContent: validateOrderingOriginal
+        },
+        single: {
+            name: 'single',
+            displayName: 'Single Words',
+            description: 'Individual words to be ordered into sentences',
+            icon: 'text',
+            exampleContent: 'Cinema\nRestaurant\nBeach',
+            parseContent: parseOrderingSingle,
+            validateContent: validateOrderingSingle
+        },
+        aligner: {
+            name: 'aligner',
+            displayName: 'Aligner',
+            description: 'Alignment-based ordering.txt with positioning',
+            icon: 'align',
+            exampleContent: '@align("The", "cat", "is", "sleeping")',
+            parseContent: parseOrderingAligner,
+            validateContent: validateOrderingAligner
+        }
+    },
     
     // Components are provided by the main app
     // DisplayComponent: will be injected by app-level code

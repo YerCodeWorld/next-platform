@@ -101,31 +101,31 @@ export const ExercisePreview: React.FC<ExercisePreviewProps> = ({ exercise }) =>
     return (
         <div className="exs-preview">
             <div className="exs-preview-header">
-                <h4>{exercise.title}</h4>
+                <h4>{exercise.title || exercise.metadata?.title}</h4>
                 <div className="exs-preview-meta">
-                    <span className={`exs-badge exs-badge-${exercise.difficulty?.toLowerCase()}`}>
-                        {exercise.difficulty}
+                    <span className={`exs-badge exs-badge-${(exercise.difficulty || exercise.metadata?.difficulty)?.toLowerCase()}`}>
+                        {exercise.difficulty || exercise.metadata?.difficulty}
                     </span>
-                    <span className="exs-badge">{exercise.type.replace('_', ' ')}</span>
-                    <span className="exs-badge">{exercise.category}</span>
+                    <span className="exs-badge">{(exercise.type || exercise.metadata?.type)?.replace('_', ' ')}</span>
+                    <span className="exs-badge">{exercise.category || exercise.metadata?.category}</span>
                 </div>
             </div>
 
-            {exercise.instructions && (
-                <p className="exs-preview-instructions">{exercise.instructions}</p>
+            {(exercise.instructions || exercise.metadata?.instructions) && (
+                <p className="exs-preview-instructions">{exercise.instructions || exercise.metadata?.instructions}</p>
             )}
 
             {renderContent()}
 
-            {exercise.hints && exercise.hints.length > 0 && (
+            {(exercise.hints || exercise.metadata?.hints) && (exercise.hints?.length > 0 || exercise.metadata?.hints?.length > 0) && (
                 <div className="exs-preview-hints">
-                    <strong>Hints:</strong> {exercise.hints.length} available
+                    <strong>Hints:</strong> {(exercise.hints || exercise.metadata?.hints)?.length} available
                 </div>
             )}
 
-            {exercise.tags && exercise.tags.length > 0 && (
+            {(exercise.tags || exercise.metadata?.tags) && (exercise.tags?.length > 0 || exercise.metadata?.tags?.length > 0) && (
                 <div className="exs-preview-tags">
-                    {exercise.tags.map((tag, index) => (
+                    {(exercise.tags || exercise.metadata?.tags)?.map((tag, index) => (
                         <span key={index} className="exs-tag">
                             {tag}
                         </span>

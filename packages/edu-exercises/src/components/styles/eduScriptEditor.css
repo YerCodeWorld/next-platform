@@ -1,0 +1,518 @@
+/* EduScript Editor Styles */
+
+.eduscript-editor-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: #ffffff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+/* Toolbar */
+.eduscript-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border-bottom: 1px solid #e2e8f0;
+  gap: 16px;
+}
+
+.eduscript-toolbar-left,
+.eduscript-toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.eduscript-toolbar button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  color: #64748b;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.eduscript-toolbar button:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+  color: #475569;
+}
+
+.eduscript-toolbar button.active {
+  background: #7c3aed;
+  border-color: #7c3aed;
+  color: #ffffff;
+}
+
+.eduscript-toolbar button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.toolbar-separator {
+  width: 1px;
+  height: 20px;
+  background: #e2e8f0;
+  margin: 0 4px;
+}
+
+.toolbar-hint {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #64748b;
+  font-size: 12px;
+}
+
+.parse-status {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.parse-status.success {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.parse-status.error {
+  background: #fef2f2;
+  color: #dc2626;
+}
+
+.save-button {
+  background: #059669 !important;
+  border-color: #059669 !important;
+  color: #ffffff !important;
+  font-weight: 600;
+}
+
+.save-button:hover:not(:disabled) {
+  background: #047857 !important;
+  border-color: #047857 !important;
+}
+
+/* Main Content */
+.eduscript-content {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+/* Template Library */
+.eduscript-templates {
+  width: 400px;
+  background: #f8fafc;
+  border-right: 1px solid #e2e8f0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.templates-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  background: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.templates-header h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #1e293b;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.close-templates {
+  background: none !important;
+  border: none !important;
+  color: #64748b !important;
+  padding: 4px !important;
+}
+
+.templates-content {
+  flex: 1;
+  padding: 16px;
+}
+
+.template-category {
+  margin-bottom: 24px;
+}
+
+.template-category h4 {
+  margin: 0 0 12px 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.template-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.eduscript-templates .template-item {
+  background: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 8px !important;
+  padding: 12px !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  color: #1f2937 !important;
+}
+
+.eduscript-templates .template-item:hover {
+  border-color: #7c3aed !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05) !important;
+  background: #f8fafc !important;
+}
+
+.eduscript-templates .template-item.selected {
+  border-color: #7c3aed !important;
+  background: #faf5ff !important;
+}
+
+.template-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.eduscript-templates .template-name {
+  font-weight: 600 !important;
+  color: #1e293b !important;
+  font-size: 13px !important;
+}
+
+.eduscript-templates .template-action {
+  font-size: 11px !important;
+  color: #7c3aed !important;
+  font-weight: 500 !important;
+}
+
+.eduscript-templates .template-description {
+  margin: 0 !important;
+  font-size: 12px !important;
+  color: #64748b !important;
+  line-height: 1.4 !important;
+}
+
+.template-preview {
+  margin-top: 12px;
+  border-top: 1px solid #e2e8f0;
+  padding-top: 12px;
+}
+
+.eduscript-templates .template-preview pre {
+  background: #f1f5f9 !important;
+  padding: 12px !important;
+  border-radius: 6px !important;
+  font-size: 11px !important;
+  line-height: 1.4 !important;
+  overflow-x: auto !important;
+  margin: 0 0 12px 0 !important;
+  border: 1px solid #e2e8f0 !important;
+  color: #374151 !important;
+}
+
+.eduscript-templates .template-preview code {
+  font-family: 'Fira Code', 'JetBrains Mono', 'Monaco', 'Consolas', monospace !important;
+  color: #374151 !important;
+}
+
+.insert-button {
+  background: #7c3aed !important;
+  border-color: #7c3aed !important;
+  color: #ffffff !important;
+  font-size: 12px !important;
+  padding: 6px 12px !important;
+  font-weight: 600;
+}
+
+.insert-button:hover {
+  background: #6d28d9 !important;
+  border-color: #6d28d9 !important;
+}
+
+/* Editor */
+.eduscript-editor-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  background: #ffffff;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.eduscript-codemirror-editor {
+  flex: 1;
+  background: #ffffff;
+  font-family: 'Fira Code', 'JetBrains Mono', 'Monaco', 'Consolas', monospace;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.eduscript-codemirror-editor .cm-editor {
+  height: 100%;
+  background: #ffffff;
+}
+
+.eduscript-codemirror-editor .cm-scroller {
+  font-family: inherit;
+  background: #ffffff;
+}
+
+.eduscript-codemirror-editor .cm-content {
+  padding: 16px;
+  background: #ffffff;
+  min-height: 400px;
+}
+
+.eduscript-codemirror-editor .cm-focused {
+  outline: 2px solid #7c3aed;
+  outline-offset: -2px;
+}
+
+.eduscript-codemirror-editor .cm-line {
+  color: #1f2937;
+}
+
+.eduscript-codemirror-editor .cm-cursor {
+  border-left: 2px solid #7c3aed;
+}
+
+/* Preview */
+.eduscript-preview {
+  width: 400px;
+  background: #f8fafc;
+  border-left: 1px solid #e2e8f0;
+  overflow-y: auto;
+  padding: 16px;
+}
+
+.eduscript-preview h3 {
+  margin: 0 0 16px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.preview-exercises {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.preview-errors {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.preview-errors h4 {
+  margin: 0 0 12px 0;
+  color: #dc2626;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.preview-errors ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.preview-errors li {
+  color: #dc2626;
+  font-size: 13px;
+  line-height: 1.5;
+  margin-bottom: 4px;
+}
+
+.preview-empty {
+  text-align: center;
+  color: #64748b;
+}
+
+.preview-empty p {
+  margin: 0 0 24px 0;
+  font-size: 14px;
+}
+
+.preview-tips {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 16px;
+  text-align: left;
+}
+
+.preview-tips h4 {
+  margin: 0 0 12px 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.preview-tips ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.preview-tips li {
+  font-size: 12px;
+  line-height: 1.5;
+  margin-bottom: 6px;
+  color: #4b5563;
+}
+
+.preview-tips code {
+  background: #f1f5f9;
+  padding: 2px 4px;
+  border-radius: 3px;
+  font-family: 'Fira Code', 'JetBrains Mono', 'Monaco', 'Consolas', monospace;
+  font-size: 11px;
+  color: #7c3aed;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .eduscript-templates,
+  .eduscript-preview {
+    width: 320px;
+  }
+}
+
+@media (max-width: 900px) {
+  .eduscript-content {
+    flex-direction: column;
+  }
+  
+  .eduscript-templates,
+  .eduscript-preview {
+    width: 100%;
+    max-height: 300px;
+  }
+  
+  .eduscript-editor-wrapper {
+    min-height: 400px;
+  }
+}
+
+@media (max-width: 640px) {
+  .eduscript-toolbar {
+    flex-direction: column;
+    gap: 12px;
+    padding: 12px;
+  }
+  
+  .eduscript-toolbar-left,
+  .eduscript-toolbar-right {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  
+  .toolbar-separator {
+    display: none;
+  }
+  
+  .eduscript-toolbar button span {
+    display: none;
+  }
+  
+  .templates-content {
+    padding: 12px;
+  }
+  
+  .template-item {
+    padding: 8px;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .eduscript-editor-container {
+    background: #1e293b;
+    color: #f1f5f9;
+  }
+  
+  .eduscript-toolbar {
+    background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+    border-bottom-color: #475569;
+  }
+  
+  .eduscript-toolbar button {
+    background: #334155;
+    border-color: #475569;
+    color: #cbd5e1;
+  }
+  
+  .eduscript-toolbar button:hover {
+    background: #475569;
+    border-color: #64748b;
+    color: #f1f5f9;
+  }
+  
+  .eduscript-templates,
+  .eduscript-preview {
+    background: #1e293b;
+    border-color: #475569;
+  }
+  
+  .templates-header {
+    background: #334155;
+    border-bottom-color: #475569;
+  }
+  
+  .template-item {
+    background: #334155;
+    border-color: #475569;
+  }
+  
+  .template-item:hover,
+  .template-item.selected {
+    border-color: #7c3aed;
+    background: #312e81;
+  }
+  
+  .template-preview pre {
+    background: #1e293b;
+    border-color: #475569;
+  }
+  
+  .preview-tips {
+    background: #334155;
+    border-color: #475569;
+  }
+  
+  .preview-tips code {
+    background: #1e293b;
+  }
+}

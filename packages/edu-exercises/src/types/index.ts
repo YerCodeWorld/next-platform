@@ -61,4 +61,6 @@ export type {
     ExerciseDifficulty,
     ExerciseCategory,
     ExerciseContent
-};
+} from '@repo/api-bridge';
+
+export type { CategorizeContent, SelectorContent } from '@repo/api-bridge';

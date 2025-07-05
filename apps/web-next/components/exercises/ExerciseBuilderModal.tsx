@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { X, BookOpen, Code, Plus } from 'lucide-react';
-import { LanScriptEditor, ManualBuilder, exerciseToLanScript } from '@repo/exercises';
+import { EduScriptEditor, exerciseToLanScript } from '@repo/exercises';
 import { ExercisePackage, ExerciseDifficulty, ExerciseCategory, User, useExerciseApi, CreateExercisePayload, PackageExercise, Exercise } from '@repo/api-bridge';
 import { toast } from 'sonner';
 
@@ -28,7 +28,7 @@ export function ExerciseBuilderModal({
   exerciseToEdit
 }: ExerciseBuilderModalProps) {
   const [mounted, setMounted] = useState(false);
-  const [activeTab, setActiveTab] = useState<'manual' | 'lanscript'>('manual');
+  // Removed tab state - using EduScript only
   const [exercises, setExercises] = useState<CreateExercisePayload[]>([]);
   const [isCreating, setIsCreating] = useState(false);
   
@@ -55,36 +55,6 @@ export function ExerciseBuilderModal({
     difficulty: difficulty || 'BEGINNER' as ExerciseDifficulty,
     category: pkg.category as ExerciseCategory,
     tags: [pkg.title.toLowerCase().replace(/\s+/g, '-')]
-  };
-
-  const handleManualExerciseAdd = async (exercise: CreateExercisePayload) => {
-    setIsCreating(true);
-    try {
-      // Ensure packageId and difficulty are set
-      const exerciseWithContext = {
-        ...exercise,
-        packageId: pkg.id,
-        difficulty: difficulty || exercise.difficulty || 'BEGINNER' as ExerciseDifficulty
-      };
-
-      if (exerciseToEdit) {
-        // Update existing exercise
-        await exerciseApi.updateExercise(exerciseToEdit.id, exerciseWithContext);
-        toast.success(locale === 'es' ? 'Ejercicio actualizado exitosamente' : 'Exercise updated successfully');
-      } else {
-        // Create new exercise
-        await exerciseApi.createExercise(exerciseWithContext);
-        toast.success(locale === 'es' ? 'Ejercicio creado exitosamente' : 'Exercise created successfully');
-      }
-      
-      onExerciseCreated?.();
-      onClose();
-    } catch (error) {
-      console.error('Error saving exercise:', error);
-      toast.error(locale === 'es' ? 'Error al guardar ejercicio' : 'Error saving exercise');
-    } finally {
-      setIsCreating(false);
-    }
   };
 
   const handleLanscriptExercisesParsed = (parsedExercises: CreateExercisePayload[]) => {
@@ -178,54 +148,16 @@ export function ExerciseBuilderModal({
           </button>
         </div>
 
-        {/* Tab Navigation */}
-        <div className="exercise-builder-modal__tabs">
-          <button
-            className={`tab-button ${activeTab === 'manual' ? 'active' : ''}`}
-            onClick={() => setActiveTab('manual')}
-          >
-            <BookOpen className="tab-icon" />
-            {locale === 'es' ? 'Constructor Manual' : 'Manual Builder'}
-          </button>
-          <button
-            className={`tab-button ${activeTab === 'lanscript' ? 'active' : ''}`}
-            onClick={() => setActiveTab('lanscript')}
-          >
-            <Code className="tab-icon" />
-            {locale === 'es' ? 'Editor LanScript' : 'LanScript Editor'}
-          </button>
-        </div>
-
-        {/* Exercise Builder Content */}
+        {/* Exercise Builder Content - EduScript Only */}
         <div className="exercise-builder-modal__body">
-          {activeTab === 'manual' ? (
-            <ManualBuilder
-              authorEmail={userData.email}
-              defaultMetadata={defaultMetadata}
-              currentExercise={exerciseToEdit && 'content' in exerciseToEdit ? {
-                title: exerciseToEdit.title,
-                instructions: exerciseToEdit.instructions,
-                type: exerciseToEdit.type,
-                difficulty: exerciseToEdit.difficulty,
-                category: exerciseToEdit.category,
-                content: exerciseToEdit.content,
-                hints: exerciseToEdit.hints,
-                explanation: exerciseToEdit.explanation,
-                tags: exerciseToEdit.tags,
-                isPublished: exerciseToEdit.isPublished,
-                authorEmail: exerciseToEdit.authorEmail
-              } as CreateExercisePayload : undefined}
-              onAdd={handleManualExerciseAdd}
-            />
-          ) : (
-            <LanScriptEditor
-              authorEmail={userData.email}
-              defaultMetadata={defaultMetadata}
-              initialScript={exerciseToEdit && exerciseToEdit.type && 'content' in exerciseToEdit ? exerciseToLanScript(exerciseToEdit) : undefined}
-              onExercisesParsed={handleLanscriptExercisesParsed}
-              onSaveAll={handleLanscriptSaveAll}
-            />
-          )}
+          <EduScriptEditor
+            authorEmail={userData.email}
+            defaultMetadata={defaultMetadata}
+            initialScript={exerciseToEdit && exerciseToEdit.type && 'content' in exerciseToEdit ? 
+              (exerciseToEdit.rawEduScript || exerciseToLanScript(exerciseToEdit)) : undefined}
+            onExercisesParsed={handleLanscriptExercisesParsed}
+            onSaveAll={handleLanscriptSaveAll}
+          />
           
           {/* Loading Overlay */}
           {isCreating && (

@@ -1,0 +1,494 @@
+MATCH VARIATION
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Match With Correct Answers</title>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <span class="progress">SENTENCE 4/10</span>
+      <h2>MATCH WITH CORRECT ANSWERS</h2>
+      <div class="clock">⏱️ <span id="timer">00:00</span></div>
+    </div>
+
+    <div class="exercise">
+      <div class="item">
+        <div class="question">LARGEST COUNTRY IN THE WORLD</div>
+        <select>
+          <option value="">...</option>
+          <option>Russia</option>
+          <option>Brazil</option>
+          <option>France</option>
+          <option>Seychelles</option>
+        </select>
+      </div>
+
+      <div class="item">
+        <div class="question">SMALLEST AFRICAN COUNTRY</div>
+        <select>
+          <option value="">...</option>
+          <option>Russia</option>
+          <option>Brazil</option>
+          <option>France</option>
+          <option>Seychelles</option>
+        </select>
+      </div>
+
+      <div class="item">
+        <div class="question">MOST POPULOUS COUNTRY IN SOUTH AMERICA</div>
+        <select>
+          <option value="">...</option>
+          <option>Russia</option>
+          <option>Brazil</option>
+          <option>France</option>
+          <option>Seychelles</option>
+        </select>
+      </div>
+
+      <div class="item">
+        <div class="question">MOST VISITED COUNTRY IN THE WORLD</div>
+        <select>
+          <option value="">...</option>
+          <option>Russia</option>
+          <option>Brazil</option>
+          <option>France</option>
+          <option>Seychelles</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
+
+body {
+  font-family: "Comic Sans MS", sans-serif;
+  background: #fff;
+  padding: 20px;
+  margin: 0;
+}
+
+.container {
+  max-width: 600px;
+  margin: auto;
+  border: 2px solid black;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 5px 5px 0 black;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.progress {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.clock {
+  font-weight: bold;
+  margin-top: 10px;
+}
+
+h2 {
+  text-decoration: underline;
+  font-weight: bold;
+  margin: 0;
+}
+
+.exercise .item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 15px 0;
+}
+
+.question {
+  width: 55%;
+  font-weight: bold;
+  border-bottom: 2px dashed black;
+  padding-bottom: 5px;
+}
+
+select {
+  width: 40%;
+  padding: 10px;
+  font-weight: bold;
+  border-radius: 10px;
+  border: 2px solid black;
+  box-shadow: 2px 2px 0 black;
+  background-color: #e0f0ff;
+  appearance: none;
+}
+
+let seconds = 0;
+const timer = document.getElementById('timer');
+
+setInterval(() => {
+  seconds++;
+  const min = String(Math.floor(seconds / 60)).padStart(2, '0');
+  const sec = String(seconds % 60).padStart(2, '0');
+  timer.textContent = `${min}:${sec}`;
+}, 1000);
+
+-----------------------------------------
+
+TRUE OR FALSE DISPLAY AND VERY SIMPLE PROTOTYPE FOR CATEGORIZE ORIGINAL DISPLAY
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>True | False | Neutral</title>
+  <link rel="stylesheet" href="styles.css"/>
+</head>
+<body>
+  <div class="container">
+    <div id="question-box" class="question-box">
+      <!-- JS fills this -->
+    </div>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>
+
+body {
+  font-family: "Comic Sans MS", sans-serif;
+  background: #fdfdfd;
+  margin: 0;
+  padding: 0;
+}
+
+.container {
+  max-width: 700px;
+  min-height: 60vh;
+  margin: 40px auto;
+  padding: 20px;
+  text-align: center;
+  align-content: center;
+  justify-content: center;
+}
+
+h2 {
+  text-decoration: underline;
+  font-weight: bold;
+  margin-bottom: 30px;
+}
+
+#question-box {
+  transition: opacity 0.3s ease;
+}
+
+.question-box {
+  padding: 15%;
+}
+
+.question-text {
+  font-size: 1.4rem;
+  font-weight: bold;
+  margin-bottom: 25px;
+  border-bottom: 2px dashed black;
+  padding-bottom: 40px;
+}
+
+.card-options {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.card {
+  flex: 1;
+  min-width: 120px;
+  min-height: 20vh;
+  padding: 25px;
+  border-radius: 15px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  cursor: pointer;
+  border: 3px solid black;
+  box-shadow: 4px 4px 0 #000;
+  transition: transform 0.2s, background 0.2s, box-shadow 0.2s;
+  user-select: none;
+  align-content: center;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+}
+
+.card.true {
+  background-color: #d0f4ff;
+  border-color: #00aaff;
+}
+
+.card.false {
+  background-color: #ffd0d0;
+  border-color: #ff4c4c;
+}
+
+.card.neutral {
+  background-color: #f8f8b3;
+  border-color: #d0c000;
+}
+
+.card.selected {
+  outline: 4px solid #000;
+  transform: scale(1.05);
+}
+
+const questions = [
+  "The sun rises in the west.",
+  "Water boils at 100°C at sea level.",
+  "Neutral statements are neither true nor false.",
+  "Cats are mammals.",
+  "Bananas are vegetables.",
+];
+
+const options = [
+  { label: "TRUE", class: "true" },
+  { label: "NEUTRAL", class: "neutral" },
+  { label: "FALSE", class: "false" },
+];
+
+let currentIndex = 0;
+const questionBox = document.getElementById("question-box");
+
+function renderQuestion(index) {
+  const qText = questions[index];
+
+  questionBox.innerHTML = `
+    <div class="question-text">${qText}</div>
+    <div class="card-options">
+      ${options.map(opt => `
+        <div class="card ${opt.class}" data-value="${opt.label}">
+          ${opt.label}
+        </div>
+      `).join('')}
+    </div>
+  `;
+
+  document.querySelectorAll(".card").forEach(card => {
+    card.addEventListener("click", () => {
+      card.classList.add("selected");
+      setTimeout(() => {
+        currentIndex++;
+        if (currentIndex < questions.length) {
+          renderQuestion(currentIndex);
+        } else {
+          questionBox.innerHTML = `<h3>✅ Finished!</h3>`;
+        }
+      }, 400);
+    });
+  });
+}
+
+renderQuestion(currentIndex);
+
+-----------------------------------------
+
+CARDS VARIATION
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Select the Correct Images</title>
+  <link rel="stylesheet" href="styles.css"/>
+</head>
+<body>
+  <div class="container">
+    <h2>SELECT ALL ANIMALS</h2>
+    <div class="grid" id="card-grid">
+      <!-- JS will load cards -->
+    </div>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>
+
+
+body {
+  font-family: "Comic Sans MS", sans-serif;
+  background: #fffefa;
+  margin: 0;
+  padding: 0;
+}
+
+.container {
+  max-width: 600px;
+  margin: 40px auto;
+  padding: 20px;
+  text-align: center;
+}
+
+h2 {
+  font-weight: bold;
+  text-decoration: underline;
+  margin-bottom: 30px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.card {
+  background: #fff;
+  border: 3px solid black;
+  border-radius: 15px;
+  box-shadow: 3px 3px 0 black;
+  padding: 10px;
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.15s, background 0.2s;
+}
+
+.card img {
+  width: 100%;
+  border-radius: 10px;
+}
+
+.card:hover {
+  transform: scale(1.05);
+}
+
+.card.selected {
+  background-color: #d0fcd0;
+  border-color: green;
+}
+
+const items = [
+  { img: "https://upload.wikimedia.org/wikipedia/commons/6/6e/Golde33443.jpg", isAnswer: true }, // Dog
+  { img: "https://upload.wikimedia.org/wikipedia/commons/1/15/Red_Apple.jpg", isAnswer: false }, // Apple
+  { img: "https://upload.wikimedia.org/wikipedia/commons/3/32/House_cat_on_scratch_board.jpg", isAnswer: true }, // Cat
+  { img: "https://upload.wikimedia.org/wikipedia/commons/5/57/Hamburger_%28black_bg%29.jpg", isAnswer: false }, // Burger
+];
+
+const grid = document.getElementById("card-grid");
+
+items.forEach(item => {
+  const div = document.createElement("div");
+  div.className = "card";
+  div.innerHTML = `<img src="${item.img}" alt="option image"/>`;
+
+  div.addEventListener("click", () => {
+    div.classList.toggle("selected");
+    // Optional: track answer
+  });
+
+  grid.appendChild(div);
+});
+
+-----------------------------
+
+SIMILAR: CATEGORIZE LAKE VARIATION SUPER SIMPLE SNIPPET
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Image/Emoji Selector</title>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+  <div class="container">
+    <h2>SELECT ALL ANIMALS 🐾</h2>
+    <div class="grid" id="card-grid">
+      <!-- Cards added via JS -->
+    </div>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>
+
+body {
+  font-family: "Comic Sans MS", sans-serif;
+  background: #fffefa;
+  margin: 0;
+  padding: 0;
+}
+
+.container {
+  max-width: 700px;
+  margin: 40px auto;
+  padding: 20px;
+  text-align: center;
+}
+
+h2 {
+  font-weight: bold;
+  text-decoration: underline;
+  margin-bottom: 30px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 20px;
+}
+
+.card {
+  background: #fff;
+  border: 3px solid black;
+  border-radius: 15px;
+  box-shadow: 3px 3px 0 black;
+  padding: 25px;
+  font-size: 2rem;
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.15s, background 0.2s;
+}
+
+.card:hover {
+  transform: scale(1.05);
+}
+
+.card.selected {
+  background-color: #d0fcd0;
+  border-color: green;
+}
+
+const items = [
+  { label: "🐶", isAnswer: true },
+  { label: "🍎", isAnswer: false },
+  { label: "🐱", isAnswer: true },
+  { label: "🚗", isAnswer: false },
+  { label: "🦊", isAnswer: true },
+  { label: "🍔", isAnswer: false },
+  { label: "🐸", isAnswer: true },
+  { label: "📱", isAnswer: false },
+];
+
+const grid = document.getElementById("card-grid");
+
+items.forEach((item, i) => {
+  const div = document.createElement("div");
+  div.className = "card";
+  div.textContent = item.label;
+
+  div.addEventListener("click", () => {
+    div.classList.toggle("selected");
+    // Optional: store selection in item object or elsewhere
+  });
+
+  grid.appendChild(div);
+});
+
+Reminding that words could be displayed in an unorganized container (so that they don't appear aligned to each
+other). And also container should allow either vertical/horizontal overflow for exercises with many words.
+
+---------------------------------------

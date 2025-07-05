@@ -1,0 +1,256 @@
+Original display ready
+
+SINGLE VARIATION (BROKEN BEHAVIOR, JUST TAKE AS A BASIC IDEA)
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Drag to Order Word</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <h2>UNSCRAMBLE THE WORD</h2>
+    <p class="instruction">Drag the letters to form the correct word.</p>
+
+    <div id="letter-container" class="letter-line"></div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
+
+body {
+  font-family: "Comic Sans MS", sans-serif;
+  background: #fffdf7;
+  margin: 0;
+  padding: 0;
+}
+
+.container {
+  max-width: 600px;
+  margin: 40px auto;
+  padding: 20px;
+  text-align: center;
+}
+
+h2 {
+  font-weight: bold;
+  text-decoration: underline;
+}
+
+.instruction {
+  margin-bottom: 20px;
+  font-size: 1.1rem;
+}
+
+.letter-line {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+
+.letter {
+  font-size: 1.4rem;
+  font-weight: bold;
+  padding: 15px 20px;
+  border: 3px solid black;
+  border-radius: 12px;
+  box-shadow: 3px 3px 0 black;
+  cursor: grab;
+  background-color: var(--color);
+  transition: transform 0.2s;
+  user-select: none;
+}
+
+.letter:active {
+  cursor: grabbing;
+  transform: scale(1.05);
+}
+const word = "TALENTED";
+const scrambled = word.split("").sort(() => Math.random() - 0.5);
+
+const pastelColors = [
+  "#ffe0e0", "#d0f0ff", "#fef4d6", "#e1ffe1",
+  "#e0e0ff", "#ffe6f0", "#e0fff7", "#f0e0ff"
+];
+
+const container = document.getElementById("letter-container");
+
+scrambled.forEach((char, index) => {
+  const span = document.createElement("div");
+  span.className = "letter";
+  span.textContent = char;
+  span.draggable = true;
+  span.style.setProperty('--color', pastelColors[index % pastelColors.length]);
+
+  // Drag Events
+  span.addEventListener("dragstart", e => {
+    e.dataTransfer.setData("text/plain", index);
+  });
+
+  span.addEventListener("dragover", e => e.preventDefault());
+
+  span.addEventListener("drop", e => {
+    e.preventDefault();
+    const fromIndex = e.dataTransfer.getData("text/plain");
+    const toIndex = index;
+
+    const children = [...container.children];
+    container.innerHTML = "";
+
+    const temp = children.splice(fromIndex, 1)[0];
+    children.splice(toIndex, 0, temp);
+
+    children.forEach(child => container.appendChild(child));
+  });
+
+  container.appendChild(span);
+});
+
+ALIGNER VARIATION
+
+Make sure to display boxes vertically with overflow when screen size does not help.
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Timeliner</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <h2>ORDER THE EVENTS</h2>
+    <p class="instruction">Drag the items along the timeline in the correct order.</p>
+
+    <div class="timeline-wrapper">
+      <div class="timeline-line"></div>
+      <div id="card-container" class="timeline-cards">
+        <!-- Cards will be rendered here -->
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
+
+body {
+  font-family: "Comic Sans MS", sans-serif;
+  background: #fffef9;
+  margin: 0;
+  padding: 0;
+}
+
+.container {
+  max-width: 800px;
+  margin: 40px auto;
+  padding: 20px;
+  text-align: center;
+}
+
+h2 {
+  font-weight: bold;
+  text-decoration: underline;
+}
+
+.instruction {
+  font-size: 1rem;
+  margin-bottom: 30px;
+}
+
+.timeline-wrapper {
+  position: relative;
+  padding: 40px 0;
+}
+
+.timeline-line {
+  height: 4px;
+  background: black;
+  width: 90%;
+  margin: auto;
+  position: absolute;
+  top: 50%;
+  left: 5%;
+  z-index: 1;
+}
+
+.timeline-cards {
+  display: flex;
+  justify-content: center;
+  flex-wrap: nowrap;
+  gap: 25px;
+  z-index: 2;
+  position: relative;
+}
+
+.card {
+  background-color: var(--color);
+  padding: 20px 25px;
+  border: 3px solid black;
+  border-radius: 12px;
+  box-shadow: 3px 3px 0 black;
+  font-weight: bold;
+  cursor: grab;
+  transition: transform 0.2s ease;
+  user-select: none;
+}
+
+.card:active {
+  cursor: grabbing;
+  transform: scale(1.05);
+}
+
+const items = [
+  "Invention of the Wheel",
+  "Moon Landing",
+  "First Computer",
+  "Printing Press",
+  "WWII"
+];
+
+const pastelColors = [
+  "#ffe0e0", "#d0f0ff", "#fef4d6", "#e1ffe1",
+  "#e0e0ff", "#ffe6f0", "#e0fff7", "#f0e0ff"
+];
+
+const container = document.getElementById("card-container");
+
+// Shuffle the array for initial random state
+const shuffled = [...items].sort(() => Math.random() - 0.5);
+
+shuffled.forEach((text, index) => {
+  const card = document.createElement("div");
+  card.className = "card";
+  card.draggable = true;
+  card.textContent = text;
+  card.style.setProperty("--color", pastelColors[index % pastelColors.length]);
+
+  card.addEventListener("dragstart", e => {
+    e.dataTransfer.setData("text/plain", index);
+  });
+
+  card.addEventListener("dragover", e => e.preventDefault());
+
+  card.addEventListener("drop", e => {
+    e.preventDefault();
+    const fromIndex = e.dataTransfer.getData("text/plain");
+    const toIndex = index;
+
+    const cards = [...container.children];
+    const moved = cards.splice(fromIndex, 1)[0];
+    cards.splice(toIndex, 0, moved);
+
+    container.innerHTML = "";
+    cards.forEach(card => container.appendChild(card));
+  });
+
+  container.appendChild(card);
+});
+

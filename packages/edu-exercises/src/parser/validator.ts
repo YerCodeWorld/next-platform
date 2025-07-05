@@ -10,6 +10,7 @@ import {
 export interface ValidationResult {
     isValid: boolean;
     errors: string[];
+    warnings?: string[];
 }
 
 // Type guards for runtime type checking

@@ -4,6 +4,7 @@ import { Exercise, ExercisePackage, User, MatchingContent } from '@repo/api-brid
 import { Clock, Lightbulb, ChevronUp, ChevronDown, X, CheckCircle, XCircle } from 'lucide-react';
 import { ExerciseProgressBar } from '../ExerciseProgressBar';
 import { useSounds } from '../../../utils/sounds';
+import { MatchingThreesomeDisplay } from './MatchingThreesomeDisplay';
 
 interface MatchingDisplayProps {
   exercise: Exercise;
@@ -27,6 +28,38 @@ interface LayoutInfo {
 
 const WORD_COLORS = ['blue', 'pink', 'green', 'purple'];
 
+/**
+ * Detect matching variation based on content patterns
+ */
+function detectMatchingVariation(content: MatchingContent): string {
+  // Check for threesome pattern: pairs that chain together
+  // threesome pairs come in groups of 2 where first.right === second.left
+  let threesomeCount = 0;
+  for (let i = 0; i < content.pairs.length; i += 2) {
+    const firstPair = content.pairs[i];
+    const secondPair = content.pairs[i + 1];
+    
+    if (firstPair && secondPair && firstPair.right === secondPair.left) {
+      threesomeCount++;
+    }
+  }
+  
+  // If more than half the pairs form threesome patterns, it's threesome variation
+  if (threesomeCount > 0 && threesomeCount * 2 >= content.pairs.length * 0.5) {
+    return 'threesome';
+  }
+
+  // Check for "new" variation: longer content 
+  const hasLongContent = content.pairs.some(pair => 
+    pair.left.length > 15 || pair.right.length > 15
+  );
+  if (hasLongContent) {
+    return 'new';
+  }
+
+  return 'original';
+}
+
 export function MatchingDisplay({
   exercise,
   package: pkg,
@@ -34,10 +67,9 @@ export function MatchingDisplay({
   userData,
   onComplete
 }: MatchingDisplayProps) {
-  // Suppress unused variable warnings for props that may be used in future features
-  void pkg;
-  void userData;
   const content = exercise.content as MatchingContent;
+  
+  // All hooks must be called before any conditional logic
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [matchingState, setMatchingState] = useState<MatchingState>({
     matches: {},
@@ -406,6 +438,22 @@ export function MatchingDisplay({
     
     return null;
   };
+
+  // Use exercise variation if available, otherwise detect from content
+  const variation = exercise.variation || detectMatchingVariation(content);
+  
+  // Route to threesome display if detected
+  if (variation === 'threesome') {
+    return (
+      <MatchingThreesomeDisplay
+        exercise={exercise}
+        package={pkg}
+        locale={locale}
+        userData={userData}
+        onComplete={onComplete}
+      />
+    );
+  }
 
   if (!content.pairs || content.pairs.length === 0) {
     return (

@@ -1,8 +1,7 @@
 // Create components
 export { ExerciseCreator } from './create/ExerciseCreator';
-export { ManualBuilder } from './create/ManualBuilder';
 export { ExercisePreview } from './create/ExercisePreview';
-export { LanScriptEditor } from './create/LanScriptEditor';
+export { EduScriptEditor } from './create/EduScriptEditor';
 
 // Display components
 export { ExerciseDisplay } from './display/ExerciseDisplay';

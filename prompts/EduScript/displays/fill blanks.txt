@@ -1,0 +1,303 @@
+Original Display Ready
+
+MATCHES VARIATION (blanks behavior not implemented)
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Fill in the Blanks - Match</title>
+  <link rel="stylesheet" href="styles.css"/>
+</head>
+<body>
+  <div class="container">
+    <h2>WRITE THE ANTONYM OF EACH WORD</h2>
+    <div class="columns">
+      <div class="column left">
+        <div class="slot filled">BEAUTY</div>
+        <div class="slot filled">NOISY</div>
+        <div class="slot blank" data-accept="true"></div>
+        <div class="slot blank" data-accept="true"></div>
+        <div class="slot filled">TALL</div>
+      </div>
+      <div class="column right">
+        <div class="slot blank" data-accept="true"></div>
+        <div class="slot blank" data-accept="true"></div>
+        <div class="answer" draggable="true">BORING</div>
+        <div class="answer" draggable="true">SAD</div>
+        <div class="slot blank" data-accept="true"></div>
+      </div>
+    </div>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>
+
+body {
+  font-family: "Comic Sans MS", sans-serif;
+  background: #fffefc;
+  margin: 0;
+  padding: 0;
+}
+
+.container {
+  max-width: 800px;
+  margin: 40px auto;
+  padding: 20px;
+  text-align: center;
+}
+
+h2 {
+  font-weight: bold;
+  text-decoration: underline;
+  margin-bottom: 30px;
+}
+
+.columns {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  background-color: #f0f8ff;
+  padding: 30px;
+  border: 3px solid black;
+  border-radius: 15px;
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  flex: 1;
+}
+
+.slot {
+  height: 40px;
+  min-width: 100px;
+  background-color: transparent;
+  border-bottom: 2px solid black;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+.filled {
+  background-color: #d0eaff;
+  border: 3px solid black;
+  border-radius: 12px;
+  box-shadow: 2px 2px 0 black;
+  height: auto;
+  padding: 10px 15px;
+  border-bottom: none;
+}
+
+.answer {
+  background-color: #ffe08a;
+  padding: 10px 15px;
+  border: 3px solid black;
+  border-radius: 12px;
+  font-weight: bold;
+  cursor: grab;
+  user-select: none;
+  box-shadow: 2px 2px 0 black;
+}
+
+.answer:active {
+  cursor: grabbing;
+}
+
+.blank.over {
+  outline: 3px dashed green;
+}
+
+document.querySelectorAll('.answer').forEach(draggable => {
+  draggable.addEventListener('dragstart', e => {
+    e.dataTransfer.setData('text/plain', draggable.textContent);
+    setTimeout(() => draggable.style.display = "none", 0);
+  });
+
+  draggable.addEventListener('dragend', () => {
+    draggable.style.display = "inline-flex";
+  });
+});
+
+document.querySelectorAll('.slot.blank').forEach(slot => {
+  slot.addEventListener('dragover', e => {
+    e.preventDefault();
+    slot.classList.add('over');
+  });
+
+  slot.addEventListener('dragleave', () => {
+    slot.classList.remove('over');
+  });
+
+  slot.addEventListener('drop', e => {
+    e.preventDefault();
+    const data = e.dataTransfer.getData('text/plain');
+    slot.textContent = data;
+    slot.classList.remove('over');
+  });
+});
+
+
+SINGLE VARIATION
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Complete the Word</title>
+  <link rel="stylesheet" href="styles.css"/>
+</head>
+<body>
+  <div class="container">
+    <h2>FINISH THE UNCOMPLETE WORD</h2>
+
+    <div class="drop-zone" id="word-line">
+      <!-- Word slots (some filled, some blank) -->
+    </div>
+
+    <div class="letter-bank" id="letter-bank">
+      <!-- Draggable letters -->
+    </div>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>
+
+
+body {
+  font-family: "Comic Sans MS", sans-serif;
+  background: #fffef8;
+  margin: 0;
+  padding: 0;
+}
+
+.container {
+  max-width: 800px;
+  margin: 40px auto;
+  padding: 20px;
+  text-align: center;
+}
+
+h2 {
+  font-weight: bold;
+  text-decoration: underline;
+  margin-bottom: 30px;
+}
+
+.drop-zone {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-bottom: 40px;
+}
+
+.slot {
+  width: 45px;
+  height: 45px;
+  border-bottom: 3px solid black;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  font-weight: bold;
+}
+
+.slot.filled {
+  background-color: #ffc0cb;
+  border: 3px solid black;
+  border-radius: 10px;
+  box-shadow: 2px 2px 0 black;
+  border-bottom: none;
+}
+
+.letter-bank {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.letter {
+  font-size: 1.4rem;
+  font-weight: bold;
+  padding: 12px 20px;
+  border-radius: 10px;
+  border: 3px solid black;
+  box-shadow: 2px 2px 0 black;
+  cursor: grab;
+  user-select: none;
+  background-color: var(--color);
+}
+
+.letter:active {
+  cursor: grabbing;
+}
+
+.slot.over {
+  outline: 2px dashed green;
+}
+
+const word = ['B', 'U', '_', 'L', '_', 'N', 'G'];
+const presetIndices = [0, 1, 3, 5, 6]; // letters already shown
+const bankLetters = ['A', 'I', 'E', 'O']; // distractors and answers
+const pastelColors = ['#ffef90', '#b3ecb3', '#ffc0cb', '#d0f0ff', '#e0f7fa'];
+
+const wordLine = document.getElementById('word-line');
+const letterBank = document.getElementById('letter-bank');
+
+// Render the word line
+word.forEach((char, i) => {
+  const div = document.createElement('div');
+  div.className = 'slot';
+  if (presetIndices.includes(i)) {
+    div.classList.add('filled');
+    div.textContent = char;
+  } else {
+    div.setAttribute('data-accept', 'true');
+    div.setAttribute('data-index', i);
+
+    div.addEventListener('dragover', e => {
+      e.preventDefault();
+      div.classList.add('over');
+    });
+
+    div.addEventListener('dragleave', () => div.classList.remove('over'));
+
+    div.addEventListener('drop', e => {
+      e.preventDefault();
+      const letter = e.dataTransfer.getData('text/plain');
+      div.textContent = letter;
+      div.classList.remove('over');
+    });
+  }
+
+  wordLine.appendChild(div);
+});
+
+// Render the letter bank
+bankLetters.forEach((char, i) => {
+  const span = document.createElement('div');
+  span.className = 'letter';
+  span.textContent = char;
+  span.draggable = true;
+  span.style.setProperty('--color', pastelColors[i % pastelColors.length]);
+
+  span.addEventListener('dragstart', e => {
+    e.dataTransfer.setData('text/plain', char);
+    setTimeout(() => span.style.display = 'none', 0);
+  });
+
+  span.addEventListener('dragend', () => {
+    span.style.display = 'inline-flex';
+  });
+
+  letterBank.appendChild(span);
+});
+
+For this one my original idea was to have the blanks be input tags so user manually enters a letter,
+so you could do that instead.

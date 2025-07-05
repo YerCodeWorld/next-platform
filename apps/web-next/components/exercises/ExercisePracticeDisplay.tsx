@@ -1,10 +1,12 @@
 'use client';
 import React, { useState } from 'react';
 import { Exercise, ExercisePackage, User, useExercisePackagesApi } from '@repo/api-bridge';
-import { MultipleChoiceDisplay } from './displays/MultipleChoiceDisplay';
-import { FillBlanksDisplay } from './displays/FillBlanksDisplay';
-import { OrderingDisplay } from './displays/OrderingDisplay';
-import { MatchingDisplay } from './displays/MatchingDisplay';
+import { MultipleChoiceVariationRouter } from './displays/MultipleChoiceVariationRouter';
+import { FillBlanksVariationRouter } from './displays/FillBlanksVariationRouter';
+import { OrderingVariationRouter } from './displays/OrderingVariationRouter';
+import { MatchingVariationRouter } from './displays/MatchingVariationRouter';
+import { CategorizeVariationRouter } from './displays/CategorizeVariationRouter';
+import { SelectorVariationRouter } from './displays/SelectorVariationRouter';
 import { ArrowLeft } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
@@ -56,7 +58,7 @@ export default function ExercisePracticeDisplay({
     switch (exercise.type) {
       case 'MULTIPLE_CHOICE':
         return (
-          <MultipleChoiceDisplay
+          <MultipleChoiceVariationRouter
             exercise={exercise}
             package={pkg}
             locale={locale}
@@ -66,7 +68,7 @@ export default function ExercisePracticeDisplay({
         );
       case 'FILL_BLANK':
         return (
-          <FillBlanksDisplay
+          <FillBlanksVariationRouter
             exercise={exercise}
             package={pkg}
             locale={locale}
@@ -76,7 +78,7 @@ export default function ExercisePracticeDisplay({
         );
       case 'ORDERING':
         return (
-          <OrderingDisplay
+          <OrderingVariationRouter
             exercise={exercise}
             package={pkg}
             locale={locale}
@@ -86,7 +88,27 @@ export default function ExercisePracticeDisplay({
         );
       case 'MATCHING':
         return (
-          <MatchingDisplay
+          <MatchingVariationRouter
+            exercise={exercise}
+            package={pkg}
+            locale={locale}
+            userData={userData}
+            onComplete={handleComplete}
+          />
+        );
+      case 'CATEGORIZER':
+        return (
+          <CategorizeVariationRouter
+            exercise={exercise}
+            package={pkg}
+            locale={locale}
+            userData={userData}
+            onComplete={handleComplete}
+          />
+        );
+      case 'SELECTOR':
+        return (
+          <SelectorVariationRouter
             exercise={exercise}
             package={pkg}
             locale={locale}

@@ -981,4 +981,119 @@
   .choice-text {
     font-size: 1rem;
   }
+  
+  .mc-cards-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .mc-card-option {
+    min-height: 100px;
+  }
+}
+
+/* Multiple Choice Cards Display Styles */
+.multiple-choice-cards-display .mc-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+  margin: 2rem 0;
+  padding: 0 1rem;
+}
+
+.multiple-choice-cards-display .mc-cards-grid.has-images {
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+
+.mc-card-option {
+  background: #ffffff;
+  border: 3px solid #000000;
+  border-radius: 15px;
+  box-shadow: 3px 3px 0 #000000;
+  padding: 1.5rem;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.15s ease;
+  min-height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 1.1rem;
+  position: relative;
+  font-family: "Comic Sans MS", sans-serif;
+}
+
+.mc-card-option:hover {
+  transform: scale(1.05);
+  box-shadow: 4px 4px 0 #000000;
+}
+
+.mc-card-option.selected {
+  background-color: #d0fcd0;
+  border-color: #10b981;
+}
+
+.mc-card-option.correct {
+  background-color: #d0fcd0;
+  border-color: #10b981;
+}
+
+.mc-card-option.incorrect {
+  background-color: #ffd0d0;
+  border-color: #ef4444;
+}
+
+.mc-card-option.missed {
+  background-color: #fef3c7;
+  border-color: #f59e0b;
+}
+
+.mc-card-option.disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.mc-card-image-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.mc-card-image {
+  max-width: 100%;
+  max-height: 150px;
+  object-fit: contain;
+  border-radius: 10px;
+}
+
+.mc-card-text-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  width: 100%;
+  text-align: center;
+}
+
+.mc-card-text {
+  line-height: 1.4;
+}
+
+.mc-card-result-icon {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.image-card {
+  min-height: 200px;
+}
+
+.text-card {
+  min-height: 120px;
 }

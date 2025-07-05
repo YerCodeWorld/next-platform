@@ -10,6 +10,8 @@ import { multipleChoiceExercise } from './multipleChoice';
 import { fillBlankExercise } from './fillBlank';
 import { matchingExercise } from './matching';
 import { orderingExercise } from './ordering';
+import { categorizeExercise } from './categorize';
+import { selectorExercise } from './selector';
 import { logger } from '../utils/logger';
 
 /**
@@ -24,6 +26,8 @@ export function registerDefaultExerciseTypes(): void {
         exerciseRegistry.register(fillBlankExercise);
         exerciseRegistry.register(matchingExercise);
         exerciseRegistry.register(orderingExercise);
+        exerciseRegistry.register(categorizeExercise);
+        exerciseRegistry.register(selectorExercise);
         
         logger.info('All default exercise types registered successfully', {
             registeredTypes: exerciseRegistry.getExerciseTypes()
@@ -52,6 +56,8 @@ export { multipleChoiceExercise } from './multipleChoice';
 export { fillBlankExercise } from './fillBlank';
 export { matchingExercise } from './matching';
 export { orderingExercise } from './ordering';
+export { categorizeExercise } from './categorize';
+export { selectorExercise } from './selector';
 
 // Export registry for convenience
 export { exerciseRegistry } from '../registry/ExerciseRegistry';

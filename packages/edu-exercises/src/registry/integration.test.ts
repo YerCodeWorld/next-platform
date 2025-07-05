@@ -51,7 +51,7 @@ describe('Exercise Registry Integration', () => {
       const matchLines = ['Apple = Fruit', 'Car = Vehicle']
       expect(registry.detectType(matchLines)).toBe('MATCHING')
 
-      // Test ordering detection
+      // Test ordering.txt detection
       const orderLines = ['The | cat | is | sleeping']
       expect(registry.detectType(orderLines)).toBe('ORDERING')
     })
@@ -98,7 +98,7 @@ describe('Exercise Registry Integration', () => {
       const matchValidation = registry.validateContent(matchType!, matchContent)
       expect(matchValidation.isValid).toBe(true)
 
-      // Test ordering parsing and validation
+      // Test ordering.txt parsing and validation
       const orderLines = ['The | cat | is | sleeping']
       const orderType = registry.detectType(orderLines)
       expect(orderType).toBe('ORDERING')
@@ -285,6 +285,79 @@ describe('Exercise Registry Integration', () => {
         const lanScript = registry.toLanScript(type!, content)
         expect(lanScript).toBeTruthy()
       })
+    })
+
+    it('should handle multiple choice matches variation without validation errors', () => {
+      registry.register(multipleChoiceExercise)
+
+      // Test the exact content from the user's problem
+      const matchesLines = [
+        'Present Simple     = She does not usually go to the gym',
+        'Past Simple        = Our family went to the USA last summer', 
+        'Future Simple      = I will think about your idea',
+        'Present Continuous = Who is thinking what I am thinking?',
+        '// Extra answers for difficulty',
+        '= I have been here for a long time!',
+        '= We will have graduated by the time you come back...'
+      ]
+
+      const type = registry.detectType(matchesLines)
+      expect(type).toBe('MULTIPLE_CHOICE')
+
+      // Use parseContentWithVariation with explicit matches variation
+      const parseResult = registry.parseContentWithVariation('MULTIPLE_CHOICE', matchesLines, {
+        variation: 'matches'
+      })
+      expect(parseResult.content).toBeDefined()
+      expect(parseResult.variation).toBe('matches')
+      expect((parseResult.content as any).questions).toBeDefined()
+      expect((parseResult.content as any).questions.length).toBeGreaterThan(0)
+
+      // Check if variation metadata was added to content
+      expect((parseResult.content as any).variation).toBe('matches')
+
+      // This should NOT produce "At least 2 options" errors anymore
+      const validation = registry.validateContent(type!, parseResult.content)
+      expect(validation.isValid).toBe(true)
+      expect(validation.errors).not.toContain(expect.stringContaining('At least 2 options'))
+    })
+
+    it('should handle multiple choice cards variation with style override', () => {
+      registry.register(multipleChoiceExercise)
+
+      // Test the exact content from the user's problem
+      const cardsLines = [
+        '[Dom. Rep] | New York City | Lima | Shibuya',
+        '[Japan] | Queens | Amazon',
+        '[Russia] | Sahara | Oceania | Buenos Aires'
+      ]
+
+      const type = registry.detectType(cardsLines)
+      expect(type).toBe('MULTIPLE_CHOICE')
+
+      // Parse with explicit cards variation (simulating style override)
+      const parseResult = registry.parseContentWithVariation('MULTIPLE_CHOICE', cardsLines, {
+        variation: 'cards'
+      })
+      expect(parseResult.content).toBeDefined()
+      expect(parseResult.variation).toBe('cards')
+      expect((parseResult.content as any).questions).toBeDefined()
+      expect((parseResult.content as any).questions.length).toBe(3)
+
+      // Check if variation metadata was added to content
+      expect((parseResult.content as any).variation).toBe('cards')
+
+      // Verify card parsing: correct answer + distractors
+      const firstQuestion = (parseResult.content as any).questions[0]
+      expect(firstQuestion.question).toBe('') // Empty question uses global instructions
+      expect(firstQuestion.options).toContain('Dom. Rep') // Correct answer included
+      expect(firstQuestion.options).toContain('New York City') // Distractor included
+      expect(firstQuestion.options.length).toBe(4) // Dom. Rep + 3 distractors
+      expect(firstQuestion.correctIndices).toEqual([0]) // First option is correct
+
+      // Validation should pass for cards variation
+      const validation = registry.validateContent(type!, parseResult.content)
+      expect(validation.isValid).toBe(true)
     })
   })
 })
