@@ -5,6 +5,7 @@ import { FillBlankExercise } from './FillBlankExercise';
 import { MatchingExercise } from './MatchingExercise';
 import { MultipleChoiceExercise } from './MultipleChoiceExercise';
 import { OrderingExercise } from './OrderingExercise';
+import { PlaceholderExercise } from './PlaceholderExercise';
 import { toast } from 'sonner';
 import '../styles/exercises.css';
 
@@ -51,6 +52,14 @@ export const ExerciseDisplay: React.FC<ExerciseDisplayProps> = ({
             disabled: showResult && practiceMode
         };
 
+        // Check if this exercise has a variation that's not the default
+        const hasVariation = exercise.variation && exercise.variation !== 'original';
+        
+        // For now, show placeholder for all variations until we build proper support
+        if (hasVariation) {
+            return <PlaceholderExercise {...props} />;
+        }
+
         switch (exercise.type) {
             case 'FILL_BLANK':
                 return <FillBlankExercise {...props} />;
@@ -60,8 +69,12 @@ export const ExerciseDisplay: React.FC<ExerciseDisplayProps> = ({
                 return <MultipleChoiceExercise {...props} />;
             case 'ORDERING':
                 return <OrderingExercise {...props} />;
+            case 'CATEGORIZER':
+                return <PlaceholderExercise {...props} />;
+            case 'SELECTOR':
+                return <PlaceholderExercise {...props} />;
             default:
-                return <div>Unknown exercise type</div>;
+                return <div>Unknown exercise type: {exercise.type}</div>;
         }
     };
 

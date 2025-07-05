@@ -9,3 +9,6 @@ export { FillBlankExercise } from './display/FillBlankExercise';
 export { MatchingExercise } from './display/MatchingExercise';
 export { MultipleChoiceExercise } from './display/MultipleChoiceExercise';
 export { OrderingExercise } from './display/OrderingExercise';
+
+// Placeholder display component
+export { PlaceholderExercise } from './display/PlaceholderExercise';

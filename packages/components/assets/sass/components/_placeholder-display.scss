@@ -1,0 +1,98 @@
+// Placeholder Exercise Display - For exercises under construction
+
+.exs-placeholder-exercise {
+  max-width: 600px;
+  margin: 2rem auto;
+  padding: 2rem;
+
+  .exs-placeholder-content {
+    text-align: center;
+    padding: 3rem 2rem;
+    border: 2px dashed #d1d5db;
+    border-radius: 12px;
+    background: #f9fafb;
+  }
+
+  .exs-placeholder-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+  }
+
+  .exs-placeholder-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #374151;
+    margin-bottom: 1rem;
+  }
+
+  .exs-placeholder-message {
+    font-size: 1.1rem;
+    color: #6b7280;
+    margin-bottom: 2rem;
+  }
+
+  .exs-placeholder-details {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    text-align: left;
+
+    p {
+      margin: 0.5rem 0;
+      font-size: 0.95rem;
+
+      strong {
+        color: #374151;
+      }
+    }
+  }
+
+  .exs-placeholder-actions {
+    .exs-btn {
+      padding: 0.75rem 1.5rem;
+      border: 2px solid;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+
+      &.exs-btn-secondary {
+        background: white;
+        color: #374151;
+        border-color: #d1d5db;
+
+        &:hover:not(:disabled) {
+          background: #f9fafb;
+          border-color: #9ca3af;
+        }
+
+        &:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+      }
+    }
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .exs-placeholder-exercise {
+    margin: 1rem;
+    padding: 1rem;
+
+    .exs-placeholder-content {
+      padding: 2rem 1rem;
+    }
+
+    .exs-placeholder-icon {
+      font-size: 3rem;
+    }
+
+    .exs-placeholder-title {
+      font-size: 1.3rem;
+    }
+  }
+}

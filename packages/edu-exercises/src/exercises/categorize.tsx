@@ -16,33 +16,60 @@ const categorizePatterns = {
 
 // Detect CATEGORIZE exercise type and variation
 function detectCategorize(lines: string[]): { isMatch: boolean; variation: string } {
-  const relevantLines = lines.filter(line => 
-    line.trim() && !line.trim().startsWith('//') && !line.includes('@ins(') && !line.includes('@idea(')
-  );
+  const relevantLines = lines.filter(line => {
+    const trimmed = line.trim();
+    return trimmed && !trimmed.startsWith('//');
+  });
 
   if (relevantLines.length === 0) {
     return { isMatch: false, variation: 'original' };
   }
 
-  // Check for lake variation (starts with = or "Select")
-  const hasLakePattern = relevantLines.some(line => categorizePatterns.lake.test(line.trim()));
+  // Check for lake variation (starts with = without category name)
+  const hasLakePattern = relevantLines.some(line => {
+    const trimmed = line.trim();
+    return trimmed.startsWith('=') && !trimmed.includes('instructions');
+  });
+  
   if (hasLakePattern) {
     return { isMatch: true, variation: 'lake' };
   }
 
-  // Check for category assignments (contains =)
-  const hasCategoryAssignments = relevantLines.some(line => line.includes('='));
-  if (!hasCategoryAssignments) {
+  // Check for category assignments (CATEGORY = items)
+  const categoryLines = relevantLines.filter(line => {
+    const trimmed = line.trim();
+    // Match pattern: CATEGORY_NAME = items
+    return /^[A-Z][A-Z\s]*\s*=\s*.+$/.test(trimmed);
+  });
+  
+  if (categoryLines.length === 0) {
     return { isMatch: false, variation: 'original' };
   }
 
-  // Determine if it's original or ordering.txt based on pattern complexity
-  const hasMultipleItems = relevantLines.some(line => {
+  // Determine if it's ordering variation
+  // Ordering has multiple categories with multiple items each (pre-filled items that need fixing)
+  const categoriesWithMultipleItems = categoryLines.filter(line => {
     const afterEquals = line.split('=')[1];
-    return afterEquals && afterEquals.includes('|');
+    if (!afterEquals || !afterEquals.includes('|')) return false;
+    
+    // Count items - ordering typically has 3+ items per category
+    const items = afterEquals.split('|').map(s => s.trim()).filter(Boolean);
+    return items.length >= 3;
   });
 
-  if (hasMultipleItems) {
+  // For ordering: need at least 2 categories with 3+ items each, and no function calls
+  // Ordering is for pre-filled items that need fixing, not for generating items
+  const hasNoFunctionCalls = !categoryLines.some(line => 
+    line.includes('@fill(') || line.includes('@var(')
+  );
+
+  // Only consider it ordering if:
+  // 1. Multiple categories with multiple items each
+  // 2. No function calls (since ordering is about fixing pre-filled items)
+  // 3. All categories have 3+ plain items
+  if (categoriesWithMultipleItems.length >= 2 && 
+      categoriesWithMultipleItems.length === categoryLines.length &&
+      hasNoFunctionCalls) {
     return { isMatch: true, variation: 'ordering' };
   }
 
@@ -71,36 +98,43 @@ function parseOriginalVariation(lines: string[]): CategorizeContent {
     const trimmed = line.trim();
     if (!trimmed || trimmed.startsWith('//')) continue;
 
-    const match = trimmed.match(/^([A-Z\s]+)\s*=\s*(.+)$/);
+    // More flexible pattern to match category names
+    const match = trimmed.match(/^([A-Z][A-Z\s]*)\s*=\s*(.+)$/);
     if (!match || !match[1] || !match[2]) continue;
 
     const categoryName = match[1].trim();
     const itemsStr = match[2].trim();
 
     // Extract hint if present
-    const hintMatch = itemsStr.match(/@(idea|hint)\s*\(([^)]+)\)/);
-    const hint = hintMatch && hintMatch[2] ? hintMatch[2].replace(/['"]/g, '') : undefined;
+    const hintMatch = itemsStr.match(/@(idea|hint)\s*\(\s*["']([^"']+)["']\s*\)/);
+    const hint = hintMatch && hintMatch[2] ? hintMatch[2] : undefined;
 
     // Remove hint from items string
-    const cleanItemsStr = itemsStr.replace(/@(idea|hint)\s*\([^)]+\)/, '').trim();
+    const cleanItemsStr = itemsStr.replace(/@(idea|hint)\s*\([^)]+\)/g, '').trim();
 
     // Parse items (could be function calls or pipe-separated)
     let items: string[] = [];
     
-    if (cleanItemsStr.startsWith('@fill(')) {
-      // This will be resolved by the EduScript parser
-      items = [cleanItemsStr];
-    } else if (cleanItemsStr.includes('|')) {
-      items = cleanItemsStr.split('|').map(item => item.trim()).filter(Boolean);
-    } else {
-      items = [cleanItemsStr];
+    // Split by pipe first to handle mixed content like: item1 | @fill() | item2
+    const parts = cleanItemsStr.split('|').map(part => part.trim()).filter(Boolean);
+    
+    for (const part of parts) {
+      if (part.startsWith('@fill(') || part.startsWith('@var(')) {
+        // Keep function calls as-is for the parser to resolve
+        items.push(part);
+      } else {
+        // Regular items
+        items.push(part);
+      }
     }
 
-    categories.push({
-      name: categoryName,
-      items,
-      hint
-    });
+    if (items.length > 0) {
+      categories.push({
+        name: categoryName,
+        items,
+        hint
+      });
+    }
   }
 
   return {
@@ -139,7 +173,7 @@ function parseOrderingVariation(lines: string[]): CategorizeContent {
   }
 
   return {
-    categories: [], // Not used in ordering.txt variation
+    categories: [], // Not used in ordering variation
     prefilledCategories,
     variation: 'ordering'
   };
@@ -147,35 +181,60 @@ function parseOrderingVariation(lines: string[]): CategorizeContent {
 
 // Parse lake variation: = @fill('planets', 5) OR Select all planets
 function parseLakeVariation(lines: string[]): CategorizeContent {
-  let instruction = 'Select the correct items';
+  let instruction = 'Select and categorize the items';
   let allItems: string[] = [];
+  let correctItems: string[] = [];
   let targetCategory = '';
 
   for (const line of lines) {
     const trimmed = line.trim();
-    if (!trimmed || trimmed.startsWith('//')) continue;
+    if (!trimmed) continue;
 
-    // Check for instruction line
-    if (trimmed.startsWith('Select ') || trimmed.includes('instructions =')) {
-      instruction = trimmed.replace(/instructions\s*=\s*/, '').replace(/['"]/g, '');
+    // Check for instruction in @ins decorator
+    const insMatch = trimmed.match(/@ins\s*\(\s*["']([^"']+)["']\s*\)/);
+    if (insMatch && insMatch[1]) {
+      instruction = insMatch[1];
+      continue;
+    }
+
+    // Check for instruction in comment
+    if (trimmed.startsWith('//')) {
+      const commentText = trimmed.substring(2).trim();
+      if (commentText.toLowerCase().includes('select') || 
+          commentText.toLowerCase().includes('categorize') ||
+          commentText.toLowerCase().includes('choose')) {
+        instruction = commentText;
+      }
       continue;
     }
 
     // Correct answers (start with =)
     if (trimmed.startsWith('=')) {
       const itemsStr = trimmed.substring(1).trim();
-      if (itemsStr.startsWith('@fill(')) {
-        allItems.push(itemsStr);
-      } else if (itemsStr.includes('|')) {
-        allItems.push(...itemsStr.split('|').map(item => item.trim()).filter(Boolean));
-      } else {
-        allItems.push(itemsStr);
+      const parts = itemsStr.split('|').map(part => part.trim()).filter(Boolean);
+      
+      for (const part of parts) {
+        if (part.startsWith('@fill(') || part.startsWith('@var(')) {
+          // Keep function calls for parser to resolve
+          correctItems.push(part);
+          allItems.push(part);
+        } else {
+          correctItems.push(part);
+          allItems.push(part);
+        }
       }
     }
-    
-    // Other items (distractors)
-    else if (trimmed.includes('@fill(') && !trimmed.startsWith('=')) {
-      allItems.push(trimmed);
+    // Distractor items (don't start with =)
+    else if (!trimmed.includes('=') && !trimmed.startsWith('@metadata') && !trimmed.startsWith('@config')) {
+      const parts = trimmed.split('|').map(part => part.trim()).filter(Boolean);
+      
+      for (const part of parts) {
+        if (part.startsWith('@fill(') || part.startsWith('@var(')) {
+          allItems.push(part);
+        } else if (part) {
+          allItems.push(part);
+        }
+      }
     }
   }
 
@@ -184,6 +243,7 @@ function parseLakeVariation(lines: string[]): CategorizeContent {
     variation: 'lake',
     instruction,
     allItems,
+    correctItems, // Store correct items separately
     targetCategory
   };
 }
@@ -275,6 +335,37 @@ export const categorizeExercise: ExerciseTypeConfig<CategorizeContent> = {
   
   detectPattern: (lines: string[]) => detectCategorize(lines).isMatch,
   parseContent: parseCategorize,
+  
+  // Variation detection
+  detectVariation: (lines: string[], content: CategorizeContent) => {
+    const detection = detectCategorize(lines);
+    return detection.variation;
+  },
+  
+  // Define variations
+  variations: {
+    original: {
+      name: 'original',
+      displayName: 'Original',
+      description: 'Drag items into their correct categories',
+      exampleContent: 'FRUITS = apple | banana | @fill("fruits", 3)\nVEGETABLES = carrot | broccoli'
+    },
+    ordering: {
+      name: 'ordering',
+      displayName: 'Ordering',
+      description: 'Fix incorrectly categorized items',
+      exampleContent: 'FRUITS = apple | carrot | banana\nVEGETABLES = broccoli | orange | lettuce'
+    },
+    lake: {
+      name: 'lake',
+      displayName: 'Lake',
+      description: 'Free-form categorization',
+      exampleContent: '// Select all planets\n= Earth | Mars | Venus\nSun | Moon | Jupiter'
+    }
+  },
+  
+  defaultVariation: 'original',
+  
   validateContent: (content: CategorizeContent) => {
     const result = validateCategorize(content);
     return {

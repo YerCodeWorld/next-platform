@@ -132,12 +132,13 @@ export interface CategorizeContent {
         items: string[];
         hint?: string;
     }>;
-    variation?: 'original' | 'ordering.txt' | 'lake';
+    variation?: 'original' | 'ordering' | 'lake';
     // For lake variation
     instruction?: string;
     allItems?: string[];
+    correctItems?: string[];
     targetCategory?: string;
-    // For ordering.txt variation
+    // For ordering variation
     prefilledCategories?: Array<{
         name: string;
         correctItems: string[];

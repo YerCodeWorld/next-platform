@@ -1,12 +1,7 @@
 'use client';
 import React, { useState } from 'react';
 import { Exercise, ExercisePackage, User, useExercisePackagesApi } from '@repo/api-bridge';
-import { MultipleChoiceVariationRouter } from './displays/MultipleChoiceVariationRouter';
-import { FillBlanksVariationRouter } from './displays/FillBlanksVariationRouter';
-import { OrderingVariationRouter } from './displays/OrderingVariationRouter';
-import { MatchingVariationRouter } from './displays/MatchingVariationRouter';
-import { CategorizeVariationRouter } from './displays/CategorizeVariationRouter';
-import { SelectorVariationRouter } from './displays/SelectorVariationRouter';
+import { ExerciseDisplay } from '@repo/exercises';
 import { ArrowLeft } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
@@ -55,79 +50,14 @@ export default function ExercisePracticeDisplay({
   };
 
   const renderExerciseDisplay = () => {
-    switch (exercise.type) {
-      case 'MULTIPLE_CHOICE':
-        return (
-          <MultipleChoiceVariationRouter
-            exercise={exercise}
-            package={pkg}
-            locale={locale}
-            userData={userData}
-            onComplete={handleComplete}
-          />
-        );
-      case 'FILL_BLANK':
-        return (
-          <FillBlanksVariationRouter
-            exercise={exercise}
-            package={pkg}
-            locale={locale}
-            userData={userData}
-            onComplete={handleComplete}
-          />
-        );
-      case 'ORDERING':
-        return (
-          <OrderingVariationRouter
-            exercise={exercise}
-            package={pkg}
-            locale={locale}
-            userData={userData}
-            onComplete={handleComplete}
-          />
-        );
-      case 'MATCHING':
-        return (
-          <MatchingVariationRouter
-            exercise={exercise}
-            package={pkg}
-            locale={locale}
-            userData={userData}
-            onComplete={handleComplete}
-          />
-        );
-      case 'CATEGORIZER':
-        return (
-          <CategorizeVariationRouter
-            exercise={exercise}
-            package={pkg}
-            locale={locale}
-            userData={userData}
-            onComplete={handleComplete}
-          />
-        );
-      case 'SELECTOR':
-        return (
-          <SelectorVariationRouter
-            exercise={exercise}
-            package={pkg}
-            locale={locale}
-            userData={userData}
-            onComplete={handleComplete}
-          />
-        );
-      default:
-        return (
-          <div className="exercise-practice-error">
-            <h2>{locale === 'es' ? 'Error' : 'Error'}</h2>
-            <p>
-              {locale === 'es' 
-                ? 'Tipo de ejercicio desconocido.' 
-                : 'Unknown exercise type.'}
-            </p>
-          </div>
-        );
-    }
+    return (
+      <ExerciseDisplay
+        exercise={exercise}
+        onComplete={handleComplete}
+        showExplanation={true}
+        practiceMode={true}
+      />
+    );
   };
 
   return (

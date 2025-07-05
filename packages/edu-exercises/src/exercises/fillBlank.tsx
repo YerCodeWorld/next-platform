@@ -21,9 +21,7 @@ import { logger } from '../utils/logger';
  * Everything needed for fill-in-the-blank exercises in one place
  */
 
-// Components are implemented in the main app at:
-// - apps/web-next/components/exercises/displays/FillBlankDisplay.tsx
-// - Manual builder components (to be created when needed)
+// Components are implemented in packages/edu-exercises/src/components/display/
 // The registry focuses on parsing and validation logic only
 
 /**
